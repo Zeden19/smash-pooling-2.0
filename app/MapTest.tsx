@@ -1,15 +1,18 @@
 "use client";
 import GoogleMap from "@/app/components/GoogleMap";
-import { MapContext, MapProvider } from "@/app/MapContext";
-import { useContext } from "react";
+import { Button } from "@/components/ui/button";
+import useMapStore from "@/app/stores";
 
 function MapTest() {
-  const {map, dispatch} = useContext(MapContext)
+  const {setMarker} = useMapStore()
   return (
-    <MapProvider>
-      
+    <>
+      <Button onClick={() => setMarker({lat: 0, lng: 0})}>
+        Add marker to Toronto
+      </Button>
+
       <GoogleMap />
-    </MapProvider>
+    </>
   );
 }
 
