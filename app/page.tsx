@@ -8,17 +8,18 @@ import { ModeToggle } from "@/components/ModeToggle";
 export default async function Home() {
   const { user } = await validateRequest();
   return (
-    <div className={"block"}>
-      <Button asChild variant={"default"}>
-        <Link href="api/login/startgg">Sign in with StartGG</Link>
-      </Button>
-      {user && (
+    <div className={"block m-5"}>
+      {user ? (
         <>
           <p>hello {user.slug}</p>
           <form action={logout}>
             <button>Sign out</button>
           </form>
         </>
+      ) : (
+        <Button asChild variant={"default"}>
+          <Link href="api/login/startgg">Sign in with StartGG</Link>
+        </Button>
       )}
       <ModeToggle />
       <GoogleMap />

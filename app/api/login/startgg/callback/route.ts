@@ -3,8 +3,8 @@ import { OAuth2RequestError } from "arctic";
 import { generateIdFromEntropySize } from "lucia";
 import { startgg, lucia } from "@/app/api/auth/auth";
 import prisma from "@/prisma/prismaClient";
-import { GET_CURRENT_USER } from "@/app/api/login/startgg/callback/getCurrentUser";
 import { GraphQLClient } from "graphql-request";
+import { GET_CURRENT_USER } from "@/app/hooks/startggQueries";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
