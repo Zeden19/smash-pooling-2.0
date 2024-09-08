@@ -1,9 +1,9 @@
 import { validateRequest } from "@/app/hooks/validateRequest";
 import { logout } from "@/app/hooks/logout";
-import GoogleMap from "@/app/components/GoogleMap";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ModeToggle";
+import MapTest from "@/app/MapTest";
 
 export default async function Home() {
   const { user } = await validateRequest();
@@ -13,16 +13,17 @@ export default async function Home() {
         <>
           <p>hello {user.slug}</p>
           <form action={logout}>
-            <button>Sign out</button>
+            <Button>Sign out</Button>
           </form>
         </>
       ) : (
-        <Button asChild variant={"default"}>
+        <Button asChild>
           <Link href="api/login/startgg">Sign in with StartGG</Link>
         </Button>
       )}
+
       <ModeToggle />
-      <GoogleMap />
+      <MapTest/>
     </div>
   );
 }
