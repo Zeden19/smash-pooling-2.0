@@ -1,7 +1,8 @@
 "use client";
 import { useEffect } from "react";
 import useMapStore from "@/app/stores";
-import loader from "@/app/services/googleMapsLoader";
+import loadMapsAPI from "@/app/services/loadMapsApi";
+import MapsApi from "@/app/services/MapsApi";
 
 //Map's styling
 const mapCentre = {
@@ -11,29 +12,29 @@ const mapCentre = {
 const zoom = 6;
 
 function GoogleMap() {
-  const { setMap, setAdvancedMarkerClass, setGeocoder } = useMapStore();
+  const { setMap, setMapsApi } = useMapStore();
+
+  async function initMap(): Promise<void> {
+    const { Map } = (await google.maps.importLibrary("maps")) as google.maps.MapsLibrary;
+    const map = new Map(document.getElementById("map") as HTMLElement, {
+      center: mapCentre,
+      zoom: zoom,
+      mapId: process.env.NEXT_PUBLIC_MAP_ID,
+    });
+
+    // move geocoder and advanced marker element inside constructor so we only include map
+    const { AdvancedMarkerElement } = (await google.maps.importLibrary(
+      "marker",
+    )) as google.maps.MarkerLibrary;
+    const mapsApi = new MapsApi(map, AdvancedMarkerElement);
+    setMapsApi(mapsApi);
+    setMap(map);
+  }
 
   useEffect(() => {
-    loader
-      .importLibrary("maps")
-      .then(({ Map }) => {
-        const newMap = new Map(document.getElementById("map")!, {
-          zoom: zoom,
-          mapId: process.env.NEXT_PUBLIC_MAP_ID,
-          center: mapCentre,
-        });
-        setMap(newMap);
-      })
-      .catch(() => {
-        return "Could not load Map";
-      });
-
-    loader
-      .importLibrary("marker")
-      .then((r) => setAdvancedMarkerClass(r.AdvancedMarkerElement));
-    
-    loader.importLibrary("geocoding").then((r) => setGeocoder(r.Geocoder.prototype))
-  }, [setAdvancedMarkerClass, setGeocoder, setMap]);
+    loadMapsAPI();
+    initMap();
+  }, []);
 
   return (
     <div>

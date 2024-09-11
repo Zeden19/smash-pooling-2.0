@@ -1,6 +1,5 @@
 "use client";
 import GoogleMap from "@/app/components/GoogleMap";
-import { Button } from "@/components/ui/button";
 import useMapStore from "@/app/stores";
 import { Input } from "@/components/ui/input";
 import { FormEvent } from "react";
@@ -12,7 +11,7 @@ interface TournamentResponse {
     id: number;
     lat: number;
     lng: number;
-    mapsPlaceId: number;
+    mapsPlaceId: string;
     name: string;
     state: number;
     url: string;
@@ -21,7 +20,7 @@ interface TournamentResponse {
 }
 
 function MapTest() {
-  const { addMarker, geocoder } = useMapStore();
+  const { mapsApi } = useMapStore();
 
   async function handleStartggLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,29 +39,31 @@ function MapTest() {
     if (!tournament) return;
 
     // add toast here
-    addMarker({ lat: tournament.lat, lng: tournament.lng });
+    mapsApi?.addMarker({ lat: tournament.lat, lng: tournament.lng });
+    // addMarker({ lat: tournament.lat, lng: tournament.lng });
   }
 
   async function handleOrigin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = event.target as HTMLFormElement;
-    const data = await geocoder?.geocode({ address: formData.origin.value });
-    
+    const data = await mapsApi?.geocode({ address: formData.origin.value });
+
     // add toaster
     if (!data) return;
-    
-    const location = data.results[0].geometry.location
+
     // add toaster
-    addMarker({ lat: location.lat(), lng: location.lng() });
+    mapsApi?.addMarker({
+      lat: data.geometry.location.lat(),
+      lng: data.geometry.location.lng(),
+    });
+    // addMarker({
+    //   lat: result.geometry.location.lat(),
+    //   lng: result.geometry.location.lng(),
+    // });
   }
+
   return (
     <div className={"flex flex-col gap-3"}>
-      <Button
-        className={"w-48"}
-        onClick={() => addMarker({ lat: 43.6532, lng: -79.3832 })}>
-        Add marker to Toronto
-      </Button>
-
       <form onSubmit={(event) => handleStartggLink(event)}>
         <Input
           className={"w-96"}

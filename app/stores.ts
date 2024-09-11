@@ -1,35 +1,20 @@
 import { create } from "zustand";
-import Geocoder = google.maps.Geocoder;
-
+import MapsApi from "@/app/services/MapsApi";
 
 interface MapStore {
   map: google.maps.Map | null;
-  advancedMarkerClass: typeof google.maps.marker.AdvancedMarkerElement | null;
-  geocoder: Geocoder | null;
-  
+  mapsApi: MapsApi | null;
+
   setMap: (map: google.maps.Map) => void;
-  setAdvancedMarkerClass: (advancedMarker: typeof google.maps.marker.AdvancedMarkerElement) => void;
-  setGeocoder: (geocoder: Geocoder) => void;
-  addMarker: (cords: { lat: number; lng: number }) => void;
+  setMapsApi: (mapApi: MapsApi) => void;
 }
 
 const useMapStore = create<MapStore>((setState) => ({
   map: null,
-  advancedMarkerClass: null,
-  geocoder: null,
-  
+  mapsApi: null,
+
   setMap: (map: google.maps.Map) => setState(() => ({ map: map })),
-  setAdvancedMarkerClass: (advancedMarker) => setState(() => ({ advancedMarkerClass: advancedMarker })),
-  setGeocoder: (geocoder: Geocoder) => setState(() => ({ geocoder: geocoder })),
-  addMarker: (cords) =>
-    setState(
-      (state) =>
-        new state.advancedMarkerClass!({
-          map: state.map,
-          position: cords,
-          title: "I want to die"
-        })
-    )
+  setMapsApi: (mapsApi: MapsApi) => setState(() => ({ mapsApi: mapsApi })),
 }));
 
 export default useMapStore;
