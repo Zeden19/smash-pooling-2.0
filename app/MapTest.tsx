@@ -2,9 +2,12 @@
 import GoogleMap from "@/app/components/GoogleMap";
 import useMapStore from "@/app/stores";
 import { Input } from "@/components/ui/input";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import startggClient, { slug } from "@/app/services/startggClient";
 import { GET_TOURNAMENT_BY_URL } from "@/app/hooks/startggQueries";
+import { Button } from "@/components/ui/button";
+import LatLngLiteral = google.maps.LatLngLiteral;
+import LatLng = google.maps.LatLng;
 
 interface TournamentResponse {
   tournament: {
@@ -21,6 +24,8 @@ interface TournamentResponse {
 
 function MapTest() {
   const { mapsApi } = useMapStore();
+  const [origin, setOrigin] = useState<LatLngLiteral>();
+  const [destination, setDestination] = useState<LatLngLiteral>();
 
   async function handleStartggLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -39,8 +44,9 @@ function MapTest() {
     if (!tournament) return;
 
     // add toast here
-    mapsApi?.addMarker({ lat: tournament.lat, lng: tournament.lng });
-    // addMarker({ lat: tournament.lat, lng: tournament.lng });
+    const cords = { lat: tournament.lat, lng: tournament.lng };
+    mapsApi?.addMarker(cords);
+    setDestination(cords);
   }
 
   async function handleOrigin(event: FormEvent<HTMLFormElement>) {
@@ -52,14 +58,22 @@ function MapTest() {
     if (!data) return;
 
     // add toaster
-    mapsApi?.addMarker({
+    const cords = {
       lat: data.geometry.location.lat(),
       lng: data.geometry.location.lng(),
-    });
-    // addMarker({
-    //   lat: result.geometry.location.lat(),
-    //   lng: result.geometry.location.lng(),
-    // });
+    };
+    mapsApi?.addMarker(cords);
+    setOrigin(cords);
+  }
+
+  async function getRoutes() {
+    // add error message
+    if (!origin || !destination) return;
+    const route: LatLng[] | undefined = await mapsApi?.getRoutes(origin, destination);
+
+    // add toaster
+    if (!route) return;
+    mapsApi?.setRoute(route);
   }
 
   return (
@@ -82,6 +96,11 @@ function MapTest() {
           placeholder={"From"}
         />
       </form>
+
+      <Button onClick={() => getRoutes()}>Find Directions</Button>
+
+      {/*Used in the future when user has to select a route*/}
+      {/*<Button onClick={() => setRoute()}>Set Route</Button>*/}
       <GoogleMap />
     </div>
   );

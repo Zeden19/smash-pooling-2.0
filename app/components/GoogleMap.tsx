@@ -12,7 +12,7 @@ const mapCentre = {
 const zoom = 6;
 
 function GoogleMap() {
-  const { setMap, setMapsApi } = useMapStore();
+  const { setMapsApi } = useMapStore();
 
   async function initMap(): Promise<void> {
     const { Map } = (await google.maps.importLibrary("maps")) as google.maps.MapsLibrary;
@@ -20,15 +20,18 @@ function GoogleMap() {
       center: mapCentre,
       zoom: zoom,
       mapId: process.env.NEXT_PUBLIC_MAP_ID,
+      gestureHandling: "greedy",
     });
 
-    // move geocoder and advanced marker element inside constructor so we only include map
+    // we have to load advanced marker here because its await ):
     const { AdvancedMarkerElement } = (await google.maps.importLibrary(
       "marker",
     )) as google.maps.MarkerLibrary;
-    const mapsApi = new MapsApi(map, AdvancedMarkerElement);
+    const { DirectionsService } = (await google.maps.importLibrary(
+      "routes",
+    )) as google.maps.RoutesLibrary;
+    const mapsApi = new MapsApi(map, AdvancedMarkerElement, DirectionsService.prototype);
     setMapsApi(mapsApi);
-    setMap(map);
   }
 
   useEffect(() => {

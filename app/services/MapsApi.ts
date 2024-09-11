@@ -1,4 +1,6 @@
 import AdvancedMarkerElement = google.maps.marker.AdvancedMarkerElement;
+import LatLngLiteral = google.maps.LatLngLiteral;
+import LatLng = google.maps.LatLng;
 
 class MapsApi {
   private geocoder: google.maps.Geocoder;
@@ -6,6 +8,7 @@ class MapsApi {
   constructor(
     private map: google.maps.Map,
     private advancedMarker: typeof AdvancedMarkerElement,
+    private directionsService: google.maps.DirectionsService,
   ) {
     this.geocoder = google.maps.Geocoder.prototype;
   }
@@ -15,8 +18,34 @@ class MapsApi {
     return data.results[0];
   }
 
-  addMarker(cords: { lat: number; lng: number }) {
+  addMarker(cords: LatLngLiteral) {
     new this.advancedMarker({ map: this.map, position: cords });
+  }
+
+  async getRoutes(
+    origin: LatLngLiteral,
+    destination: LatLngLiteral,
+  ): Promise<LatLng[] | undefined> {
+    let route: LatLng[] | undefined;
+    await this.directionsService.route(
+      //@ts-ignore
+      { origin: origin, destination: destination, travelMode: "DRIVING" },
+      (result, status) => {
+        if (status !== "OK") return;
+        route = result?.routes[0].overview_path;
+      },
+    );
+    return route;
+  }
+
+  setRoute(route: LatLng[]) {
+    new google.maps.Polyline({
+      path: route,
+      strokeColor: "#FF0000",
+      strokeOpacity: 1.0,
+      strokeWeight: 2,
+      map: this.map,
+    });
   }
 }
 
