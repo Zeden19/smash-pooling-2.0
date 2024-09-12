@@ -1,5 +1,5 @@
 "use client";
-import GoogleMap from "@/app/components/GoogleMap";
+import GoogleMap from "@/components/GoogleMap";
 import useMapStore from "@/app/stores";
 import { Input } from "@/components/ui/input";
 import { FormEvent, useState } from "react";

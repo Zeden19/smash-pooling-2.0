@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import React from "react";
-import ThemeProvider from "@/app/components/ThemeProvider";
+import ThemeProvider from "@/components/ThemeProvider";
+import NavigationBar from "@/app/NavigationBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute={"class"} defaultTheme={"system"} enableSystem>
+          <NavigationBar />
           {children}
         </ThemeProvider>
       </body>
