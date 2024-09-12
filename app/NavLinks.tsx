@@ -5,6 +5,7 @@ import React from "react";
 
 function NavLinks() {
   const navLinks = [
+    // eventually we should make the carpools its own dropdown
     { href: "/", label: "Home" },
     { href: "/add", label: "Add Carpools" },
     { href: "/find", label: "Find Carpools" },

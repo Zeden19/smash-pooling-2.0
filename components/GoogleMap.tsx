@@ -37,7 +37,7 @@ function GoogleMap() {
 
   return (
     <div>
-      <div style={{ width: "80vw", height: "80vh" }} id={"map"} />
+      <div style={{ width: "100w", height: "80vh" }} id={"map"} />
     </div>
   );
 }
