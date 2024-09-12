@@ -23,14 +23,10 @@ function GoogleMap() {
       gestureHandling: "greedy",
     });
 
-    // we have to load advanced marker here because its await ):
-    const { AdvancedMarkerElement } = (await google.maps.importLibrary(
-      "marker",
-    )) as google.maps.MarkerLibrary;
-    const { DirectionsService } = (await google.maps.importLibrary(
-      "routes",
-    )) as google.maps.RoutesLibrary;
-    const mapsApi = new MapsApi(map, AdvancedMarkerElement, DirectionsService.prototype);
+    // We have  to load library
+    (await google.maps.importLibrary("marker")) as google.maps.MarkerLibrary;
+    (await google.maps.importLibrary("routes")) as google.maps.RoutesLibrary;
+    const mapsApi = new MapsApi(map);
     setMapsApi(mapsApi);
   }
 

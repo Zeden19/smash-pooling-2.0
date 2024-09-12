@@ -1,16 +1,15 @@
-import AdvancedMarkerElement = google.maps.marker.AdvancedMarkerElement;
 import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
 
 class MapsApi {
   private geocoder: google.maps.Geocoder;
+  private readonly advancedMarker: typeof google.maps.marker.AdvancedMarkerElement;
+  private directionsService: google.maps.DirectionsService;
 
-  constructor(
-    private map: google.maps.Map,
-    private advancedMarker: typeof AdvancedMarkerElement,
-    private directionsService: google.maps.DirectionsService,
-  ) {
+  constructor(private map: google.maps.Map) {
+    this.directionsService = google.maps.DirectionsService.prototype;
     this.geocoder = google.maps.Geocoder.prototype;
+    this.advancedMarker = google.maps.marker.AdvancedMarkerElement;
   }
 
   async geocode(address: { address: string }) {
