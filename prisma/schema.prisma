@@ -36,10 +36,10 @@ model Carpool {
   originName      String
   destinationLat  Int
   destinationLng  Int
-  destinationName Int
+  destinationName String
 
   tournamentSlug String
-  path           Json
-  price          Int
-  description    Int
+  route          Json
+  price          Int    @default(0)
+  description    String @default("")
 }

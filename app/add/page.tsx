@@ -7,6 +7,7 @@ import startggClient, { slug } from "@/app/services/startggClient";
 import { GET_TOURNAMENT_BY_URL } from "@/app/hooks/startggQueries";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import axios from "axios";
 import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
 
@@ -25,18 +26,24 @@ interface TournamentResponse {
 
 function MapTest() {
   const { mapsApi } = useMapStore();
-  const [origin, setOrigin] = useState<LatLngLiteral>();
-  const [destination, setDestination] = useState<LatLngLiteral>();
+  const [origin, setOrigin] = useState<{ cords: LatLngLiteral; name: string }>();
+  const [destination, setDestination] = useState<{
+    cords: LatLngLiteral;
+    name: string;
+    slug: string;
+  }>();
   const [route, setRoute] = useState<LatLng[]>();
 
   const [loadingOrigin, setLoadingOrigin] = useState(false);
   const [loadingDestination, setLoadingDestination] = useState(false);
   const [loadingRoute, setLoadingRoute] = useState(false);
+  const [addingCarpool, setAddingCarpool] = useState(false);
 
   async function handleOrigin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = event.target as HTMLFormElement;
-    const data = await mapsApi?.geocode({ address: formData.origin.value });
+    const inputValue = formData.origin.value;
+    const data = await mapsApi?.geocode({ address: inputValue });
 
     // add toaster
     if (!data) return;
@@ -47,7 +54,7 @@ function MapTest() {
       lng: data.geometry.location.lng(),
     };
     mapsApi?.addMarker(cords);
-    setOrigin(cords);
+    setOrigin({ cords: cords, name: inputValue });
   }
 
   async function handleStartggLink(event: FormEvent<HTMLFormElement>) {
@@ -69,19 +76,37 @@ function MapTest() {
     // add toast here
     const cords = { lat: tournament.lat, lng: tournament.lng };
     mapsApi?.addMarker(cords);
-    setDestination(cords);
+    setDestination({ cords, name: tournament.venueAddress, slug: tournamentSlug });
   }
 
   async function getRoutes() {
     // add error message
     if (!origin || !destination) return;
-    const route: LatLng[] | undefined = await mapsApi?.getRoutes(origin, destination);
+    const route: LatLng[] | undefined = await mapsApi?.getRoutes(
+      origin.cords,
+      destination.cords,
+    );
 
     // add toaster
     if (!route) return;
 
     mapsApi?.setRoute(route);
     setRoute(route);
+  }
+
+  async function addCarpool() {
+    const data = await axios.post("/api/carpool/add", {
+      origin,
+      destination,
+      rout,
+    });
+
+    console.log(data);
+
+    // add toaster
+    if (!data) return;
+
+    // add toaster for success
   }
 
   return (
@@ -129,7 +154,14 @@ function MapTest() {
           Find Route
           {loadingRoute && <LoadingSpinner />}
         </Button>
-        <Button>Add Carpool</Button>
+        <Button
+          onClick={async () => {
+            setAddingCarpool(true);
+            await addCarpool();
+            setAddingCarpool(false);
+          }}>
+          Add Carpool
+        </Button>
 
         {/*Used in the future when user has to select a route*/}
         {/*<Button onClick={() => setRoute()}>Set Route</Button>*/}
