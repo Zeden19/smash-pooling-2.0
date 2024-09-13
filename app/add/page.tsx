@@ -24,6 +24,11 @@ interface TournamentResponse {
   };
 }
 
+// things to do: seperate this file into each respective "fetch"
+// find a better way to handle loading & error staes instead if using multiple useState hooks
+// find out how to handle errors on front end
+// does react router solve these issues?
+
 function MapTest() {
   const { mapsApi } = useMapStore();
   const [origin, setOrigin] = useState<{ cords: LatLngLiteral; name: string }>();
@@ -95,16 +100,18 @@ function MapTest() {
   }
 
   async function addCarpool() {
-    const data = await axios.post("/api/carpool/add", {
-      origin,
-      destination,
-      rout,
-    });
+    try {
+      const { data } = await axios.post("/api/carpool/add", {
+        origin,
+        destination,
+        route,
+      });
 
-    console.log(data);
-
-    // add toaster
-    if (!data) return;
+      console.log(data);
+      // show toaster
+    } catch (e) {
+      console.log(e);
+    }
 
     // add toaster for success
   }
