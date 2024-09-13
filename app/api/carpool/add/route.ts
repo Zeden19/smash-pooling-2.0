@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import prisma from "@/prisma/prismaClient";
+import { validateRequest } from "@/app/hooks/validateRequest";
 
 const cords = z.object({
   lat: z.number({ message: "Lat" }),
@@ -21,10 +23,29 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  console.log(body);
 
   const { error } = schema.safeParse(body);
   if (error) return NextResponse.json({ error: error.format() }, { status: 400 });
 
-  return NextResponse.json({ route: body.destination.route }, { status: 200 });
+  const { user } = await validateRequest();
+  if (!user) return NextResponse.json({ error: "User not logged in" }, { status: 400 });
+
+  const destination = body.destination;
+  const origin = body.origin;
+  const route = body.route;
+  const newCarpool = await prisma.carpool.create({
+    data: {
+      driverId: user.id,
+      originLat: origin.cords.lat,
+      originLng: origin.cords.lng,
+      originName: origin.name,
+      destinationLat: destination.cords.lat,
+      destinationLng: destination.cords.lng,
+      destinationName: destination.name,
+      tournamentSlug: destination.slug,
+      route: route,
+    },
+  });
+
+  return NextResponse.json({ route: newCarpool.route }, { status: 200 });
 }
