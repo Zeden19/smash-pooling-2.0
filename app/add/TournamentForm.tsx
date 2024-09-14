@@ -3,8 +3,8 @@ import { FormEvent, useState } from "react";
 import startggClient, { slug } from "@/app/services/startggClient";
 import { GET_TOURNAMENT_BY_URL } from "@/app/services/startggQueries";
 import useMapStore from "@/app/stores";
-import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle } from "lucide-react";
+import FailureToast from "@/components/FailureToast";
+import SuccessToast from "@/components/SuccessToast";
 
 interface Tournament {
   id: number;
@@ -40,53 +40,24 @@ function TournamentForm({ handleSubmit }: Props) {
 
     // add toast here
     if (!tournamentSlug) {
-      toast({
-        title: (
-          <>
-            <XCircle />
-            Could Not Find Tournament Slug
-          </>
-        ),
-        description: "Make sure the URL is correct",
-        variant: "destructive",
-      });
+      FailureToast("Could Not Find Tournament Slug", "Make sure the URL is correct");
       return;
     }
 
     const { tournament }: TournamentResponse = await startggClient.request(
       GET_TOURNAMENT_BY_URL,
-      {
-        slug: tournamentSlug,
-      },
+      { slug: tournamentSlug },
     );
-    // add toast here
+
     if (!tournament) {
-      toast({
-        title: (
-          <>
-            <XCircle />
-            Could Not Find tournament
-          </>
-        ),
-        description: "Make sure the URL is correct",
-        variant: "destructive",
-      });
+      FailureToast("Could Not Find tournament", "Make sure the URL is correct");
       return;
     }
 
-    // add toast here
     const cords = { lat: tournament.lat, lng: tournament.lng };
     mapsApi?.addMarker(cords);
     handleSubmit(tournament.venueAddress, cords, tournamentSlug);
-    toast({
-      title: (
-        <>
-          <CheckCircle />
-          Successfully Found tournament
-        </>
-      ),
-      variant: "success",
-    });
+    SuccessToast("Successfully Found tournament");
   }
 
   return (

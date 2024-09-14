@@ -3,8 +3,8 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useState } from "react";
 import axios from "axios";
 import { Destination, Origin } from "@/app/add/page";
-import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle } from "lucide-react";
+import SuccessToast from "@/components/SuccessToast";
+import FailureToast from "@/components/FailureToast";
 import LatLng = google.maps.LatLng;
 
 interface Props {
@@ -15,7 +15,6 @@ interface Props {
 
 function AddCarpool({ route, destination, origin }: Props) {
   const [addingCarpool, setAddingCarpool] = useState(false);
-  const { toast } = useToast();
 
   async function addCarpool() {
     try {
@@ -24,26 +23,12 @@ function AddCarpool({ route, destination, origin }: Props) {
         destination,
         route,
       });
-
-      toast({
-        variant: "success",
-        title: (
-          <>
-            <CheckCircle /> Successfully Added Carpool
-          </>
-        ),
-        description: "Your good to go!",
-      });
+      SuccessToast("Successfully Added Carpool", "Your good to go!");
     } catch (e) {
-      toast({
-        variant: "destructive",
-        title: (
-          <>
-            <XCircle /> Could Not Add Carpool
-          </>
-        ),
-        description: "Please try again or report this bug if it persists",
-      });
+      FailureToast(
+        "Could Not Add Carpool",
+        "Please try again or report this bug if it persists",
+      );
     }
   }
 

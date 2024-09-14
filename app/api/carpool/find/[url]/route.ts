@@ -21,7 +21,6 @@ export async function GET(
   const carpools = await prisma.carpool.findMany({
     where: { tournamentSlug: url },
   });
-  console.log(carpools);
 
   if (carpools.length === 0)
     return NextResponse.json({ error: "No carpools not found" }, { status: 404 });

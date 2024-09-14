@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import useMapStore from "@/app/stores";
 import { Destination, Origin } from "@/app/add/page";
-import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle } from "lucide-react";
+import FailureToast from "@/components/FailureToast";
+import SuccessToast from "@/components/SuccessToast";
 import LatLng = google.maps.LatLng;
 
 interface Props {
@@ -23,41 +23,12 @@ function GetRoute({ destination, origin, setRoute }: Props) {
     try {
       route = await mapsApi?.getRoutes(origin.cords, destination.cords);
     } catch (e) {
-      toast({
-        variant: "destructive",
-        title: (
-          <>
-            <XCircle /> Could Not Find Route
-          </>
-        ),
-        description: "Check your origin and tournament",
-      });
-      return;
+      FailureToast("Could Not Find Route", "Check your origin and tournament");
     }
 
-    if (!route) {
-      toast({
-        variant: "destructive",
-        title: (
-          <>
-            <XCircle /> Could Not Find Route
-          </>
-        ),
-        description: "Check your origin and tournament markers",
-      });
-      return;
-    }
-
-    mapsApi?.setRoute(route);
+    mapsApi?.setRoute(route!);
     setRoute(route);
-    toast({
-      variant: "success",
-      title: (
-        <>
-          <CheckCircle /> Successfully Found Route
-        </>
-      ),
-    });
+    SuccessToast("Successfully Found Route");
   }
 
   const [loadingRoute, setLoadingRoute] = useState(false);

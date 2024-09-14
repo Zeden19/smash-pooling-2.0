@@ -1,8 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { FormEvent, useState } from "react";
 import useMapStore from "@/app/stores";
-import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle } from "lucide-react";
+import FailureToast from "@/components/FailureToast";
+import SuccessToast from "@/components/SuccessToast";
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 interface Props {
@@ -21,15 +21,7 @@ function OriginForm({ setOrigin }: Props) {
     try {
       data = await mapsApi?.geocode({ address: inputValue });
     } catch (e) {
-      toast({
-        variant: "destructive",
-        title: (
-          <>
-            <XCircle /> Could Not Find Address
-          </>
-        ),
-        description: "Make sure you entered a valid address",
-      });
+      FailureToast("Could Not Find Address", "Make sure you entered a valid address");
       return;
     }
 
@@ -39,14 +31,7 @@ function OriginForm({ setOrigin }: Props) {
     };
     mapsApi?.addMarker(cords);
     setOrigin({ cords: cords, name: inputValue });
-    toast({
-      variant: "success",
-      title: (
-        <>
-          <CheckCircle /> Successfully Found Address
-        </>
-      ),
-    });
+    SuccessToast("Successfully Found Address");
   }
 
   return (

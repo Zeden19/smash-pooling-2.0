@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { FormEvent } from "react";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle } from "lucide-react";
+import { XCircle } from "lucide-react";
 import { slug as getSlug } from "@/app/services/startggClient";
+import FailureToast from "@/components/FailureToast";
+import SuccessToast from "@/components/SuccessToast";
 
-function findCarpoolPage() {
+function FindCarpoolPage() {
   async function getCarpools(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
@@ -28,23 +30,9 @@ function findCarpoolPage() {
 
     try {
       const { data } = await axios.get(`/api/carpool/find/${slug}`);
-      toast({
-        title: (
-          <>
-            <CheckCircle /> Successfully Found Carpools
-          </>
-        ),
-        variant: "success",
-      });
+      SuccessToast("Successfully Found Carpools");
     } catch (e: any) {
-      toast({
-        title: (
-          <>
-            <XCircle /> {e.response.data.error}
-          </>
-        ),
-        variant: "destructive",
-      });
+      FailureToast(e.response.data.error);
     }
   }
 
@@ -60,4 +48,4 @@ function findCarpoolPage() {
   );
 }
 
-export default findCarpoolPage;
+export default FindCarpoolPage;
