@@ -1,5 +1,11 @@
+import GoogleMap from "@/components/GoogleMap";
+
 function findCarpoolPage() {
-  return <>Find Carpool Page</>;
+  return (
+    <>
+      <GoogleMap />
+    </>
+  );
 }
 
 export default findCarpoolPage;

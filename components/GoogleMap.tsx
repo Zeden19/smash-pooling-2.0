@@ -23,15 +23,16 @@ function GoogleMap() {
       gestureHandling: "greedy",
     });
 
-    // We have  to load library
-    (await google.maps.importLibrary("marker")) as google.maps.MarkerLibrary;
-    (await google.maps.importLibrary("routes")) as google.maps.RoutesLibrary;
+    // We have  to load libraries
+    if (!google.maps.marker)
+      (await google.maps.importLibrary("marker")) as google.maps.MarkerLibrary;
     const mapsApi = new MapsApi(map);
     setMapsApi(mapsApi);
   }
 
   useEffect(() => {
-    loadMapsAPI();
+    if (!(typeof google === "object") || !(typeof google.maps === "object"))
+      loadMapsAPI();
     initMap();
   }, []);
 
