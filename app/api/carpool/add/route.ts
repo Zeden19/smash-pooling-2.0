@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/prisma/prismaClient";
 import { validateRequest } from "@/app/hooks/validateRequest";
+import { Prisma } from "@prisma/client";
 
 const cords = z.object({
   lat: z.number({ message: "Lat" }),
@@ -36,11 +37,11 @@ export async function POST(request: NextRequest) {
   const newCarpool = await prisma.carpool.create({
     data: {
       driverId: user.id,
-      originLat: origin.cords.lat,
-      originLng: origin.cords.lng,
+      originLat: new Prisma.Decimal(origin.cords.lat),
+      originLng: new Prisma.Decimal(origin.cords.lng),
       originName: origin.name,
-      destinationLat: destination.cords.lat,
-      destinationLng: destination.cords.lng,
+      destinationLat: new Prisma.Decimal(destination.cords.lat),
+      destinationLng: new Prisma.Decimal(destination.cords.lng),
       destinationName: destination.name,
       tournamentSlug: destination.slug,
       route: route,

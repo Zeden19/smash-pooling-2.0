@@ -1,10 +1,12 @@
 import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
+import PinElementOptions = google.maps.marker.PinElementOptions;
 
 class MapsApi {
   private geocoder: google.maps.Geocoder;
   private readonly advancedMarker: typeof google.maps.marker.AdvancedMarkerElement;
   private directionsService: google.maps.DirectionsService;
+  private PinElement = google.maps.marker.PinElement;
 
   constructor(private map: google.maps.Map) {
     this.directionsService = google.maps.DirectionsService.prototype;
@@ -17,8 +19,9 @@ class MapsApi {
     return data.results[0];
   }
 
-  addMarker(cords: LatLngLiteral) {
-    new this.advancedMarker({ map: this.map, position: cords });
+  addMarker(cords: LatLngLiteral, markerOptions?: PinElementOptions) {
+    const pin = new this.PinElement(markerOptions);
+    new this.advancedMarker({ map: this.map, position: cords, content: pin.element });
   }
 
   async getRoutes(

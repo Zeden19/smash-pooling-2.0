@@ -31,11 +31,11 @@ model Carpool {
   attendees User[] @relation(name: "CarpoolAttendee")
 
   // We should eventually transition to placeIds since they will be far easier to maintain and get data
-  originLat       Int
-  originLng       Int
+  originLat       Decimal
+  originLng       Decimal
   originName      String
-  destinationLat  Int
-  destinationLng  Int
+  destinationLat  Decimal
+  destinationLng  Decimal
   destinationName String
 
   tournamentSlug String

@@ -3,6 +3,7 @@ import { FormEvent, useState } from "react";
 import useMapStore from "@/app/stores";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
+import { orangeMarker } from "@/app/services/MarkerStyles";
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 interface Props {
@@ -29,7 +30,7 @@ function OriginForm({ setOrigin }: Props) {
       lat: data!.geometry.location.lat(),
       lng: data!.geometry.location.lng(),
     };
-    mapsApi?.addMarker(cords);
+    mapsApi?.addMarker(cords, orangeMarker);
     setOrigin({ cords: cords, name: inputValue });
     SuccessToast("Successfully Found Address");
   }
@@ -43,7 +44,6 @@ function OriginForm({ setOrigin }: Props) {
       }}>
       <Input
         disabled={loadingOrigin}
-        className={""}
         defaultValue={"Toronto"}
         id={"origin"}
         placeholder={"From"}

@@ -7,7 +7,6 @@ export async function GET(
   req: NextRequest,
   { params: { url } }: { params: { url: string } },
 ) {
-  console.log(url);
   const { tournament } = await startggClient.request<{ tournament: { id: number } }>(
     CHECK_TOURNAMENT_EXISTS,
     {
@@ -25,5 +24,5 @@ export async function GET(
   if (carpools.length === 0)
     return NextResponse.json({ error: "No carpools not found" }, { status: 404 });
 
-  return NextResponse.json({ data: carpools }, { status: 200 });
+  return NextResponse.json(carpools, { status: 200 });
 }
