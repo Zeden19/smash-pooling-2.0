@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { FormEvent, useState } from "react";
 import startggClient, { slug } from "@/app/services/startggClient";
-import { GET_TOURNAMENT_BY_URL } from "@/app/hooks/startggQueries";
+import { GET_TOURNAMENT_BY_URL } from "@/app/services/startggQueries";
 import useMapStore from "@/app/stores";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle } from "lucide-react";

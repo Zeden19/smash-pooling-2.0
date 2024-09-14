@@ -24,6 +24,8 @@ export interface Destination {
   slug: string;
 }
 
+// consider using server search params: this might be overly complex due to the nature of things;
+// using placeids might help
 function MapTest() {
   const [origin, setOrigin] = useState<Origin>();
   const [destination, setDestination] = useState<Destination>();

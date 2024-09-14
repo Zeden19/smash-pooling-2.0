@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
 import { OAuth2RequestError } from "arctic";
 import { generateIdFromEntropySize } from "lucia";
-import { startgg, lucia } from "@/app/api/auth/auth";
+import { lucia, startgg } from "@/app/api/auth/auth";
 import prisma from "@/prisma/prismaClient";
 import { GraphQLClient } from "graphql-request";
-import { GET_CURRENT_USER } from "@/app/hooks/startggQueries";
+import { GET_CURRENT_USER } from "@/app/services/startggQueries";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -27,7 +27,7 @@ export async function GET(request: Request): Promise<Response> {
         Authorization: `Bearer ${tokens.accessToken}`,
       },
     });
-    
+
     let startGgUserResponse: StartGGResponse = await client.request(GET_CURRENT_USER);
     const startGGUser = startGgUserResponse.currentUser;
 
@@ -84,7 +84,7 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 interface StartGGResponse {
-    currentUser: StartGGUser
+  currentUser: StartGGUser;
 }
 
 interface StartGGUser {
