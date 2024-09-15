@@ -10,11 +10,20 @@ import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
 import useMapStore from "@/app/stores";
 import type { Carpool } from "@prisma/client";
-import { orangeMarker } from "@/app/services/MarkerStyles";
+import { orangeMarker } from "@/app/MarkerStyles";
 import { DecimalToNumber } from "@/app/services/DecimalConversions";
 
 function FindCarpoolPage() {
   const { mapsApi } = useMapStore();
+
+  async function attendCarpool(id: number) {
+    try {
+      const data = await axios.patch(`/api/carpool/addAttendee/${id}`);
+      SuccessToast("Successfully attended Carpool!", "Stay safe!");
+    } catch (e) {
+      FailureToast("Could not attend carpool: " + e, "Please try again");
+    }
+  }
 
   async function getCarpools(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -53,8 +62,6 @@ function FindCarpoolPage() {
         },
         orangeMarker,
       );
-      //@ts-ignore
-      mapsApi?.setRoute(carpool.route);
       mapsApi?.addMarker({
         lat: DecimalToNumber(carpool.destinationLat),
         lng: DecimalToNumber(carpool.destinationLng),
@@ -67,7 +74,12 @@ function FindCarpoolPage() {
     <>
       <div className={"flex gap-5 space-x-6 justify-start ms-5 my-3"}>
         <form onSubmit={(event) => getCarpools(event)}>
-          <Input id={"url"} className={"w-96"} placeholder={"TournamentURL"} />
+          <Input
+            defaultValue={"https://www.start.gg/tournament/bullet-hell-1/details"}
+            id={"url"}
+            className={"w-96"}
+            placeholder={"TournamentURL"}
+          />
         </form>
       </div>
       <GoogleMap />

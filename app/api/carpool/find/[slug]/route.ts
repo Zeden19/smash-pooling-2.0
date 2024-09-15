@@ -5,12 +5,12 @@ import { CHECK_TOURNAMENT_EXISTS } from "@/app/services/startggQueries";
 
 export async function GET(
   req: NextRequest,
-  { params: { url } }: { params: { url: string } },
+  { params: { slug } }: { params: { slug: string } },
 ) {
   const { tournament } = await startggClient.request<{ tournament: { id: number } }>(
     CHECK_TOURNAMENT_EXISTS,
     {
-      slug: url,
+      slug,
     },
   );
 
@@ -18,7 +18,7 @@ export async function GET(
     return NextResponse.json({ error: "Tournament does not exist" }, { status: 404 });
 
   const carpools = await prisma.carpool.findMany({
-    where: { tournamentSlug: url },
+    where: { tournamentSlug: slug },
   });
 
   if (carpools.length === 0)

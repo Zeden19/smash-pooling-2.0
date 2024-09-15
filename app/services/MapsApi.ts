@@ -40,11 +40,11 @@ class MapsApi {
     return route;
   }
 
-  setRoute(route: LatLng[]) {
+  setRoute(route: LatLng[], infoWindowContent?: Element) {
     new google.maps.Polyline({
       path: route,
       strokeColor: "#FF0000",
-      strokeOpacity: 1.0,
+      strokeOpacity: 2.0,
       strokeWeight: 2,
       map: this.map,
     });

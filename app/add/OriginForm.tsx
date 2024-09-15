@@ -3,7 +3,7 @@ import { FormEvent, useState } from "react";
 import useMapStore from "@/app/stores";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
-import { orangeMarker } from "@/app/services/MarkerStyles";
+import { orangeMarker } from "@/app/MarkerStyles";
 import { Origin } from "@/app/add/page";
 
 interface Props {
