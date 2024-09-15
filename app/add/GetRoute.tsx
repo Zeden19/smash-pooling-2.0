@@ -10,10 +10,11 @@ import LatLng = google.maps.LatLng;
 interface Props {
   destination: Destination | undefined;
   origin: Origin | undefined;
-  setRoute: (route: any) => void;
+  setRoute: (route: LatLng[]) => void;
+  route: LatLng[] | undefined;
 }
 
-function GetRoute({ destination, origin, setRoute }: Props) {
+function GetRoute({ route, destination, origin, setRoute }: Props) {
   const { mapsApi } = useMapStore();
 
   async function getRoutes() {
@@ -27,7 +28,7 @@ function GetRoute({ destination, origin, setRoute }: Props) {
     }
 
     mapsApi?.setRoute(route!);
-    setRoute(route);
+    setRoute(route!);
     SuccessToast("Successfully Found Route");
   }
 
@@ -36,7 +37,7 @@ function GetRoute({ destination, origin, setRoute }: Props) {
   return (
     <Button
       disabled={loadingRoute || !destination || !origin}
-      className={"gap-3"}
+      className={`gap-3 ${route && "border-green-400 border-2"}`}
       onClick={async () => {
         setLoadingRoute(true);
         await getRoutes();

@@ -8,11 +8,6 @@ import AddCarpool from "@/app/add/AddCarpool";
 import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
 
-// things to do: separate this file into each respective "fetch"
-// find a better way to handle loading & error states instead if using multiple useState hooks
-// find out how to handle errors on front end
-// does react router solve these issues?
-
 export interface Origin {
   cords: LatLngLiteral;
   name: string;
@@ -35,14 +30,16 @@ function MapTest() {
     <>
       <div className={"flex flex-row gap-5 space-x-6 justify-start ms-5 my-3"}>
         <TournamentForm
+          destination={destination}
           handleSubmit={(venueAddress, cords, slug) =>
             setDestination({ name: venueAddress, cords: cords, slug: slug })
           }
         />
 
-        <OriginForm setOrigin={(origin) => setOrigin(origin)} />
+        <OriginForm origin={origin} setOrigin={(origin) => setOrigin(origin)} />
 
         <GetRoute
+          route={route}
           origin={origin}
           destination={destination}
           setRoute={(route) => setRoute(route)}

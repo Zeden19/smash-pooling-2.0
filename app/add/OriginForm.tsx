@@ -4,13 +4,14 @@ import useMapStore from "@/app/stores";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
 import { orangeMarker } from "@/app/services/MarkerStyles";
-import LatLngLiteral = google.maps.LatLngLiteral;
+import { Origin } from "@/app/add/page";
 
 interface Props {
-  setOrigin: (origin: { cords: LatLngLiteral; name: string }) => void;
+  setOrigin: (origin: Origin) => void;
+  origin: Origin | undefined;
 }
 
-function OriginForm({ setOrigin }: Props) {
+function OriginForm({ setOrigin, origin }: Props) {
   const { mapsApi } = useMapStore();
   const [loadingOrigin, setLoadingOrigin] = useState(false);
 
@@ -43,6 +44,7 @@ function OriginForm({ setOrigin }: Props) {
         setLoadingOrigin(false);
       }}>
       <Input
+        className={origin && "border-green-400"}
         disabled={loadingOrigin}
         defaultValue={"Toronto"}
         id={"origin"}

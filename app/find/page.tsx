@@ -34,29 +34,33 @@ function FindCarpoolPage() {
       return;
     }
 
+    let carpools;
+
     try {
       const { data } = await axios.get(`/api/carpool/find/${slug}`);
-      data.forEach((carpool: Carpool) => {
-        mapsApi?.addMarker(
-          {
-            lat: DecimalToNumber(carpool.originLat),
-            lng: DecimalToNumber(carpool.originLng),
-          },
-          orangeMarker,
-        );
-        //@ts-ignore
-        mapsApi?.setRoute(carpool.route);
-        mapsApi?.addMarker({
-          lat: DecimalToNumber(carpool.destinationLat),
-          lng: DecimalToNumber(carpool.destinationLng),
-        });
-      });
-      SuccessToast("Successfully Found Carpools");
+      carpools = data;
     } catch (e: any) {
       if (e instanceof AxiosError) return FailureToast(e.response?.data.error);
       console.log(e);
       FailureToast("Could not Find Carpool");
     }
+
+    carpools.forEach((carpool: Carpool) => {
+      mapsApi?.addMarker(
+        {
+          lat: DecimalToNumber(carpool.originLat),
+          lng: DecimalToNumber(carpool.originLng),
+        },
+        orangeMarker,
+      );
+      //@ts-ignore
+      mapsApi?.setRoute(carpool.route);
+      mapsApi?.addMarker({
+        lat: DecimalToNumber(carpool.destinationLat),
+        lng: DecimalToNumber(carpool.destinationLng),
+      });
+    });
+    SuccessToast("Successfully Found Carpools");
   }
 
   return (

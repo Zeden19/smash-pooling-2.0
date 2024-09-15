@@ -5,6 +5,7 @@ import { GET_TOURNAMENT_BY_URL } from "@/app/services/startggQueries";
 import useMapStore from "@/app/stores";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
+import { Destination } from "@/app/add/page";
 
 interface Tournament {
   id: number;
@@ -27,9 +28,10 @@ interface Props {
     cords: { lat: number; lng: number },
     slug: string,
   ) => void;
+  destination: Destination | undefined;
 }
 
-function TournamentForm({ handleSubmit }: Props) {
+function TournamentForm({ handleSubmit, destination }: Props) {
   const [loadingDestination, setLoadingDestination] = useState(false);
   const { mapsApi } = useMapStore();
 
@@ -74,6 +76,7 @@ function TournamentForm({ handleSubmit }: Props) {
         id={"link"}
         type={"text"}
         placeholder={"startgg Url"}
+        className={`${destination && "border-green-400"}`}
       />
     </form>
   );
