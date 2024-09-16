@@ -1,7 +1,6 @@
 "use client";
 import { useEffect } from "react";
 import useMapStore from "@/app/stores";
-import loadMapsAPI from "@/app/services/loadMapsApi";
 import MapsApi from "@/app/services/MapsApi";
 
 //Map's styling
@@ -31,8 +30,6 @@ function GoogleMap() {
   }
 
   useEffect(() => {
-    if (!(typeof google === "object") || !(typeof google.maps === "object"))
-      loadMapsAPI();
     initMap();
   }, []);
 

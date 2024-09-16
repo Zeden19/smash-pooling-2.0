@@ -1,12 +1,14 @@
 import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
 import PinElementOptions = google.maps.marker.PinElementOptions;
+import { PopUp } from "@/app/services/PopUp";
 
 class MapsApi {
   private geocoder: google.maps.Geocoder;
   private readonly advancedMarker: typeof google.maps.marker.AdvancedMarkerElement;
   private directionsService: google.maps.DirectionsService;
-  private PinElement = google.maps.marker.PinElement;
+  private pinElement = google.maps.marker.PinElement;
+  private popUp: PopUp | undefined;
 
   constructor(private map: google.maps.Map) {
     this.directionsService = google.maps.DirectionsService.prototype;
@@ -20,7 +22,7 @@ class MapsApi {
   }
 
   addMarker(cords: LatLngLiteral, markerOptions?: PinElementOptions) {
-    const pin = new this.PinElement(markerOptions);
+    const pin = new this.pinElement(markerOptions);
     new this.advancedMarker({ map: this.map, position: cords, content: pin.element });
   }
 
@@ -40,14 +42,22 @@ class MapsApi {
     return route;
   }
 
-  setRoute(route: LatLng[], infoWindowContent?: Element) {
-    new google.maps.Polyline({
+  setRoute(route: LatLng[], infoWindowContent?: HTMLElement) {
+    const newRoute = new google.maps.Polyline({
       path: route,
       strokeColor: "#FF0000",
-      strokeOpacity: 2.0,
+      strokeOpacity: 1.0,
       strokeWeight: 2,
       map: this.map,
     });
+
+    if (infoWindowContent) {
+      google.maps.event.addListener(newRoute, "click", (event: { latLng: LatLng }) => {
+        if (this.popUp) this.popUp.setMap(null);
+        this.popUp = new PopUp(event.latLng, infoWindowContent);
+        this.popUp.setMap(this.map);
+      });
+    }
   }
 }
 

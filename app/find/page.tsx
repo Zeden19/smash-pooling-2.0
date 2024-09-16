@@ -3,8 +3,7 @@ import GoogleMap from "@/components/GoogleMap";
 import { Input } from "@/components/ui/input";
 import { FormEvent } from "react";
 import axios, { AxiosError } from "axios";
-import { toast } from "@/hooks/use-toast";
-import { XCircle } from "lucide-react";
+import styles from "./styles.module.css";
 import { slug as getSlug } from "@/app/services/startggClient";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
@@ -31,15 +30,7 @@ function FindCarpoolPage() {
 
     const slug = getSlug(form.url.value);
     if (!slug) {
-      toast({
-        title: (
-          <>
-            <XCircle /> Tournament not Found
-          </>
-        ),
-        variant: "destructive",
-        description: "Make sure your URL is correct",
-      });
+      FailureToast("Could not find carpool tournament", "Make sure your URL is correct");
       return;
     }
 
@@ -55,6 +46,17 @@ function FindCarpoolPage() {
     }
 
     carpools.forEach((carpool: Carpool) => {
+      const container = document.createElement("div");
+      const text = document.createElement("div");
+      text.textContent = "Carpool to " + carpool.destinationName;
+      container.appendChild(text);
+
+      const button = document.createElement("button");
+      button.textContent = "Attend Carpool";
+      button.onclick = () => attendCarpool(carpool.id);
+      button.classList.add(styles.attendButton);
+      container.appendChild(button);
+
       mapsApi?.addMarker(
         {
           lat: DecimalToNumber(carpool.originLat),
@@ -62,6 +64,8 @@ function FindCarpoolPage() {
         },
         orangeMarker,
       );
+      // @ts-ignore
+      mapsApi?.setRoute(carpool.route!, container);
       mapsApi?.addMarker({
         lat: DecimalToNumber(carpool.destinationLat),
         lng: DecimalToNumber(carpool.destinationLng),

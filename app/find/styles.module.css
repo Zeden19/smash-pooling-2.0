@@ -1,0 +1,12 @@
+.attendButton {
+    padding: 6px;
+    margin: 5px;
+    background: #DDD;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.attendButton:hover {
+    transition: 0.3s;
+    background: #BBB;
+}

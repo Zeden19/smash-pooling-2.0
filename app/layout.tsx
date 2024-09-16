@@ -19,14 +19,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider attribute={"class"} defaultTheme={"system"} enableSystem>
-          <NavigationBar />
-          {children}
-          <Toaster />
-        </ThemeProvider>
-      </body>
-    </html>
+    <>
+      <script
+        async
+        defer
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAPS_KEY}&loading=async`}
+      />
+      <html lang="en" suppressHydrationWarning>
+        <body className={inter.className}>
+          <ThemeProvider attribute={"class"} defaultTheme={"system"} enableSystem>
+            <NavigationBar />
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </body>
+      </html>
+    </>
   );
 }

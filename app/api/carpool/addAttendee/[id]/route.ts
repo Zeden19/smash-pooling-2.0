@@ -9,18 +9,18 @@ export async function PATCH(
   const { user } = await validateRequest();
   if (!user)
     return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+  console.log(user);
 
   const carpool = await prisma.carpool.findUnique({ where: { id: parseInt(id) } });
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
-  const updatedCarpool = prisma.carpool.update({
+  const data = prisma.carpool.update({
     where: { id: parseInt(id) },
     data: {
       attendees: {
-        create: user,
+        create: [user],
       },
     },
   });
-
   return NextResponse.json({ status: 200 });
 }
