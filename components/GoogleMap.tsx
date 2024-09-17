@@ -4,6 +4,8 @@ import useMapStore from "@/app/stores";
 import MapsApi from "@/app/services/MapsApi";
 
 //Map's styling
+export const mapSize = { width: "100w", height: "80vh" };
+
 const mapCentre = {
   lat: 43.6532,
   lng: -79.3832,
@@ -35,7 +37,7 @@ function GoogleMap() {
 
   return (
     <div>
-      <div style={{ width: "100w", height: "80vh" }} id={"map"} />
+      <div style={mapSize} id={"map"} />
     </div>
   );
 }

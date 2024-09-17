@@ -41,7 +41,7 @@ function GetRoute({ route, destination, origin, setRoute }: Props) {
   return (
     <Button
       disabled={loadingRoute || !destination || !origin}
-      className={`gap-3 ${route && "border-green-400 border-2"}`}
+      className={`${route && "border-green-400 border-2"}`}
       onClick={async () => {
         setLoadingRoute(true);
         await getRoutes();
