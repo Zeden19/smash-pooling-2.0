@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CarIcon } from "lucide-react";
-import { ModeToggle } from "@/components/ModeToggle";
+import { ModeToggle } from "@/app/ModeToggle";
 import React from "react";
 import UserControls from "@/app/UserControls";
 import NavLinks from "@/app/NavLinks";
