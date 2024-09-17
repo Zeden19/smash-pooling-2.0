@@ -52,7 +52,7 @@ async function UserControls() {
         </DropdownMenu>
       ) : (
         <Button size="sm">
-          <Link href="api/login/startgg">Sign in with StartGG</Link>
+          <Link href="/api/login/startgg">Sign in with StartGG</Link>
         </Button>
       )}
     </>

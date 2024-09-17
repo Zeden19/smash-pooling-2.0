@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import useMapStore from "@/app/stores";
-import MapsApi from "@/app/services/MapsApi";
+import MapsApi from "@/app/carpool/MapsApi";
 
 //Map's styling
 export const mapSize = { width: "100w", height: "80vh" };

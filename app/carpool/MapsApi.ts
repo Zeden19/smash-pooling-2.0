@@ -1,7 +1,7 @@
 import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
 import PinElementOptions = google.maps.marker.PinElementOptions;
-import { PopUp } from "@/app/services/PopUp";
+import { PopUp } from "@/app/carpool/PopUp";
 
 class MapsApi {
   private geocoder: google.maps.Geocoder;

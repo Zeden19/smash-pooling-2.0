@@ -7,9 +7,9 @@ function NavLinks() {
   const navLinks = [
     // eventually we should make the carpools its own dropdown
     { href: "/", label: "Home" },
-    { href: "/add", label: "Add Carpools" },
-    { href: "/find", label: "Find Carpools" },
-    { href: "/edit", label: "Edit Carpools" },
+    { href: "/carpool/add", label: "Add Carpools" },
+    { href: "/carpool/find", label: "Find Carpools" },
+    { href: "/carpool/edit", label: "Edit Carpools" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
   ];

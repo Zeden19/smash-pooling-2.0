@@ -2,7 +2,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import useMapStore from "@/app/stores";
-import { Destination, Origin } from "@/app/add/page";
+import { Destination, Origin } from "@/app/carpool/add/page";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
 import LatLng = google.maps.LatLng;

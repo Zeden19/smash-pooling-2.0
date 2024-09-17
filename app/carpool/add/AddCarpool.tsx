@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useState } from "react";
 import axios from "axios";
-import { Destination, Origin } from "@/app/add/page";
+import { Destination, Origin } from "@/app/carpool/add/page";
 import SuccessToast from "@/components/SuccessToast";
 import FailureToast from "@/components/FailureToast";
 import LatLng = google.maps.LatLng;

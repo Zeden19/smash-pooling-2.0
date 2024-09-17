@@ -4,7 +4,7 @@ import useMapStore from "@/app/stores";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
 import { orangeMarker } from "@/app/MarkerStyles";
-import { Origin } from "@/app/add/page";
+import { Origin } from "@/app/carpool/add/page";
 
 interface Props {
   setOrigin: (origin: Origin) => void;

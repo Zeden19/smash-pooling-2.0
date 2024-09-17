@@ -5,7 +5,7 @@ import { GET_TOURNAMENT_BY_URL } from "@/app/services/startggQueries";
 import useMapStore from "@/app/stores";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
-import { Destination } from "@/app/add/page";
+import { Destination } from "@/app/carpool/add/page";
 
 interface Tournament {
   id: number;

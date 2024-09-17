@@ -1,10 +1,10 @@
 "use client";
 import GoogleMap from "@/components/GoogleMap";
 import { useState } from "react";
-import TournamentForm from "@/app/add/TournamentForm";
-import OriginForm from "@/app/add/OriginForm";
-import GetRoute from "@/app/add/GetRoute";
-import AddCarpool from "@/app/add/AddCarpool";
+import TournamentForm from "@/app/carpool/add/TournamentForm";
+import OriginForm from "@/app/carpool/add/OriginForm";
+import GetRoute from "@/app/carpool/add/GetRoute";
+import AddCarpool from "@/app/carpool/add/AddCarpool";
 import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
 

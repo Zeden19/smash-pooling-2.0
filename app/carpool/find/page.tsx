@@ -10,7 +10,7 @@ import SuccessToast from "@/components/SuccessToast";
 import useMapStore from "@/app/stores";
 import type { Carpool } from "@prisma/client";
 import { orangeMarker } from "@/app/MarkerStyles";
-import { DecimalToNumber } from "@/app/services/DecimalConversions";
+import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 function FindCarpoolPage() {
