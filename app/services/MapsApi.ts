@@ -5,10 +5,13 @@ import { PopUp } from "@/app/services/PopUp";
 
 class MapsApi {
   private geocoder: google.maps.Geocoder;
-  private readonly advancedMarker: typeof google.maps.marker.AdvancedMarkerElement;
   private directionsService: google.maps.DirectionsService;
   private pinElement = google.maps.marker.PinElement;
+  private readonly advancedMarker: typeof google.maps.marker.AdvancedMarkerElement;
   private popUp: PopUp | undefined;
+
+  private markers: Array<google.maps.marker.AdvancedMarkerElement> = [];
+  private polyLines: Array<google.maps.Polyline> = [];
 
   constructor(private map: google.maps.Map) {
     this.directionsService = google.maps.DirectionsService.prototype;
@@ -23,7 +26,13 @@ class MapsApi {
 
   addMarker(cords: LatLngLiteral, markerOptions?: PinElementOptions) {
     const pin = new this.pinElement(markerOptions);
-    new this.advancedMarker({ map: this.map, position: cords, content: pin.element });
+    const newMarker = new this.advancedMarker({
+      map: this.map,
+      position: cords,
+      content: pin.element,
+    });
+    this.markers.push(newMarker);
+    return newMarker;
   }
 
   async getRoutes(
@@ -58,6 +67,22 @@ class MapsApi {
         this.popUp.setMap(this.map);
       });
     }
+
+    this.polyLines.push(newRoute);
+    return newRoute;
+  }
+
+  removeRoute(route: google.maps.Polyline) {
+    route.setMap(null);
+  }
+
+  removeMarker(marker: google.maps.marker.AdvancedMarkerElement) {
+    marker.map = null;
+  }
+
+  removeAllElements() {
+    this.markers.forEach((marker) => (marker.map = null));
+    this.polyLines.forEach((polyline) => polyline.setMap(null));
   }
 }
 

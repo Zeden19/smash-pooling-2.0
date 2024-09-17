@@ -16,10 +16,13 @@ interface Props {
 
 function GetRoute({ route, destination, origin, setRoute }: Props) {
   const { mapsApi } = useMapStore();
+  const [shownRoute, setShownRoute] = useState<google.maps.Polyline>();
 
   async function getRoutes() {
     // add error message
     if (!origin || !destination) return;
+
+    if (shownRoute) shownRoute.setMap(null);
     let route: LatLng[] | undefined;
     try {
       route = await mapsApi?.getRoutes(origin.cords, destination.cords);
@@ -27,9 +30,10 @@ function GetRoute({ route, destination, origin, setRoute }: Props) {
       FailureToast("Could Not Find Route", "Check your origin and tournament");
     }
 
-    mapsApi?.setRoute(route!);
+    const newRoute = mapsApi?.setRoute(route!);
     setRoute(route!);
     SuccessToast("Successfully Found Route");
+    setShownRoute(newRoute);
   }
 
   const [loadingRoute, setLoadingRoute] = useState(false);

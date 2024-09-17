@@ -33,10 +33,13 @@ interface Props {
 
 function TournamentForm({ handleSubmit, destination }: Props) {
   const [loadingDestination, setLoadingDestination] = useState(false);
+  const [destinationMarker, setDestinationMarker] =
+    useState<google.maps.marker.AdvancedMarkerElement>();
   const { mapsApi } = useMapStore();
 
   async function handleStartggLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (destinationMarker) mapsApi?.removeMarker(destinationMarker);
     const formData = event.target as HTMLFormElement;
     const tournamentSlug = slug(formData.link.value);
 
@@ -57,8 +60,9 @@ function TournamentForm({ handleSubmit, destination }: Props) {
     }
 
     const cords = { lat: tournament.lat, lng: tournament.lng };
-    mapsApi?.addMarker(cords);
+    const marker = mapsApi?.addMarker(cords);
     handleSubmit(tournament.venueAddress, cords, tournamentSlug);
+    setDestinationMarker(marker);
     SuccessToast("Successfully Found tournament");
   }
 

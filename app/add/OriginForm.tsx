@@ -14,9 +14,13 @@ interface Props {
 function OriginForm({ setOrigin, origin }: Props) {
   const { mapsApi } = useMapStore();
   const [loadingOrigin, setLoadingOrigin] = useState(false);
+  const [originMarker, setOriginMarker] =
+    useState<google.maps.marker.AdvancedMarkerElement>();
 
   async function handleOrigin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (originMarker) mapsApi?.removeMarker(originMarker);
     const formData = event.target as HTMLFormElement;
     const inputValue = formData.origin.value;
     let data;
@@ -31,7 +35,7 @@ function OriginForm({ setOrigin, origin }: Props) {
       lat: data!.geometry.location.lat(),
       lng: data!.geometry.location.lng(),
     };
-    mapsApi?.addMarker(cords, orangeMarker);
+    setOriginMarker(mapsApi?.addMarker(cords, orangeMarker));
     setOrigin({ cords: cords, name: inputValue });
     SuccessToast("Successfully Found Address");
   }

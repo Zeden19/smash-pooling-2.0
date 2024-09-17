@@ -1,7 +1,7 @@
 "use client";
 import GoogleMap from "@/components/GoogleMap";
 import { Input } from "@/components/ui/input";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import axios, { AxiosError } from "axios";
 import styles from "./styles.module.css";
 import { slug as getSlug } from "@/app/services/startggClient";
@@ -11,8 +11,10 @@ import useMapStore from "@/app/stores";
 import type { Carpool } from "@prisma/client";
 import { orangeMarker } from "@/app/MarkerStyles";
 import { DecimalToNumber } from "@/app/services/DecimalConversions";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 function FindCarpoolPage() {
+  const [findingCarpools, setFindingCarpools] = useState(false);
   const { mapsApi } = useMapStore();
 
   async function attendCarpool(id: number) {
@@ -26,6 +28,7 @@ function FindCarpoolPage() {
 
   async function getCarpools(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFindingCarpools(true);
     const form = event.target as HTMLFormElement;
 
     const slug = getSlug(form.url.value);
@@ -40,11 +43,15 @@ function FindCarpoolPage() {
       const { data } = await axios.get(`/api/carpool/find/${slug}`);
       carpools = data;
     } catch (e: any) {
-      if (e instanceof AxiosError) return FailureToast(e.response?.data.error);
-      console.log(e);
+      if (e instanceof AxiosError) {
+        setFindingCarpools(false);
+        return FailureToast(e.response?.data.error);
+      }
       FailureToast("Could not Find Carpool");
+      setFindingCarpools(false);
     }
 
+    mapsApi?.removeAllElements();
     carpools.forEach((carpool: Carpool) => {
       const container = document.createElement("div");
       const text = document.createElement("div");
@@ -72,18 +79,23 @@ function FindCarpoolPage() {
       });
     });
     SuccessToast("Successfully Found Carpools");
+    setFindingCarpools(false);
   }
 
   return (
     <>
       <div className={"flex gap-5 space-x-6 justify-start ms-5 my-3"}>
-        <form onSubmit={(event) => getCarpools(event)}>
+        <form
+          className={"flex gap-2 items-center"}
+          onSubmit={(event) => getCarpools(event)}>
           <Input
+            disabled={findingCarpools}
             defaultValue={"https://www.start.gg/tournament/bullet-hell-1/details"}
             id={"url"}
             className={"w-96"}
             placeholder={"TournamentURL"}
           />
+          {findingCarpools && <LoadingSpinner />}
         </form>
       </div>
       <GoogleMap />
