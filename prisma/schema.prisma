@@ -16,9 +16,13 @@ model Session {
 }
 
 model User {
-  id                String    @id
-  startggId         Int       @unique
-  slug              String
+  id             String @id
+  startggId      Int    @unique
+  gamertag       String
+  slug           String
+  email          String
+  profilePicture String @db.VarChar(1000)
+
   sessions          Session[]
   carpoolsDriving   Carpool[] @relation(name: "CarpoolDriver") // many to one
   carpoolsAttending Carpool[] @relation(name: "CarpoolAttendee") // many to many

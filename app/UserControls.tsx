@@ -37,12 +37,12 @@ async function UserControls() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Link href={`/profile/${user.id}`}>Profile </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/profile/${user.id}/carpools`}>Your Carpools </Link>
-            </DropdownMenuItem>
+            <Link href={`/profile/${user.id}`}>
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+            </Link>
+            <Link href={`/profile/${user.id}/carpools`}>
+              <DropdownMenuItem>Your Carpools</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem>
               <form action={logout}>
                 <Button>Log Out</Button>

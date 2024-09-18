@@ -55,7 +55,10 @@ export async function GET(request: Request): Promise<Response> {
       data: {
         id: userId,
         startggId: startGGUser.id,
+        gamertag: startGGUser.player.gamerTag,
         slug: startGGUser.slug,
+        email: startGGUser.email,
+        profilePicture: startGGUser.images[0].url,
       },
     });
 
