@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Carpool } from "@prisma/client";
+import CarpoolStatusBadge from "@/components/CarpoolStatusBadge";
 
 interface Props {
   carpools: Carpool[];
@@ -21,22 +22,22 @@ function makeTitle(input: string) {
 
 function CarpoolTable({ carpools }: Props) {
   return (
-    <Table className={"bg-slate-900 rounded m-2 w-[800px]"}>
+    <Table className={"bg-slate-900 rounded m-2"}>
       <TableHeader>
         <TableRow>
-          <TableHead>Tournament</TableHead>
+          <TableHead className={"pl-5"}>Tournament</TableHead>
           <TableHead>Origin</TableHead>
           <TableHead>Destination</TableHead>
           <TableHead>Starting Time</TableHead>
           <TableHead>Seats Available</TableHead>
           <TableHead>Distance</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead className={"text-right pr-5"}>Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {carpools.map((carpool) => (
           <TableRow key={carpool.id}>
-            <TableCell>
+            <TableCell className={"pl-5"}>
               <a
                 href={`https://www.start.gg/tournament/${carpool.tournamentSlug}/details`}>
                 {makeTitle(carpool.tournamentSlug)}
@@ -44,10 +45,12 @@ function CarpoolTable({ carpools }: Props) {
             </TableCell>
             <TableCell>{carpool.originName}</TableCell>
             <TableCell>{carpool.destinationName}</TableCell>
-            <TableCell>{carpool.StartTime?.toDateString() || "N/A"}</TableCell>
+            <TableCell>{carpool.startTime?.toDateString() || "N/A"}</TableCell>
             <TableCell>{carpool.seatsAvailable || "N/A"}</TableCell>
             <TableCell>{carpool.distance}</TableCell>
-            <TableCell>{carpool.status}</TableCell>
+            <TableCell className={"w-32 text-right pr-5"}>
+              <CarpoolStatusBadge carpoolStatus={carpool.status} />
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

@@ -45,7 +45,7 @@ model Carpool {
   distance       String
   route          Json
   seatsAvailable Int?
-  StartTime      DateTime?
+  startTime      DateTime?
   status         CarpoolStatus @default(OPEN)
   price          Int           @default(0)
   description    String        @default("")
@@ -54,5 +54,5 @@ model Carpool {
 enum CarpoolStatus {
   OPEN
   IN_PROGRESS
-  STARTED
+  COMPLETED
 }

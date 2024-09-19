@@ -16,7 +16,7 @@ async function ProfilePage() {
 
   if (!data) redirect("/");
   return (
-    <div className={"flex gap-16"}>
+    <div className={"flex gap-12 w-[1400px]"}>
       {/*Left side*/}
       <UserInfo />
 
