@@ -8,6 +8,14 @@ import {
   PhoneIcon,
   TagIcon,
 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 async function ProfilePage() {
   const { user } = await validateRequest();
@@ -71,8 +79,74 @@ async function ProfilePage() {
       {/*Right Side*/}
       <div className={"mt-7 flex flex-col gap-5"}>
         <h1 className={"text-5xl font-bold"}>Carpool Info</h1>
-        <h3 className={"text-2xl font-bold"}>Carpools Driving</h3>
-        <h3 className={"text-2xl font-bold"}>Carpools Attending/Attended</h3>
+
+        <div>
+          <h3 className={"text-2xl font-bold"}>Carpools Driving/Driven</h3>
+          <Table className={"bg-slate-900 rounded m-2 w-[800px]"}>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tournament</TableHead>
+                <TableHead>Origin</TableHead>
+                <TableHead>Destination</TableHead>
+                <TableHead>Starting Time</TableHead>
+                <TableHead>Seats Available</TableHead>
+                <TableHead>Distance</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <a
+                    target={"_blank"}
+                    href={"https://www.start.gg/tournament/bullet-hell-1/details"}>
+                    Bullet Hell
+                  </a>
+                </TableCell>
+                <TableCell>Toronto</TableCell>
+                <TableCell>London</TableCell>
+                <TableCell>6:00PM</TableCell>
+                <TableCell>3</TableCell>
+                <TableCell>50km</TableCell>
+                <TableCell>Open</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
+        <div>
+          <h3 className={"text-2xl font-bold"}>Carpools Attending/Attended</h3>
+          <Table className={"bg-slate-900 rounded m-2 w-[800px]"}>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tournament</TableHead>
+                <TableHead>Origin</TableHead>
+                <TableHead>Destination</TableHead>
+                <TableHead>Starting Time</TableHead>
+                <TableHead>Seats Available</TableHead>
+                <TableHead>Distance</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <a
+                    target={"_blank"}
+                    href={"https://www.start.gg/tournament/bullet-hell-1/details"}>
+                    Bullet Hell
+                  </a>
+                </TableCell>
+                <TableCell>Toronto</TableCell>
+                <TableCell>London</TableCell>
+                <TableCell>6:00PM</TableCell>
+                <TableCell>3</TableCell>
+                <TableCell>50km</TableCell>
+                <TableCell>Open</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

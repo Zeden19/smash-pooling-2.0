@@ -38,17 +38,20 @@ class MapsApi {
   async getRoutes(
     origin: LatLngLiteral,
     destination: LatLngLiteral,
-  ): Promise<LatLng[] | undefined> {
-    let route: LatLng[] | undefined;
+  ): Promise<{ route: LatLng[]; distance: string } | void> {
+    let data: { route: LatLng[]; distance: string } | undefined;
     await this.directionsService.route(
       //@ts-ignore
       { origin: origin, destination: destination, travelMode: "DRIVING" },
       (result, status) => {
         if (status !== "OK") return;
-        route = result?.routes[0].overview_path;
+        const route = result!.routes[0].overview_path;
+        const distance = result!.routes[0].legs[0].distance!.text;
+        data = { route, distance };
       },
     );
-    return route;
+
+    return data;
   }
 
   setRoute(route: LatLng[], infoWindowContent?: HTMLElement) {

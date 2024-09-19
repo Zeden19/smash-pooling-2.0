@@ -15,7 +15,7 @@ const destination = z.object({
   name: z.string({ message: "Destination Name" }),
   slug: z.string({ message: "Destination Slug" }),
 });
-const route = z.array(cords);
+const route = z.object({ route: z.array(cords), distance: z.string() });
 const schema = z.object({
   origin,
   destination,
@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
       destinationLng: new Prisma.Decimal(destination.cords.lng),
       destinationName: destination.name,
       tournamentSlug: destination.slug,
-      route: route,
+      route: route.route,
+      distance: route.distance,
     },
   });
 

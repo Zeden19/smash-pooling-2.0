@@ -19,12 +19,17 @@ export interface Destination {
   slug: string;
 }
 
+export interface Route {
+  route: LatLng[];
+  distance: string;
+}
+
 // consider using server search params: this might be overly complex due to the nature of things;
 // using placeids might help
 function AddCarpoolPage() {
   const [origin, setOrigin] = useState<Origin>();
   const [destination, setDestination] = useState<Destination>();
-  const [route, setRoute] = useState<LatLng[]>();
+  const [route, setRoute] = useState<Route>();
 
   return (
     <>

@@ -34,7 +34,6 @@ model Carpool {
   driverId  String
   attendees User[] @relation(name: "CarpoolAttendee")
 
-  // We should eventually transition to placeIds since they will be far easier to maintain and get data
   originLat       Decimal
   originLng       Decimal
   originName      String
@@ -43,7 +42,17 @@ model Carpool {
   destinationName String
 
   tournamentSlug String
+  distance       String
   route          Json
-  price          Int    @default(0)
-  description    String @default("")
+  seatsAvailable Int?
+  StartTime      DateTime?
+  status         CarpoolStatus @default(OPEN)
+  price          Int           @default(0)
+  description    String        @default("")
+}
+
+enum CarpoolStatus {
+  OPEN
+  IN_PROGRESS
+  STARTED
 }
