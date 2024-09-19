@@ -15,7 +15,6 @@ function CarpoolStatusBadge({ carpoolStatus }: Props) {
     }
     return <Badge variant={"completed"}>Completed</Badge>;
   };
-  console.log(badge());
   return badge();
 }
 

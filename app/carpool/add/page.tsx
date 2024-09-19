@@ -1,5 +1,5 @@
 "use client";
-import GoogleMap from "@/components/GoogleMap";
+import GoogleMap, { defaultMapSize } from "@/components/GoogleMap";
 import { useState } from "react";
 import TournamentForm from "@/app/carpool/add/TournamentForm";
 import OriginForm from "@/app/carpool/add/OriginForm";
@@ -55,7 +55,7 @@ function AddCarpoolPage() {
         {/*Used in the future when user has to select a route*/}
         {/*<Button onClick={() => setRoute()}>Set Route</Button>*/}
       </div>
-      <GoogleMap />
+      <GoogleMap size={defaultMapSize} />
     </>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import GoogleMap from "@/components/GoogleMap";
+import GoogleMap, { defaultMapSize } from "@/components/GoogleMap";
 import { Input } from "@/components/ui/input";
 import { FormEvent, useState } from "react";
 import axios, { AxiosError } from "axios";
@@ -98,7 +98,7 @@ function FindCarpoolPage() {
           {findingCarpools && <LoadingSpinner />}
         </form>
       </div>
-      <GoogleMap />
+      <GoogleMap size={defaultMapSize} />
     </>
   );
 }

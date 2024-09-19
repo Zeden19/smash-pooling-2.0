@@ -4,7 +4,7 @@ import useMapStore from "@/app/stores";
 import MapsApi from "@/app/carpool/MapsApi";
 
 //Map's styling
-export const mapSize = { width: "100w", height: "80vh" };
+export const defaultMapSize = { width: "100vw", height: "80vh" };
 
 const mapCentre = {
   lat: 43.6532,
@@ -12,7 +12,15 @@ const mapCentre = {
 };
 const zoom = 6;
 
-function GoogleMap() {
+interface Props {
+  size: {
+    width: string;
+    height: string;
+  };
+  disableDefaultUI?: boolean;
+}
+
+function GoogleMap({ size, disableDefaultUI = false }: Props) {
   const { setMapsApi } = useMapStore();
 
   async function initMap(): Promise<void> {
@@ -22,6 +30,7 @@ function GoogleMap() {
       zoom: zoom,
       mapId: process.env.NEXT_PUBLIC_MAP_ID,
       gestureHandling: "greedy",
+      disableDefaultUI,
     });
 
     // We have  to load libraries
@@ -37,7 +46,7 @@ function GoogleMap() {
 
   return (
     <div>
-      <div style={mapSize} id={"map"} />
+      <div style={size} id={"map"} />
     </div>
   );
 }

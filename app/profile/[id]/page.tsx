@@ -1,7 +1,7 @@
 import { UserInfo } from "@/app/profile/[id]/UserInfo";
 import { validateRequest } from "@/app/hooks/validateRequest";
 import prisma from "@/prisma/prismaClient";
-import CarpoolTable from "@/app/profile/[id]/CarpoolTable";
+import CarpoolTable from "@/components/CarpoolTable";
 import { redirect } from "next/navigation";
 
 async function ProfilePage() {

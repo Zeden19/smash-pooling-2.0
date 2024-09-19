@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { mapSize } from "@/components/GoogleMap";
+import { defaultMapSize } from "@/components/GoogleMap";
 
 function loading() {
   return (
@@ -27,7 +27,7 @@ function loading() {
           </Button>
         </Skeleton>
       </div>
-      <Skeleton style={mapSize} className={"mx-8"} />
+      <Skeleton style={defaultMapSize} className={"mx-8"} />
     </>
   );
 }
