@@ -18,9 +18,10 @@ interface Props {
     height: string;
   };
   disableDefaultUI?: boolean;
+  className?: string;
 }
 
-function GoogleMap({ size, disableDefaultUI = false }: Props) {
+function GoogleMap({ size, disableDefaultUI = false, className = "" }: Props) {
   const { setMapsApi } = useMapStore();
 
   async function initMap(): Promise<void> {
@@ -46,7 +47,7 @@ function GoogleMap({ size, disableDefaultUI = false }: Props) {
 
   return (
     <div>
-      <div style={size} id={"map"} />
+      <div className={className} style={size} id={"map"} />
     </div>
   );
 }

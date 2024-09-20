@@ -87,6 +87,11 @@ class MapsApi {
     this.markers.forEach((marker) => (marker.map = null));
     this.polyLines.forEach((polyline) => polyline.setMap(null));
   }
+
+  setCentre(cords: LatLng, zoom = 7) {
+    this.map.setCenter(cords);
+    this.map.setZoom(zoom);
+  }
 }
 
 export default MapsApi;
