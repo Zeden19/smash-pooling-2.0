@@ -26,6 +26,12 @@ model User {
   sessions          Session[]
   carpoolsDriving   Carpool[] @relation(name: "CarpoolDriver") // many to one
   carpoolsAttending Carpool[] @relation(name: "CarpoolAttendee") // many to many
+
+  isDriver    Boolean?
+  fullName    String?
+  carInfo     String?
+  carSeats    String?
+  phoneNumber String?
 }
 
 model Carpool {
