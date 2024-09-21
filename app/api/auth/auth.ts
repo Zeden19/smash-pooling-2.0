@@ -20,6 +20,11 @@ export const lucia = new Lucia(adapter, {
       gamertag: attributes.gamertag,
       email: attributes.email,
       profilePicture: attributes.profilePicture,
+      isDriver: attributes.isDriver,
+      fullName: attributes.fullName,
+      carInfo: attributes.carInfo,
+      carSeats: attributes.carSeats,
+      phoneNumber: attributes.phoneNumber,
     };
   },
 });
@@ -37,6 +42,12 @@ interface DatabaseUserAttributes {
   gamertag: string;
   email: string;
   profilePicture: string;
+
+  isDriver: boolean;
+  fullName: string;
+  carInfo: string;
+  carSeats: string;
+  phoneNumber: string;
 }
 
 export const startgg = new Startgg(

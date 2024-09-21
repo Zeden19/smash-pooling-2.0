@@ -3,6 +3,7 @@ import { validateRequest } from "@/app/hooks/validateRequest";
 import prisma from "@/prisma/prismaClient";
 import CarpoolTable from "@/components/CarpoolTable";
 import { redirect } from "next/navigation";
+import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
 
 async function ProfilePage() {
   const { user } = await validateRequest();
@@ -15,6 +16,24 @@ async function ProfilePage() {
   });
 
   if (!data) redirect("/");
+
+  // we have to do this or else we will get an error saying that we are passing decimal objects to client component
+  const carpoolsDriving = data.carpoolsDriving.map((carpool) => ({
+    ...carpool,
+    originLat: DecimalToNumber(carpool.originLat),
+    originLng: DecimalToNumber(carpool.originLng),
+    destinationLat: DecimalToNumber(carpool.destinationLat),
+    destinationLng: DecimalToNumber(carpool.destinationLng),
+  }));
+
+  const carpoolsAttending = data.carpoolsAttending.map((carpool) => ({
+    ...carpool,
+    originLat: DecimalToNumber(carpool.originLat),
+    originLng: DecimalToNumber(carpool.originLng),
+    destinationLat: DecimalToNumber(carpool.destinationLat),
+    destinationLng: DecimalToNumber(carpool.destinationLng),
+  }));
+
   return (
     <div className={"flex gap-12 w-[1400px]"}>
       {/*Left side*/}
@@ -26,12 +45,12 @@ async function ProfilePage() {
 
         <div>
           <h3 className={"text-2xl font-bold"}>Carpools Driving/Driven</h3>
-          <CarpoolTable carpools={data.carpoolsDriving} />
+          <CarpoolTable carpools={carpoolsDriving} />
         </div>
 
         <div>
           <h3 className={"text-2xl font-bold"}>Carpools Attending/Attended</h3>
-          <CarpoolTable carpools={data.carpoolsAttending} />
+          <CarpoolTable carpools={carpoolsAttending} />
         </div>
       </div>
     </div>

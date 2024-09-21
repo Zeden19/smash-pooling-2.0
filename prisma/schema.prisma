@@ -27,7 +27,7 @@ model User {
   carpoolsDriving   Carpool[] @relation(name: "CarpoolDriver") // many to one
   carpoolsAttending Carpool[] @relation(name: "CarpoolAttendee") // many to many
 
-  isDriver    Boolean?
+  isDriver    Boolean @default(false)
   fullName    String?
   carInfo     String?
   carSeats    String?
