@@ -24,22 +24,29 @@ export async function UserInfo() {
         width={300}
         height={300}
       />
-      <h1 className={"text-5xl font-bold"}>{user.gamertag}</h1>
+      <h1 className={"text-4xl font-bold"}>{user.fullName || user.gamertag}</h1>
       <div className={"flex gap-2"}>
         <MailIcon />
         <p>{user.email}</p>
       </div>
       <div className={"flex gap-2"}>
         <TagIcon />
-        <p>Name or Gamer tag here</p>
+        <p>{user.fullName ? user.gamertag : user.fullName}</p>
       </div>
       <div className={"flex gap-2"}>
-        <PhoneIcon />
-        <p>Phone Number here</p>
+        {user.phoneNumber && (
+          <>
+            <PhoneIcon />
+            <p>{user.phoneNumber}</p>
+          </>
+        )}
       </div>
-
       <Separator className={"w-56"} />
-      {user.isDriver ? <DriverInfo driver={user} /> : <NewDriverForm carData={carData} />}
+      {user.isDriver ? (
+        <DriverInfo driver={user} />
+      ) : (
+        <NewDriverForm userId={user.id} carData={carData} />
+      )}
     </div>
   );
 }

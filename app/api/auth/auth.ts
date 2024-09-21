@@ -25,6 +25,7 @@ export const lucia = new Lucia(adapter, {
       carInfo: attributes.carInfo,
       carSeats: attributes.carSeats,
       phoneNumber: attributes.phoneNumber,
+      licencePlate: attributes.licencePlate,
     };
   },
 });
@@ -46,8 +47,9 @@ interface DatabaseUserAttributes {
   isDriver: boolean;
   fullName: string;
   carInfo: string;
-  carSeats: string;
+  carSeats: number;
   phoneNumber: string;
+  licencePlate: string;
 }
 
 export const startgg = new Startgg(

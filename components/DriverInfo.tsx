@@ -24,15 +24,15 @@ export async function DriverInfo({ driver }: { driver: User }) {
         </div>
         <div className={"flex gap-2"}>
           <CarIcon />
-          <p>Car Colour Make, and Model Here</p>
+          <p>{driver.carInfo}</p>
         </div>
         <div className={"flex gap-2"}>
           <IdCardIcon />
-          <p>Licence Plate Here</p>
+          <p>{driver.licencePlate}</p>
         </div>
         <div className={"flex gap-2"}>
           <ArmchairIcon />
-          <p>Number of Seats (Exlcuding driver)</p>
+          <p>{driver.carSeats} seat(s) (Excluding Driver)</p>
         </div>
       </>
     </div>

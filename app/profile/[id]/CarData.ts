@@ -1,4 +1,4 @@
-const carMakes = [
+export const carMakes = [
   "Acura",
   "Alfa Romeo",
   "Aston Martin",
@@ -63,6 +63,17 @@ const carMakes = [
   "Volkswagen",
   "Volvo",
   "smart",
-];
+] as const;
 
-export default carMakes;
+export const carColours = [
+  "Black",
+  "White",
+  "Silver",
+  "Red",
+  "Blue",
+  "Yellow",
+  "Green",
+  "Orange",
+  "Brown",
+  "Purple",
+] as const;
