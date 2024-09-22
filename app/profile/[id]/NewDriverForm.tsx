@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { carColours, carMakes } from "@/app/profile/[id]/CarData";
-import { useState } from "react";
+import { useOptimistic, useState } from "react";
 import axios from "axios";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
@@ -33,7 +33,7 @@ interface Props {
 function NewDriverForm({ carData, userId }: Props) {
   const [selectedMake, setSelectedMake] = useState<string>();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useOptimistic(false, () => true);
 
   const carModels = selectedMake
     ? carData.filter((car) => car.Make === selectedMake)
@@ -173,8 +173,8 @@ function NewDriverForm({ carData, userId }: Props) {
                 Car Seats (excluding driver)
               </Label>
               <Input
-                min={0}
                 max={12}
+                min={0}
                 required
                 name="carSeats"
                 type={"number"}

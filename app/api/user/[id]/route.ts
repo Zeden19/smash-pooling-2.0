@@ -3,6 +3,7 @@ import prisma from "@/prisma/prismaClient";
 import { validateRequest } from "@/app/hooks/validateRequest";
 import { carColours, carMakes } from "@/app/profile/[id]/CarData";
 import { z } from "zod";
+import { promises as fs } from "fs";
 
 interface Props {
   params: { id: string };
@@ -20,13 +21,25 @@ export async function GET(req: NextRequest, { params: { id } }: Props) {
 }
 
 const driverSchema = z.object({
-  fullName: z.string().min(3).max(100),
-  phoneNumber: z.string().min(8).max(100),
-  carMake: z.enum(carMakes),
-  carModel: z.string(),
-  carColour: z.enum(carColours),
-  licencePlate: z.string().min(6).max(12),
-  carSeats: z.number().min(1).max(12),
+  fullName: z
+    .string({ message: "Name is required" })
+    .min(3, { message: "Name must be longer than 3 characters" })
+    .max(40, { message: "Name must be smaller than 40 characters" }),
+  phoneNumber: z
+    .string({ message: "Phone number is required" })
+    .min(4, { message: "Phone number must be larger than 4 characters" })
+    .max(22, { message: "Phone number must be smaller than 23 characters" }),
+  carMake: z.enum(carMakes, { message: "Invalid car make" }),
+  carModel: z.string({ message: "Car model is required" }),
+  carColour: z.enum(carColours, { message: "Invalid car colour" }),
+  licencePlate: z
+    .string({ message: "Licence Plate is required" })
+    .min(6, { message: "Licence Plate must be longer than 6 characters" })
+    .max(12, { message: "Licence Plate must be shorter than 13 characters" }),
+  carSeats: z
+    .number({ message: "Car Seats is required" })
+    .min(1, { message: "Car seats must be greater than 1" })
+    .max(12, { message: "Car seats must be smaller than 13" }),
 });
 
 export async function PATCH(req: NextRequest, { params: { id } }: Props) {
@@ -44,7 +57,21 @@ export async function PATCH(req: NextRequest, { params: { id } }: Props) {
 
   const validation = driverSchema.safeParse(body);
 
-  console.log(body);
+  const file = await fs.readFile(
+    process.cwd() + "/app/profile/[id]/Car_Model_List.json",
+    "utf8",
+  );
+  const carData: { Year: number; Make: string; Model: string; Category: string }[] =
+    JSON.parse(file);
+  const carModels = body.carMake
+    ? carData.filter((car) => car.Make === body.carMake).map((car) => car.Model)
+    : null;
+
+  if (carModels?.includes(body.carModel))
+    return NextResponse.json(
+      { error: "Car model does not exist with selected car Make" },
+      { status: 400 },
+    );
 
   if (validation.error)
     return NextResponse.json({ error: validation.error }, { status: 400 });
