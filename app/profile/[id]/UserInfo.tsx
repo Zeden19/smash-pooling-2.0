@@ -2,7 +2,6 @@ import { Separator } from "@/components/ui/separator";
 import { MailIcon, PhoneIcon, TagIcon } from "lucide-react";
 import { DriverInfo } from "@/components/DriverInfo";
 import NewDriverForm from "@/app/profile/[id]/NewDriverForm";
-import { promises as fs } from "fs";
 import { User } from "prisma/prisma-client";
 import { validateRequest } from "@/app/hooks/validateRequest";
 
@@ -16,12 +15,6 @@ export async function UserInfo({ user }: Props) {
   const { user: validatedUser } = await validateRequest();
   const canEdit = user.id === validatedUser?.id;
 
-  const file = await fs.readFile(
-    process.cwd() + "/app/profile/[id]/Car_Model_List.json",
-    "utf8",
-  );
-  const carData: { Year: number; Make: string; Model: string; Category: string }[] =
-    JSON.parse(file);
   return (
     <div className={"m-8 flex flex-col gap-3"}>
       <img
@@ -52,7 +45,7 @@ export async function UserInfo({ user }: Props) {
       {user.isDriver ? (
         <DriverInfo driver={user} />
       ) : (
-        canEdit && <NewDriverForm userId={user.id} carData={carData} />
+        canEdit && <NewDriverForm userId={user.id} />
       )}
     </div>
   );

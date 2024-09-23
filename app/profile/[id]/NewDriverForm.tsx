@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { carColours, carMakes } from "@/app/profile/[id]/CarData";
+import { carColours, carData } from "@/app/profile/[id]/CarData";
 import { useOptimistic, useState } from "react";
 import axios from "axios";
 import FailureToast from "@/components/FailureToast";
@@ -26,18 +26,16 @@ import SuccessToast from "@/components/SuccessToast";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface Props {
-  carData: { Year: number; Make: string; Model: string; Category: string }[];
   userId: string;
 }
 
-function NewDriverForm({ carData, userId }: Props) {
+function NewDriverForm({ userId }: Props) {
   const [selectedMake, setSelectedMake] = useState<string>();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useOptimistic(false, () => true);
 
-  const carModels = selectedMake
-    ? carData.filter((car) => car.Make === selectedMake)
-    : null;
+  // @ts-ignore
+  const carModels = selectedMake ? carData[selectedMake] : null;
 
   async function onSubmit(formData: FormData) {
     setLoading(true);
@@ -62,7 +60,7 @@ function NewDriverForm({ carData, userId }: Props) {
       SuccessToast("Successfully updated data", "Get driving!");
       setOpen(false);
     } catch (e: any) {
-      FailureToast("Could not update data", e.response.data.error.issues[0].message);
+      FailureToast("Could not update data", e.response.data.error);
     } finally {
       setLoading(false);
     }
@@ -114,7 +112,7 @@ function NewDriverForm({ carData, userId }: Props) {
                   </SelectTrigger>
 
                   <SelectContent>
-                    {carMakes.map((make) => (
+                    {Object.keys(carData).map((make) => (
                       <SelectItem key={make} value={make}>
                         {make}
                       </SelectItem>
@@ -132,11 +130,10 @@ function NewDriverForm({ carData, userId }: Props) {
                     <SelectValue className={"w-100"} />
                   </SelectTrigger>
                   <SelectContent>
+                    {/*//@ts-ignore*/}
                     {carModels?.map((car) => (
-                      <SelectItem
-                        key={car.Model + " " + car.Year}
-                        value={car.Model + " " + car.Year}>
-                        {car.Model + " " + car.Year}
+                      <SelectItem key={car} value={car}>
+                        {car}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { validateRequest } from "@/app/hooks/validateRequest";
-import { carColours, carMakes } from "@/app/profile/[id]/CarData";
+import { carColours, carData } from "@/app/profile/[id]/CarData";
 import { z } from "zod";
-import { promises as fs } from "fs";
+import { carMakes } from "@/app/api/user/[id]/carMakes";
 
 interface Props {
   params: { id: string };
@@ -57,24 +57,19 @@ export async function PATCH(req: NextRequest, { params: { id } }: Props) {
 
   const validation = driverSchema.safeParse(body);
 
-  const file = await fs.readFile(
-    process.cwd() + "/app/profile/[id]/Car_Model_List.json",
-    "utf8",
-  );
-  const carData: { Year: number; Make: string; Model: string; Category: string }[] =
-    JSON.parse(file);
   const carModels = body.carMake
-    ? carData.filter((car) => car.Make === body.carMake).map((car) => car.Model)
+    ? //@ts-ignore
+      carData[body.carMake]
     : null;
 
-  if (carModels?.includes(body.carModel))
+  if (!carModels?.includes(body.carModel))
     return NextResponse.json(
       { error: "Car model does not exist with selected car Make" },
       { status: 400 },
     );
 
   if (validation.error)
-    return NextResponse.json({ error: validation.error }, { status: 400 });
+    return NextResponse.json({ error: validation.error.format() }, { status: 400 });
 
   const driverInfo = await prisma.user.update({
     where: { id: id },
