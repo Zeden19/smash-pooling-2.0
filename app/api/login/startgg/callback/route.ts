@@ -5,6 +5,7 @@ import { lucia, startgg } from "@/app/api/auth/auth";
 import prisma from "@/prisma/prismaClient";
 import { GraphQLClient } from "graphql-request";
 import { GET_CURRENT_USER } from "@/app/services/startggQueries";
+import defaultAvatar from "@/app/assets/defaultAvatar.png";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -58,7 +59,7 @@ export async function GET(request: Request): Promise<Response> {
         gamertag: startGGUser.player.gamerTag,
         slug: startGGUser.slug,
         email: startGGUser.email,
-        profilePicture: startGGUser.images[0].url,
+        profilePicture: startGGUser.images[0]?.url ?? defaultAvatar.src,
       },
     });
 

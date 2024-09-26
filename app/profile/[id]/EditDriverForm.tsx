@@ -24,13 +24,19 @@ import axios from "axios";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { User } from "prisma/prisma-client";
 
 interface Props {
-  userId: string;
+  user: User;
 }
 
-function NewDriverForm({ userId }: Props) {
-  const [selectedMake, setSelectedMake] = useState<string>();
+function NewDriverForm({ user }: Props) {
+  const carInfo = user.carInfo ? user.carInfo.split(" ") : undefined;
+  const carMake = carInfo ? carInfo[0] : undefined;
+  const carModel = carInfo ? carInfo.slice(1, -1) : undefined;
+  const carColour = carInfo ? carInfo[carInfo.length - 1] : undefined;
+
+  const [selectedMake, setSelectedMake] = useState<string | undefined>(carMake);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useOptimistic(false, () => true);
 
@@ -48,7 +54,7 @@ function NewDriverForm({ userId }: Props) {
     const licencePlate = formData.get("licencePlate");
 
     try {
-      await axios.patch(`/api/user/${userId}`, {
+      await axios.patch(`/api/user/${user.id}`, {
         fullName,
         phoneNumber,
         carModel,
@@ -69,13 +75,13 @@ function NewDriverForm({ userId }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Become Driver</Button>
+        <Button>Edit Driver Info</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Become Driver</DialogTitle>
+          <DialogTitle>Edit Driver Info</DialogTitle>
           <DialogDescription>
-            To become a driver you must enter some info for passengers. Please maker sure
+            To become a driver you must enter some info for passengers. Please make sure
             all info is correct
           </DialogDescription>
         </DialogHeader>
@@ -86,14 +92,24 @@ function NewDriverForm({ userId }: Props) {
               <Label htmlFor="fullName" className="text-right">
                 Full Name
               </Label>
-              <Input required name="fullName" className="col-span-3" />
+              <Input
+                defaultValue={user.fullName ?? undefined}
+                required
+                name="fullName"
+                className="col-span-3"
+              />
             </div>
 
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="phoneNumber" className="text-right">
                 Phone Number
               </Label>
-              <Input required name="phoneNumber" className="col-span-3" />
+              <Input
+                defaultValue={user.phoneNumber ?? undefined}
+                required
+                name="phoneNumber"
+                className="col-span-3"
+              />
             </div>
 
             <div className={"grid grid-cols-2 items-center gap-3"}>
@@ -104,6 +120,7 @@ function NewDriverForm({ userId }: Props) {
                 <Select
                   required
                   name={"carMake"}
+                  defaultValue={carMake}
                   onValueChange={(value) => {
                     setSelectedMake(value);
                   }}>
@@ -125,7 +142,10 @@ function NewDriverForm({ userId }: Props) {
                 <Label htmlFor={"carModel"} className="text-right">
                   Car Model
                 </Label>
-                <Select required name={"carModel"}>
+                <Select
+                  required
+                  defaultValue={carModel ? carModel.join(" ") : undefined}
+                  name={"carModel"}>
                   <SelectTrigger>
                     <SelectValue className={"w-100"} />
                   </SelectTrigger>
@@ -144,7 +164,7 @@ function NewDriverForm({ userId }: Props) {
                 <Label htmlFor={"carColour"} className="text-right">
                   Car Color
                 </Label>
-                <Select name={"carColour"} required>
+                <Select name={"carColour"} defaultValue={carColour} required>
                   <SelectTrigger>
                     <SelectValue className={"w-100"} />
                   </SelectTrigger>
@@ -162,7 +182,12 @@ function NewDriverForm({ userId }: Props) {
                 <Label htmlFor="licencePlate" className="text-right">
                   Licence Plate
                 </Label>
-                <Input required name="licencePlate" className="col-span-3" />
+                <Input
+                  defaultValue={user.licencePlate ?? undefined}
+                  required
+                  name="licencePlate"
+                  className="col-span-3"
+                />
               </div>
             </div>
             <div className={"grid grid-cols-4 items-center gap-4"}>
@@ -170,6 +195,7 @@ function NewDriverForm({ userId }: Props) {
                 Car Seats (excluding driver)
               </Label>
               <Input
+                defaultValue={user.carSeats ?? undefined}
                 max={12}
                 min={0}
                 required
