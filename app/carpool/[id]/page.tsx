@@ -1,7 +1,7 @@
 import prisma from "@/prisma/prismaClient";
 import GoogleMap from "@/components/GoogleMap";
 import { makeTitle } from "@/app/services/makeTitle";
-import { DriverInfo } from "@/components/DriverInfo";
+import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
 import MapElements from "@/app/carpool/[id]/MapElements";
 
 interface Props {

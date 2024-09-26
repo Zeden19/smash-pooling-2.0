@@ -39,6 +39,11 @@ async function ProfilePage({ params: { id } }: Props) {
     destinationLng: DecimalToNumber(carpool.destinationLng),
   }));
 
+  // @ts-ignore
+  delete user.carpoolsAttending;
+  // @ts-ignore
+  delete user.carpoolsDriving;
+
   return (
     <div className={"flex gap-12 w-[1400px]"}>
       {/*Left side*/}

@@ -1,5 +1,6 @@
 import { ArmchairIcon, CarIcon, IdCardIcon } from "lucide-react";
 import { User } from "prisma/prisma-client";
+import GenericToolTip from "@/components/GenericToolTip";
 
 export function DriverInfo({ driver }: { driver: User }) {
   return (
@@ -7,13 +8,16 @@ export function DriverInfo({ driver }: { driver: User }) {
       <>
         <h1 className={"text-2xl font-bold mb-3"}>Driver Info</h1>
         <div className={"flex gap-2"}>
-          <img
-            className={"rounded-full"}
-            alt={"Profile Picture"}
-            src={driver?.profilePicture ?? ""}
-            width={100}
-            height={100}
-          />
+          <GenericToolTip toolTipText={"Driver Picture"}>
+            <img
+              className={"rounded-full"}
+              alt={"Profile Picture"}
+              src={driver?.profilePicture ?? ""}
+              width={100}
+              height={100}
+            />
+          </GenericToolTip>
+
           <img
             className={"rounded-full"}
             alt={"Profile Picture"}
@@ -24,15 +28,21 @@ export function DriverInfo({ driver }: { driver: User }) {
         </div>
         <div className={"flex gap-2"}>
           <CarIcon />
-          <p>{driver.carInfo}</p>
+          <GenericToolTip toolTipText={"Car Info"}>
+            <p>{driver.carInfo}</p>
+          </GenericToolTip>
         </div>
         <div className={"flex gap-2"}>
           <IdCardIcon />
-          <p>{driver.licencePlate}</p>
+          <GenericToolTip toolTipText={"Licence Plate"}>
+            <p>{driver.licencePlate}</p>
+          </GenericToolTip>
         </div>
         <div className={"flex gap-2"}>
           <ArmchairIcon />
-          <p>{driver.carSeats} seat(s) (Excluding Driver)</p>
+          <GenericToolTip toolTipText={"Seats Available"}>
+            <p>{driver.carSeats} seat(s) (Excluding Driver)</p>
+          </GenericToolTip>
         </div>
       </>
     </div>
