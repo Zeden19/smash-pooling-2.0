@@ -1,7 +1,7 @@
 import { ArmchairIcon, CarIcon, IdCardIcon } from "lucide-react";
 import { User } from "prisma/prisma-client";
 
-export async function DriverInfo({ driver }: { driver: User }) {
+export function DriverInfo({ driver }: { driver: User }) {
   return (
     <div>
       <>

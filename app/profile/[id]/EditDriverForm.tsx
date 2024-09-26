@@ -28,9 +28,10 @@ import { User } from "prisma/prisma-client";
 
 interface Props {
   user: User;
+  setUser: (user: User) => void;
 }
 
-function NewDriverForm({ user }: Props) {
+function NewDriverForm({ user, setUser }: Props) {
   const carInfo = user.carInfo ? user.carInfo.split(" ") : undefined;
   const carMake = carInfo ? carInfo[0] : undefined;
   const carModel = carInfo ? carInfo.slice(1, -1) : undefined;
@@ -54,7 +55,7 @@ function NewDriverForm({ user }: Props) {
     const licencePlate = formData.get("licencePlate");
 
     try {
-      await axios.patch(`/api/user/${user.id}`, {
+      const { data } = await axios.patch(`/api/user/${user.id}`, {
         fullName,
         phoneNumber,
         carModel,
@@ -64,6 +65,7 @@ function NewDriverForm({ user }: Props) {
         licencePlate,
       });
       SuccessToast("Successfully updated data", "Get driving!");
+      setUser(data);
       setOpen(false);
     } catch (e: any) {
       FailureToast("Could not update data", e.response.data.error);
@@ -95,6 +97,7 @@ function NewDriverForm({ user }: Props) {
               <Input
                 defaultValue={user.fullName ?? undefined}
                 required
+                id={"fullName"}
                 name="fullName"
                 className="col-span-3"
               />
@@ -107,6 +110,7 @@ function NewDriverForm({ user }: Props) {
               <Input
                 defaultValue={user.phoneNumber ?? undefined}
                 required
+                id={"phoneNumber"}
                 name="phoneNumber"
                 className="col-span-3"
               />
@@ -114,7 +118,7 @@ function NewDriverForm({ user }: Props) {
 
             <div className={"grid grid-cols-2 items-center gap-3"}>
               <div>
-                <Label htmlFor={"carModel"} className="text-right">
+                <Label htmlFor={"carMake"} className="text-right">
                   Car Make
                 </Label>
                 <Select
@@ -124,7 +128,7 @@ function NewDriverForm({ user }: Props) {
                   onValueChange={(value) => {
                     setSelectedMake(value);
                   }}>
-                  <SelectTrigger>
+                  <SelectTrigger id={"carMake"}>
                     <SelectValue className={"w-100"} />
                   </SelectTrigger>
 
@@ -146,7 +150,7 @@ function NewDriverForm({ user }: Props) {
                   required
                   defaultValue={carModel ? carModel.join(" ") : undefined}
                   name={"carModel"}>
-                  <SelectTrigger>
+                  <SelectTrigger id={"carModel"}>
                     <SelectValue className={"w-100"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,7 +169,7 @@ function NewDriverForm({ user }: Props) {
                   Car Color
                 </Label>
                 <Select name={"carColour"} defaultValue={carColour} required>
-                  <SelectTrigger>
+                  <SelectTrigger id={"carColour"}>
                     <SelectValue className={"w-100"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -185,6 +189,7 @@ function NewDriverForm({ user }: Props) {
                 <Input
                   defaultValue={user.licencePlate ?? undefined}
                   required
+                  id={"licencePlate"}
                   name="licencePlate"
                   className="col-span-3"
                 />
@@ -199,6 +204,7 @@ function NewDriverForm({ user }: Props) {
                 max={12}
                 min={0}
                 required
+                id={"carSeats"}
                 name="carSeats"
                 type={"number"}
                 className="col-span-3"

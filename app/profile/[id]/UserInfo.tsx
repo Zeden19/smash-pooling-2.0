@@ -1,22 +1,20 @@
+"use client";
 import { Separator } from "@/components/ui/separator";
 import { MailIcon, PhoneIcon, TagIcon } from "lucide-react";
 import { DriverInfo } from "@/components/DriverInfo";
 import { User } from "prisma/prisma-client";
-import { validateRequest } from "@/app/hooks/validateRequest";
 import EditDriverForm from "@/app/profile/[id]/EditDriverForm";
+import { useState } from "react";
 
 interface Props {
-  user: User;
+  profileUser: User;
+  validatedUser: User | null;
 }
 
-export async function UserInfo({ user }: Props) {
+export function UserInfo({ profileUser, validatedUser }: Props) {
+  const [user, setUser] = useState<User>(profileUser);
   if (!user) return null;
-
-  const { user: validatedUser } = await validateRequest();
   const canEdit = user.id === validatedUser?.id;
-
-  console.log(user.fullName);
-  console.log(user.fullName ? "gamertag" : "fullname");
 
   return (
     <div className={"m-8 flex flex-col gap-3"}>
@@ -48,10 +46,10 @@ export async function UserInfo({ user }: Props) {
       {user.isDriver ? (
         <>
           <DriverInfo driver={user} />
-          {canEdit && <EditDriverForm user={user} />}
+          {canEdit && <EditDriverForm setUser={(user) => setUser(user)} user={user} />}
         </>
       ) : (
-        canEdit && <EditDriverForm user={user} />
+        canEdit && <EditDriverForm setUser={(user) => setUser(user)} user={user} />
       )}
     </div>
   );

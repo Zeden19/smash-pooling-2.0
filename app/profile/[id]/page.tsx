@@ -3,6 +3,7 @@ import prisma from "@/prisma/prismaClient";
 import CarpoolTable from "@/components/CarpoolTable";
 import { redirect } from "next/navigation";
 import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
+import { validateRequest } from "@/app/hooks/validateRequest";
 
 interface Props {
   params: { id: string };
@@ -16,6 +17,8 @@ async function ProfilePage({ params: { id } }: Props) {
       carpoolsDriving: true,
     },
   });
+
+  const { user: validatedUser } = await validateRequest();
 
   if (!user) redirect("/");
 
@@ -39,7 +42,7 @@ async function ProfilePage({ params: { id } }: Props) {
   return (
     <div className={"flex gap-12 w-[1400px]"}>
       {/*Left side*/}
-      <UserInfo user={user} />
+      <UserInfo profileUser={user} validatedUser={validatedUser} />
 
       {/*Right Side*/}
       <div className={"mt-7 flex flex-col gap-5"}>
