@@ -1,6 +1,7 @@
 import { ArmchairIcon, CarIcon, IdCardIcon } from "lucide-react";
 import { User } from "prisma/prisma-client";
 import GenericToolTip from "@/components/GenericToolTip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function DriverInfo({ driver }: { driver: User }) {
   return (
@@ -9,13 +10,10 @@ export function DriverInfo({ driver }: { driver: User }) {
         <h1 className={"text-2xl font-bold mb-3"}>Driver Info</h1>
         <div className={"flex gap-2"}>
           <GenericToolTip toolTipText={"Driver Picture"}>
-            <img
-              className={"rounded-full"}
-              alt={"Profile Picture"}
-              src={driver?.profilePicture ?? ""}
-              width={100}
-              height={100}
-            />
+            <Avatar className={"w-[7vw] h-[11vh]"}>
+              <AvatarImage src={driver.profilePicture} />
+              <AvatarFallback>{driver.gamertag.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
           </GenericToolTip>
 
           <img

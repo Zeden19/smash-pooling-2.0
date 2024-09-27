@@ -6,6 +6,7 @@ import { User } from "prisma/prisma-client";
 import EditDriverForm from "@/app/profile/[id]/EditDriverForm";
 import { useState } from "react";
 import GenericToolTip from "@/components/GenericToolTip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
   profileUser: User;
@@ -20,13 +21,10 @@ export function UserInfo({ profileUser, validatedUser }: Props) {
   return (
     <div className={"m-8 flex flex-col gap-3"}>
       <GenericToolTip toolTipText={"Startgg Avatar"}>
-        <img
-          className={"rounded-full"}
-          alt={"Profile Picture"}
-          src={user.profilePicture ?? ""}
-          width={300}
-          height={300}
-        />
+        <Avatar className={"w-[15vw] h-[25vh]"}>
+          <AvatarImage src={user.profilePicture} />
+          <AvatarFallback>{user.gamertag.charAt(0).toUpperCase()}</AvatarFallback>
+        </Avatar>
       </GenericToolTip>
       <h1 className={"text-4xl font-bold"}>{user.fullName || user.gamertag}</h1>
 
