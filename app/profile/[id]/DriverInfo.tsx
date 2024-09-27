@@ -8,7 +8,7 @@ export function DriverInfo({ driver }: { driver: User }) {
     <div>
       <>
         <h1 className={"text-2xl font-bold mb-3"}>Driver Info</h1>
-        <div className={"flex gap-2"}>
+        <div className={"flex gap-2 mb-3"}>
           <GenericToolTip toolTipText={"Driver Picture"}>
             <Avatar className={"w-[7vw] h-[11vh]"}>
               <AvatarImage src={driver.profilePicture} />

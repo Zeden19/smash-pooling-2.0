@@ -16,8 +16,11 @@ export async function PATCH(
   });
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
-  if (carpool.attendees.includes(user))
-    return NextResponse.json({ error: "You are already in this carpool." });
+  if (carpool.attendees.map((attendee) => attendee.id).includes(user.id))
+    return NextResponse.json(
+      { error: "You are already in this carpool." },
+      { status: 400 },
+    );
 
   const data = await prisma.carpool.update({
     where: { id: parseInt(id) },

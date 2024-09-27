@@ -21,8 +21,11 @@ function FindCarpoolPage() {
     try {
       const data = await axios.patch(`/api/carpool/addAttendee/${id}`);
       SuccessToast("Successfully attended Carpool!", "Stay safe!");
-    } catch (e) {
-      FailureToast("Could not attend carpool: " + e, "Please try again");
+    } catch (e: any) {
+      FailureToast(
+        "Could not attend carpool: " + e.response.data.error,
+        "Please try again",
+      );
     }
   }
 
