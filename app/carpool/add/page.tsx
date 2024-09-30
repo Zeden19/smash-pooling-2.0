@@ -6,7 +6,6 @@ import OriginForm from "@/app/carpool/add/OriginForm";
 import GetRoute from "@/app/carpool/add/GetRoute";
 import AddCarpool from "@/app/carpool/add/AddCarpool";
 import LatLngLiteral = google.maps.LatLngLiteral;
-import LatLng = google.maps.LatLng;
 
 export interface Origin {
   cords: LatLngLiteral;
@@ -20,7 +19,7 @@ export interface Destination {
 }
 
 export interface Route {
-  route: LatLng[];
+  route: string;
   distance: string;
 }
 

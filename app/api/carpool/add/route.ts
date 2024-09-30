@@ -5,17 +5,23 @@ import { validateRequest } from "@/app/hooks/validateRequest";
 import { Prisma } from "@prisma/client";
 
 const cords = z.object({
-  lat: z.number({ message: "Lat" }),
-  lng: z.number({ message: "Lng" }),
+  lat: z.number({ message: "Lat required" }),
+  lng: z.number({ message: "Lng required" }),
 });
 
-const origin = z.object({ cords: cords, name: z.string({ message: "Origin Name" }) });
+const origin = z.object({
+  cords: cords,
+  name: z.string({ message: "Origin Name required" }),
+});
 const destination = z.object({
   cords: cords,
-  name: z.string({ message: "Destination Name" }),
-  slug: z.string({ message: "Destination Slug" }),
+  name: z.string({ message: "Destination Name required" }),
+  slug: z.string({ message: "Destination Slug required" }),
 });
-const route = z.object({ route: z.array(cords), distance: z.string() });
+const route = z.object({
+  route: z.string({ message: "Encoded path required" }),
+  distance: z.string({ message: "Distance is required" }),
+});
 const schema = z.object({
   origin,
   destination,

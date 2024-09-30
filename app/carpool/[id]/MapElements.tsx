@@ -3,6 +3,7 @@ import useMapStore from "@/app/stores";
 import { Carpool } from "prisma/prisma-client";
 import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
 import { orangeMarker } from "@/app/MarkerStyles";
+import decodePolyline from "@/app/services/decodePath";
 
 interface Props {
   carpool: Carpool;
@@ -10,8 +11,10 @@ interface Props {
 
 function MapElements({ carpool }: Props) {
   const { mapsApi } = useMapStore();
-  const route = carpool.route as unknown as google.maps.LatLng[];
-  const middle = route[Math.floor(route.length / 2)];
+  const route = carpool.route;
+
+  const decodedRoute = decodePolyline(route) as unknown as google.maps.LatLng[];
+  const middle = decodedRoute[Math.floor(decodedRoute.length / 2)];
 
   // destination Marker
   mapsApi?.addMarker({

@@ -50,7 +50,7 @@ model Carpool {
 
   tournamentSlug String
   distance       String
-  route          Json
+  route          String        @db.VarChar(6000)
   seatsAvailable Int?
   startTime      DateTime?
   status         CarpoolStatus @default(OPEN)

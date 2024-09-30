@@ -25,7 +25,6 @@ function GetRoute({ route, destination, origin, setRoute }: Props) {
     if (shownRoute) shownRoute.setMap(null);
     try {
       const route = await mapsApi?.getRoutes(origin.cords, destination.cords)!;
-      console.log(route);
       if (!route) return;
       const newRoute = mapsApi?.setRoute(route.route);
       setRoute(route);

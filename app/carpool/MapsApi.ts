@@ -2,6 +2,7 @@ import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
 import PinElementOptions = google.maps.marker.PinElementOptions;
 import { PopUp } from "@/app/carpool/PopUp";
+import decodePolyline from "@/app/services/decodePath";
 
 class MapsApi {
   private geocoder: google.maps.Geocoder;
@@ -38,14 +39,14 @@ class MapsApi {
   async getRoutes(
     origin: LatLngLiteral,
     destination: LatLngLiteral,
-  ): Promise<{ route: LatLng[]; distance: string } | void> {
-    let data: { route: LatLng[]; distance: string } | undefined;
+  ): Promise<{ route: string; distance: string } | void> {
+    let data: { route: string; distance: string } | undefined;
     await this.directionsService.route(
       //@ts-ignore
       { origin: origin, destination: destination, travelMode: "DRIVING" },
       (result, status) => {
         if (status !== "OK") return;
-        const route = result!.routes[0].overview_path;
+        const route = result!.routes[0].overview_polyline;
         const distance = result!.routes[0].legs[0].distance!.text;
         data = { route, distance };
       },
@@ -54,9 +55,9 @@ class MapsApi {
     return data;
   }
 
-  setRoute(route: LatLng[], infoWindowContent?: HTMLElement) {
+  setRoute(route: string, infoWindowContent?: HTMLElement) {
     const newRoute = new google.maps.Polyline({
-      path: route,
+      path: decodePolyline(route),
       strokeColor: "#FF0000",
       strokeOpacity: 1.0,
       strokeWeight: 2,
