@@ -12,6 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
+import { redirect } from "next/navigation";
 
 interface Props {
   params: { id: string };
@@ -25,7 +27,7 @@ async function CarpoolPage({ params: { id } }: Props) {
       driver: true,
     },
   });
-  if (!carpool) return null;
+  if (!carpool) return redirect("/carpool/edit");
   const driver = carpool.driver;
   const attendees = carpool.attendees;
 
@@ -86,6 +88,8 @@ async function CarpoolPage({ params: { id } }: Props) {
               ))}
             </TableBody>
           </Table>
+
+          <DeleteCarpoolDialog carpoolId={carpool.id} />
         </div>
 
         <GoogleMap
