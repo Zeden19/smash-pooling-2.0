@@ -2,7 +2,7 @@ import LatLngLiteral = google.maps.LatLngLiteral;
 import LatLng = google.maps.LatLng;
 import PinElementOptions = google.maps.marker.PinElementOptions;
 import { PopUp } from "@/app/carpool/PopUp";
-import decodePolyline from "@/app/services/decodePath";
+import decodePolyline from "@/app/carpool/decodePath";
 
 class MapsApi {
   private geocoder: google.maps.Geocoder;

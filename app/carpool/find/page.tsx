@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { FormEvent, useState } from "react";
 import axios, { AxiosError } from "axios";
 import styles from "./styles.module.css";
-import { slug as getSlug } from "@/app/services/startggClient";
+import { slug as getSlug } from "@/app/helpers/services/startggClient";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
 import useMapStore from "@/app/stores";

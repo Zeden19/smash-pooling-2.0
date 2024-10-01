@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import startggClient from "@/app/services/startggClient";
-import { CHECK_TOURNAMENT_EXISTS } from "@/app/services/startggQueries";
+import startggClient from "@/app/helpers/services/startggClient";
+import { CHECK_TOURNAMENT_EXISTS } from "@/app/helpers/services/startggQueries";
 
 export async function GET(
   req: NextRequest,

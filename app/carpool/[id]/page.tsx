@@ -1,6 +1,6 @@
 import prisma from "@/prisma/prismaClient";
 import GoogleMap from "@/components/GoogleMap";
-import { makeTitle } from "@/app/services/makeTitle";
+import { makeTitle } from "@/app/helpers/services/makeTitle";
 import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
 import MapElements from "@/app/carpool/[id]/MapElements";
 import {

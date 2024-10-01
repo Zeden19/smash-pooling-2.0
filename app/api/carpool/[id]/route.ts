@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateRequest } from "@/app/hooks/validateRequest";
+import { getUser } from "@/app/helpers/hooks/getUser";
 import prisma from "@/prisma/prismaClient";
 
 export async function DELETE(
   req: NextRequest,
   { params: { id } }: { params: { id: string } },
 ) {
-  console.log("in deelte");
-  const { user } = await validateRequest();
+  const { user } = await getUser();
   const carpool = await prisma.carpool.findUnique({ where: { id: parseInt(id) } });
   console.log(id, user, carpool);
 

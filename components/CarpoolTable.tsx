@@ -8,27 +8,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import CarpoolStatusBadge from "@/components/CarpoolStatusBadge";
-import { CarpoolStatus } from "prisma/prisma-client";
 import Link from "next/link";
-import { makeTitle } from "@/app/services/makeTitle";
+import { makeTitle } from "@/app/helpers/services/makeTitle";
+import { CarpoolNumber } from "@/components/CarpoolsDisplay";
 
 interface Props {
-  carpools: {
-    originLat: number;
-    originLng: number;
-    destinationLat: number;
-    destinationLng: number;
-    id: number;
-    driverId: string;
-    originName: string;
-    destinationName: string;
-    tournamentSlug: string;
-    seatsAvailable: number | null;
-    distance: string;
-    startTime: Date | null;
-    description: string | null;
-    status: CarpoolStatus;
-  }[];
+  carpools: CarpoolNumber[];
 }
 
 function CarpoolTable({ carpools }: Props) {

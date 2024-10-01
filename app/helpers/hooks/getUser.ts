@@ -4,7 +4,7 @@ import { cache } from "react";
 import { Session, User } from "lucia";
 import { lucia } from "@/app/api/auth/auth";
 
-export const validateRequest = cache(
+export const getUser = cache(
   async (): Promise<{ user: User; session: Session } | { user: null; session: null }> => {
     const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
     if (!sessionId) {

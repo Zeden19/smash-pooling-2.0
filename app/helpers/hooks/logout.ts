@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { validateRequest } from "@/app/hooks/validateRequest";
+import { getUser } from "@/app/helpers/hooks/getUser";
 import { lucia } from "@/app/api/auth/auth";
 
 export async function logout(): Promise<ActionResult> {
   "use server";
-  const { session } = await validateRequest();
+  const { session } = await getUser();
   if (!session) {
     return {
       error: "Unauthorized",

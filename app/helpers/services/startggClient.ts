@@ -8,7 +8,7 @@ const startggClient = new GraphQLClient(endpoint, {
   },
 });
 
-export const slug = (url : string) => {
+export const slug = (url: string) => {
   try {
     const slug = new URL(url).pathname.match(/[^\/]+/g);
     if (slug) return slug[1];
@@ -16,6 +16,6 @@ export const slug = (url : string) => {
   } catch (e) {
     return false;
   }
-}
+};
 
 export default startggClient;

@@ -1,11 +1,11 @@
-import CarpoolTable from "@/components/CarpoolTable";
-import { validateRequest } from "@/app/hooks/validateRequest";
+import { getUser } from "@/app/helpers/hooks/getUser";
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
-import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
+import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
+import CarpoolsDisplay from "@/components/CarpoolsDisplay";
 
 async function EditCarpoolsPage() {
-  const { user } = await validateRequest();
+  const { user } = await getUser();
   if (!user) redirect("/");
   const data = await prisma.user.findUnique({
     where: { id: user?.id },
@@ -17,34 +17,16 @@ async function EditCarpoolsPage() {
 
   if (!data) redirect("/");
 
-  const carpoolsDriving = data.carpoolsDriving.map((carpool) => ({
-    ...carpool,
-    originLat: DecimalToNumber(carpool.originLat),
-    originLng: DecimalToNumber(carpool.originLng),
-    destinationLat: DecimalToNumber(carpool.destinationLat),
-    destinationLng: DecimalToNumber(carpool.destinationLng),
-  }));
-
-  const carpoolsAttending = data.carpoolsAttending.map((carpool) => ({
-    ...carpool,
-    originLat: DecimalToNumber(carpool.originLat),
-    originLng: DecimalToNumber(carpool.originLng),
-    destinationLat: DecimalToNumber(carpool.destinationLat),
-    destinationLng: DecimalToNumber(carpool.destinationLng),
-  }));
+  const carpoolsDriving = carpoolDecimalToNumber(data.carpoolsDriving);
+  const carpoolsAttending = carpoolDecimalToNumber(data.carpoolsAttending);
   return (
     <div className={"m-5 flex w-[90vw] flex-col gap-5"}>
       <h1 className={"text-5xl font-bold"}>Select Carpool To Edit</h1>
 
-      <div>
-        <h3 className={"text-2xl font-bold"}>Carpools Driving/Driven</h3>
-        <CarpoolTable carpools={carpoolsDriving} />
-      </div>
-
-      <div>
-        <h3 className={"text-2xl font-bold"}>Carpools Attending/Attended</h3>
-        <CarpoolTable carpools={carpoolsAttending} />
-      </div>
+      <CarpoolsDisplay
+        carpoolsDriving={carpoolsDriving}
+        carpoolsAttending={carpoolsAttending}
+      />
     </div>
   );
 }

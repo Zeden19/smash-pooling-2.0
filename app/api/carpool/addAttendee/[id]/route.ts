@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { validateRequest } from "@/app/hooks/validateRequest";
+import { getUser } from "@/app/helpers/hooks/getUser";
 
 export async function PATCH(
   req: NextRequest,
   { params: { id } }: { params: { id: string } },
 ) {
-  const { user } = await validateRequest();
+  const { user } = await getUser();
   if (!user)
     return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { validateRequest } from "@/app/hooks/validateRequest";
+import { getUser } from "@/app/helpers/hooks/getUser";
 import { carColours, carData } from "@/app/profile/[id]/CarData";
 import { z } from "zod";
 import { carMakes } from "@/app/api/user/[id]/carMakes";
@@ -44,7 +44,7 @@ const driverSchema = z.object({
 
 export async function PATCH(req: NextRequest, { params: { id } }: Props) {
   const body = await req.json();
-  const { user } = await validateRequest();
+  const { user } = await getUser();
   const data = await prisma.user.findUnique({
     where: { id: id },
     include: { carpoolsAttending: true, carpoolsDriving: true },

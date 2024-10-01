@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/prisma/prismaClient";
-import { validateRequest } from "@/app/hooks/validateRequest";
+import { getUser } from "@/app/helpers/hooks/getUser";
 import { Prisma } from "@prisma/client";
 
 const cords = z.object({
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
   const { error } = schema.safeParse(body);
   if (error) return NextResponse.json({ error: error.format() }, { status: 400 });
 
-  const { user } = await validateRequest();
+  const { user } = await getUser();
   if (!user) return NextResponse.json({ error: "User not logged in" }, { status: 400 });
 
   const destination = body.destination;

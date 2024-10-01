@@ -1,4 +1,4 @@
-import { validateRequest } from "@/app/hooks/validateRequest";
+import { getUser } from "@/app/helpers/hooks/getUser";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import Link from "next/link";
@@ -8,10 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { logout } from "@/app/hooks/logout";
+import { logout } from "@/app/helpers/hooks/logout";
 
 async function UserControls() {
-  const { user } = await validateRequest();
+  const { user } = await getUser();
 
   return (
     <>

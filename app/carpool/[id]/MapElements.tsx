@@ -3,7 +3,7 @@ import useMapStore from "@/app/stores";
 import { Carpool } from "prisma/prisma-client";
 import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
 import { orangeMarker } from "@/app/MarkerStyles";
-import decodePolyline from "@/app/services/decodePath";
+import decodePolyline from "@/app/carpool/decodePath";
 
 interface Props {
   carpool: Carpool;

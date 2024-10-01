@@ -4,8 +4,8 @@ import { generateIdFromEntropySize } from "lucia";
 import { lucia, startgg } from "@/app/api/auth/auth";
 import prisma from "@/prisma/prismaClient";
 import { GraphQLClient } from "graphql-request";
-import { GET_CURRENT_USER } from "@/app/services/startggQueries";
-import defaultAvatar from "@/app/assets/defaultAvatar.png";
+import { GET_CURRENT_USER } from "@/app/helpers/services/startggQueries";
+import defaultAvatar from "@/app/helpers/assets/defaultAvatar.png";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);

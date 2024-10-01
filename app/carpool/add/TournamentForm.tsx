@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { FormEvent, useState } from "react";
-import startggClient, { slug } from "@/app/services/startggClient";
-import { GET_TOURNAMENT_BY_URL } from "@/app/services/startggQueries";
+import startggClient, { slug } from "@/app/helpers/services/startggClient";
+import { GET_TOURNAMENT_BY_URL } from "@/app/helpers/services/startggQueries";
 import useMapStore from "@/app/stores";
 import FailureToast from "@/components/FailureToast";
 import SuccessToast from "@/components/SuccessToast";
