@@ -1,6 +1,7 @@
 Todo: 
 
 - Use React router for getting requests, makes error handling and loading easier
+- Edit Carpool (Status, origin, tournament)
 - Set up a user store so we don't validate requests everywhere
 - set up storage for driver images
 - editing carpools

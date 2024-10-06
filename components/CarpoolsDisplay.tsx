@@ -1,26 +1,9 @@
 import CarpoolTable from "@/components/CarpoolTable";
-import { CarpoolStatus } from "prisma/prisma-client";
+import { CarpoolNumber } from "@/app/helpers/entities/CarpoolTypes";
 
 interface Props {
   carpoolsDriving: CarpoolNumber[];
   carpoolsAttending: CarpoolNumber[];
-}
-
-export interface CarpoolNumber {
-  originLat: number;
-  originLng: number;
-  destinationLat: number;
-  destinationLng: number;
-  id: number;
-  driverId: string;
-  originName: string;
-  destinationName: string;
-  tournamentSlug: string;
-  seatsAvailable: number | null;
-  distance: string;
-  startTime: Date | null;
-  description: string | null;
-  status: CarpoolStatus;
 }
 
 function CarpoolsDisplay({ carpoolsDriving, carpoolsAttending }: Props) {

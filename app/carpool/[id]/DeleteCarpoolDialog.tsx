@@ -35,8 +35,8 @@ export function DeleteCarpoolDialog({ carpoolId }: Props) {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button className={"w-[50%] ml-4"} variant={"destructive"}>
+      <AlertDialogTrigger className={"mt-5"} asChild>
+        <Button className={"w-[50%]"} variant={"destructive"}>
           Delete Carpool
         </Button>
       </AlertDialogTrigger>

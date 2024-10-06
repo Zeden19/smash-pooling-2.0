@@ -1,12 +1,11 @@
 "use client";
 import useMapStore from "@/app/stores";
-import { Carpool } from "prisma/prisma-client";
-import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
 import { orangeMarker } from "@/app/MarkerStyles";
 import decodePolyline from "@/app/carpool/decodePath";
+import { CarpoolNumber } from "@/app/helpers/entities/CarpoolTypes";
 
 interface Props {
-  carpool: Carpool;
+  carpool: CarpoolNumber;
 }
 
 function MapElements({ carpool }: Props) {
@@ -18,15 +17,15 @@ function MapElements({ carpool }: Props) {
 
   // destination Marker
   mapsApi?.addMarker({
-    lat: DecimalToNumber(carpool.destinationLat),
-    lng: DecimalToNumber(carpool.destinationLng),
+    lat: carpool.destinationLat,
+    lng: carpool.destinationLng,
   });
 
   // origin marker
   mapsApi?.addMarker(
     {
-      lat: DecimalToNumber(carpool.originLat),
-      lng: DecimalToNumber(carpool.originLng),
+      lat: carpool.originLat,
+      lng: carpool.originLng,
     },
     orangeMarker,
   );

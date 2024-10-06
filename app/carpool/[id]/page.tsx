@@ -14,19 +14,32 @@ import {
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
 import { redirect } from "next/navigation";
+import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
+import {
+  CarpoolAttendeesDriver,
+  CarpoolNumber,
+} from "@/app/helpers/entities/CarpoolTypes";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import ChatWindow from "@/app/carpool/[id]/ChatWindow";
 
 interface Props {
   params: { id: string };
 }
 
 async function CarpoolPage({ params: { id } }: Props) {
-  const carpool = await prisma.carpool.findUnique({
-    where: { id: parseInt(id) },
-    include: {
-      attendees: true,
-      driver: true,
-    },
-  });
+  let carpool: CarpoolAttendeesDriver | CarpoolNumber | null =
+    await prisma.carpool.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        attendees: true,
+        driver: true,
+      },
+    });
   if (!carpool) return redirect("/carpool/edit");
   const driver = carpool.driver;
   const attendees = carpool.attendees;
@@ -41,13 +54,14 @@ async function CarpoolPage({ params: { id } }: Props) {
   return (
     <div className={"m-5"}>
       <h1 className={"text-5xl font-bold mb-8"}>
-        Carpool to {makeTitle(carpool.tournamentSlug)}
+        Carpool to {makeTitle(carpool!.tournamentSlug)}
       </h1>
 
       <div className={"flex gap-5 justify-center"}>
         <div className={"grid grid-cols-2"}>
           <div className={"mx-3"}>
             <DriverInfo driver={driver} />
+            <DeleteCarpoolDialog carpoolId={carpool.id} />
           </div>
 
           <div className={"grid grid-cols-2 h-64"}>
@@ -88,18 +102,30 @@ async function CarpoolPage({ params: { id } }: Props) {
               ))}
             </TableBody>
           </Table>
-
-          <DeleteCarpoolDialog carpoolId={carpool.id} />
         </div>
 
-        <GoogleMap
-          className={"border-4 border-slate-700 rounded"}
-          disableDefaultUI={true}
-          size={{ width: "45vw", height: "50vh" }}
-        />
+        <Accordion type="multiple" className={"w-[45vw] h-[50vh]"}>
+          <AccordionItem value={"item-1"}>
+            <AccordionTrigger>Map</AccordionTrigger>
+            <AccordionContent>
+              <GoogleMap
+                className={"border-4 border-slate-700 rounded"}
+                disableDefaultUI={true}
+                size={{ width: "40vw", height: "50vh" }}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value={"item-2"}>
+            <AccordionTrigger>Chat</AccordionTrigger>
+            <AccordionContent>
+              <ChatWindow />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         {/*Hacky solution to get around server component*/}
-        <MapElements carpool={carpool} />
+        <MapElements carpool={carpoolDecimalToNumber([carpool])[0]} />
       </div>
     </div>
   );
