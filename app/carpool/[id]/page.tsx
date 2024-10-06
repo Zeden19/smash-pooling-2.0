@@ -104,7 +104,10 @@ async function CarpoolPage({ params: { id } }: Props) {
           </Table>
         </div>
 
-        <Accordion type="multiple" className={"w-[45vw] h-[50vh]"}>
+        <Accordion
+          type="multiple"
+          defaultValue={["item-1"]}
+          className={"w-[45vw] h-[50vh]"}>
           <AccordionItem value={"item-1"}>
             <AccordionTrigger>Map</AccordionTrigger>
             <AccordionContent>
@@ -119,7 +122,10 @@ async function CarpoolPage({ params: { id } }: Props) {
           <AccordionItem value={"item-2"}>
             <AccordionTrigger>Chat</AccordionTrigger>
             <AccordionContent>
-              <ChatWindow />
+              <ChatWindow
+                origin={carpool.originName}
+                destination={makeTitle(carpool.tournamentSlug)}
+              />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
