@@ -33,15 +33,15 @@ model User {
   licencePlate String?
   carSeats     Int?
   phoneNumber  String?
-  Message      Message[] // Many To One
+  message      Message[] // Many To One
 }
 
 model Carpool {
-  id        Int        @id @default(autoincrement())
-  driver    User       @relation(fields: [driverId], references: [id], name: "CarpoolDriver") // One to Many
+  id        Int       @id @default(autoincrement())
+  driver    User      @relation(fields: [driverId], references: [id], name: "CarpoolDriver") // One to Many
   driverId  String
-  attendees User[]     @relation(name: "CarpoolAttendee") // Many To Many
-  Chatroom  Chatroom[] // Many To One
+  attendees User[]    @relation(name: "CarpoolAttendee") // Many To Many
+  chatroom  Chatroom? // one to one
 
   originLat       Decimal
   originLng       Decimal
@@ -67,17 +67,17 @@ enum CarpoolStatus {
 }
 
 model Chatroom {
-  id        Int       @id @default(autoincrement())
-  carpool   Carpool   @relation(fields: [carpoolId], references: [id]) // One to Many
-  carpoolId Int // From the carpool we can get attendees and driver
-  Message   Message[]
+  carpool   Carpool   @relation(fields: [carpoolId], references: [id], onDelete: Cascade) // One to One
+  carpoolId Int       @id @unique // From the carpool we can get attendees and driver
+  messages  Message[] // many to one
 }
 
 model Message {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id]) // one to many
-  userId     String
-  chatRoom   Chatroom @relation(fields: [chatroomId], references: [id]) // one to many
-  chatroomId Int
-  content    String   @db.VarChar(500)
+  id            Int      @id @default(autoincrement())
+  user          User?    @relation(fields: [userId], references: [id]) // one to many
+  userId        String? // messagse can come from "server"
+  chatRoom      Chatroom @relation(fields: [chatroomId], references: [carpoolId], onDelete: Cascade) // one to many
+  chatroomId    Int
+  content       String   @db.VarChar(500)
+  serverMessage Boolean  @default(false)
 }

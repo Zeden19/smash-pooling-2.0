@@ -16,10 +16,6 @@ import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
 import { redirect } from "next/navigation";
 import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
 import {
-  CarpoolAttendeesDriver,
-  CarpoolNumber,
-} from "@/app/helpers/entities/CarpoolTypes";
-import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -32,14 +28,18 @@ interface Props {
 }
 
 async function CarpoolPage({ params: { id } }: Props) {
-  let carpool: CarpoolAttendeesDriver | CarpoolNumber | null =
-    await prisma.carpool.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        attendees: true,
-        driver: true,
+  let carpool = await prisma.carpool.findUnique({
+    where: { id: parseInt(id) },
+    include: {
+      attendees: true,
+      driver: true,
+      chatroom: {
+        include: {
+          messages: true,
+        },
       },
-    });
+    },
+  });
   if (!carpool) return redirect("/carpool/edit");
   const driver = carpool.driver;
   const attendees = carpool.attendees;
@@ -123,6 +123,9 @@ async function CarpoolPage({ params: { id } }: Props) {
             <AccordionTrigger>Chat</AccordionTrigger>
             <AccordionContent>
               <ChatWindow
+                //@ts-ignore
+                chatroom={carpool.chatroom[0]!}
+                chatroomUsers={attendees}
                 origin={carpool.originName}
                 destination={makeTitle(carpool.tournamentSlug)}
               />

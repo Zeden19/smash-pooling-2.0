@@ -12,7 +12,7 @@ export async function PATCH(
 
   const carpool = await prisma.carpool.findUnique({
     where: { id: parseInt(id) },
-    include: { attendees: true },
+    include: { attendees: true, chatroom: true },
   });
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
@@ -30,6 +30,21 @@ export async function PATCH(
     data: {
       attendees: {
         set: [...carpool.attendees, user],
+      },
+      chatroom: {
+        update: {
+          where: {
+            carpoolId: carpool.id,
+          },
+          data: {
+            messages: {
+              create: {
+                serverMessage: true,
+                content: `${user.gamertag} has been added to Carpool.`,
+              },
+            },
+          },
+        },
       },
     },
   });

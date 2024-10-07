@@ -52,6 +52,16 @@ export async function POST(request: NextRequest) {
       tournamentSlug: destination.slug,
       route: route.route,
       distance: route.distance,
+      chatroom: {
+        create: {
+          messages: {
+            create: {
+              serverMessage: true,
+              content: `Carpool has been created.`,
+            },
+          },
+        },
+      },
     },
   });
 
