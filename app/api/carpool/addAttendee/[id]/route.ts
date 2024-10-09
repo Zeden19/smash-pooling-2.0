@@ -16,6 +16,8 @@ export async function PATCH(
   });
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
+  //
+
   if (carpool.attendees.map((attendee) => attendee.id).includes(user.id))
     return NextResponse.json(
       { error: "You are already in this carpool." },

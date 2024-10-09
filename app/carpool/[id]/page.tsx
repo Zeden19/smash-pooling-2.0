@@ -123,8 +123,7 @@ async function CarpoolPage({ params: { id } }: Props) {
             <AccordionTrigger>Chat</AccordionTrigger>
             <AccordionContent>
               <ChatWindow
-                //@ts-ignore
-                chatroom={carpool.chatroom[0]!}
+                chatroom={carpool.chatroom!}
                 chatroomUsers={attendees}
                 origin={carpool.originName}
                 destination={makeTitle(carpool.tournamentSlug)}

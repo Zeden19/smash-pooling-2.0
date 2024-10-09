@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Message as MessageType, User } from "prisma/prisma-client";
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   chatroomUsers: User[];
 }
 
-async function Message({ message, currentUser, chatroomUsers }: Props) {
+function Message({ message, currentUser, chatroomUsers }: Props) {
   const isCurrentUser = message.userId === currentUser.id;
 
   const messageAuthor = chatroomUsers.find((user) => user.id === message.userId);
@@ -22,6 +22,7 @@ async function Message({ message, currentUser, chatroomUsers }: Props) {
         <div className={`flex gap-2 ${isCurrentUser ? "self-start" : "self-end"}`}>
           {isCurrentUser ? (
             <Avatar className={"mt-2.5"}>
+              <AvatarImage src={messageAuthor!.profilePicture} />
               <AvatarFallback>{messageAuthor!.gamertag.charAt(0)}</AvatarFallback>
             </Avatar>
           ) : null}
@@ -29,14 +30,14 @@ async function Message({ message, currentUser, chatroomUsers }: Props) {
           <div className={"flex flex-col gap-1"}>
             <span className={"text-gray-400 text-xs"}>{messageAuthor!.gamertag}</span>
             <span
-              className={
-                "self-end mb-1 bg-slate-500 border border-slate-800 p-2 rounded-xl"
-              }>
+              className={`self-end mb-1 bg-slate-500 border border-slate-800 p-2 rounded-xl ${isCurrentUser ? "mr-auto" : "ml-auto"}`}>
               {message.content}
             </span>
           </div>
+
           {!isCurrentUser ? (
             <Avatar className={"mt-2.5"}>
+              <AvatarImage src={messageAuthor!.profilePicture} />
               <AvatarFallback>{messageAuthor!.gamertag.charAt(0)}</AvatarFallback>
             </Avatar>
           ) : null}
