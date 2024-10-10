@@ -34,7 +34,7 @@ export async function POST(body: NextRequest) {
   const newMessage = await prisma.message.create({
     data: {
       user: {
-        connect: { id: data.user.id },
+        connect: { id: user.id },
       },
       chatRoom: {
         connect: { carpoolId: data.chatRoom.carpoolId },

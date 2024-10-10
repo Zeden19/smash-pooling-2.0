@@ -15,7 +15,9 @@ function Message({ message, currentUser, chatroomUsers }: Props) {
     <>
       {message.serverMessage ? (
         <span
-          className={"self-center bg-white rounded-xl border-slate-800 text-black p-2"}>
+          className={
+            "self-center bg-white rounded-xl border-slate-800 text-black p-2 mb-2"
+          }>
           {message.content}
         </span>
       ) : (

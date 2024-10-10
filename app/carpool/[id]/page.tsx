@@ -22,6 +22,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import ChatWindow from "@/app/carpool/[id]/ChatWindow";
+import { getUser } from "@/app/helpers/hooks/getUser";
 
 interface Props {
   params: { id: string };
@@ -41,6 +42,9 @@ async function CarpoolPage({ params: { id } }: Props) {
     },
   });
   if (!carpool) return redirect("/carpool/edit");
+  const { user: currentUser } = await getUser();
+  if (!currentUser) return redirect("/");
+
   const driver = carpool.driver;
   const attendees = carpool.attendees;
 
@@ -123,8 +127,9 @@ async function CarpoolPage({ params: { id } }: Props) {
             <AccordionTrigger>Chat</AccordionTrigger>
             <AccordionContent>
               <ChatWindow
-                chatroom={carpool.chatroom!}
+                chatRoom={carpool.chatroom!}
                 chatroomUsers={attendees}
+                currentUser={currentUser}
                 origin={carpool.originName}
                 destination={makeTitle(carpool.tournamentSlug)}
               />
