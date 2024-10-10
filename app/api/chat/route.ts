@@ -3,7 +3,7 @@ import z from "zod";
 import prisma from "@/prisma/prismaClient";
 import { getUser } from "@/app/helpers/hooks/getUser";
 
-const schema = z.object({
+const newMessage = z.object({
   content: z
     .string()
     .max(500, { message: "Message must be shorter than 500 characters" })
@@ -44,4 +44,28 @@ export async function POST(body: NextRequest) {
   });
 
   return NextResponse.json({ newMessage }, { status: 200 });
+}
+
+export async function DELETE(body: NextRequest) {
+  const data = await body.json();
+  const { user } = await getUser();
+  if (!user) return NextResponse.json({ error: "User not found" });
+
+  if (user.id !== data.message.userId)
+    return NextResponse.json(
+      { error: "You are not the owner of this message" },
+      { status: 401 },
+    );
+
+  const message = await prisma.message.findUnique({
+    where: { id: data.message.id },
+  });
+
+  if (!message) return NextResponse.json({ error: "Message not found" }, { status: 404 });
+
+  const deletedMessage = await prisma.message.delete({
+    where: { id: message.id },
+  });
+
+  return NextResponse.json({ deletedMessage }, { status: 200 });
 }

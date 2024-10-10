@@ -38,6 +38,7 @@ function ChatWindow({
   const scrollToBottom = () => bottomDiv.current!.scrollIntoView({ behavior: "smooth" });
 
   async function sendMessage() {
+    if (loading) return;
     setLoading(true);
     const input = messageInput.current as unknown as HTMLInputElement;
 
@@ -72,6 +73,9 @@ function ChatWindow({
             message={message}
             currentUser={currentUser}
             chatroomUsers={chatroomUsers}
+            removeMessage={(removedMessage) =>
+              setMessages(messages.filter((message) => removedMessage.id !== message.id))
+            }
           />
         ))}
       </div>
@@ -84,7 +88,7 @@ function ChatWindow({
           ref={messageInput}
           className={"bg-gray-950 mb-2 self-center"}
         />
-        <Button onClick={sendMessage}>
+        <Button onClick={sendMessage} disabled={loading}>
           <Send />
           {loading && <LoadingSpinner />}
         </Button>
