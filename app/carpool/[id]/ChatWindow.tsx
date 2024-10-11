@@ -76,6 +76,13 @@ function ChatWindow({
             removeMessage={(removedMessage) =>
               setMessages(messages.filter((message) => removedMessage.id !== message.id))
             }
+            editMessage={(editedMessage) =>
+              setMessages(
+                messages.map((message) =>
+                  editedMessage.id === message.id ? editedMessage : message,
+                ),
+              )
+            }
           />
         ))}
       </div>

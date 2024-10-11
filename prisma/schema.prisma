@@ -80,4 +80,5 @@ model Message {
   chatroomId    Int
   content       String   @db.VarChar(500)
   serverMessage Boolean  @default(false)
+  edited        Boolean  @default(false)
 }

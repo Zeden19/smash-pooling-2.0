@@ -69,3 +69,27 @@ export async function DELETE(body: NextRequest) {
 
   return NextResponse.json({ deletedMessage }, { status: 200 });
 }
+
+export async function PATCH(body: NextRequest) {
+  const data = await body.json();
+  const { user } = await getUser();
+
+  if (!user) return NextResponse.json({ error: "User not found" });
+  if (user.id !== data.message.userId)
+    return NextResponse.json(
+      { error: "You are not the owner of this message" },
+      { status: 401 },
+    );
+
+  const message = await prisma.message.findUnique({
+    where: { id: data.message.id },
+  });
+  if (!message) return NextResponse.json({ error: "Message not found" });
+
+  const editedMessage = await prisma.message.update({
+    where: { id: data.message.id },
+    data: data.message,
+  });
+
+  return NextResponse.json({ editedMessage }, { status: 200 });
+}

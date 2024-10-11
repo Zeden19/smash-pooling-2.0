@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Message as MessageType, User } from "prisma/prisma-client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import axios from "axios";
@@ -16,32 +16,73 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface Props {
   message: MessageType;
   currentUser: User;
   chatroomUsers: User[];
   removeMessage: (message: MessageType) => void;
+  editMessage: (message: MessageType) => void;
 }
 
-function Message({ message, currentUser, chatroomUsers, removeMessage }: Props) {
+function Message({
+  message,
+  currentUser,
+  chatroomUsers,
+  removeMessage,
+  editMessage,
+}: Props) {
   const isCurrentUser = message.userId === currentUser.id;
   const [isHovering, setIsHovering] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  async function deleteMessage() {
+  const [open, setOpen] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+
+  const editedMessage = useRef<HTMLInputElement>(null);
+
+  async function remove() {
     setDeleteLoading(true);
     try {
       const { data } = await axios.delete("/api/chat", {
         data: { message },
       });
-      console.log(data);
       removeMessage(data.deletedMessage);
       setDeleteLoading(false);
     } catch (e) {
       console.log(e);
       FailureToast("Could not delete message");
       setDeleteLoading(false);
+    }
+  }
+
+  async function edit() {
+    setEditLoading(true);
+    try {
+      const { data } = await axios.patch("/api/chat", {
+        message: { ...message, content: editedMessage.current!.value, edited: true },
+      });
+      editMessage(data.editedMessage);
+      setEditLoading(false);
+      setOpen(false);
+    } catch (e) {
+      console.log(e);
+      FailureToast("Could not delete message");
+      setDeleteLoading(false);
+      setEditLoading(false);
     }
   }
 
@@ -74,6 +115,9 @@ function Message({ message, currentUser, chatroomUsers, removeMessage }: Props) 
               {message.content}
             </span>
           </div>
+          {message.edited && (
+            <span className={"text-xs text-gray-500 italic bold self-end"}>Edited</span>
+          )}
 
           {!isCurrentUser ? (
             <Avatar className={"mt-2.5"}>
@@ -103,16 +147,45 @@ function Message({ message, currentUser, chatroomUsers, removeMessage }: Props) 
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <Button variant="destructive" onClick={deleteMessage}>
+                    <Button variant="destructive" onClick={remove}>
                       Delete
                     </Button>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
 
-              <Button size={"smallIcon"} disabled={deleteLoading}>
-                <Pencil />
-              </Button>
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger>
+                  <Button size={"smallIcon"} disabled={deleteLoading}>
+                    <Pencil />
+                  </Button>
+                </DialogTrigger>
+
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit Message</DialogTitle>
+                    <DialogDescription>Enter the edited message</DialogDescription>
+                  </DialogHeader>
+                  <div className={"flex flex-col gap-2"}>
+                    <Label htmlFor={"newMessage"}>New Message</Label>
+                    <Input
+                      ref={editedMessage}
+                      defaultValue={message.content}
+                      id={"newMessage"}
+                    />
+                    <Button className={"w-1/4"} onClick={() => edit()}>
+                      Send
+                      {editLoading && <LoadingSpinner />}
+                    </Button>
+                  </div>
+
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant={"secondary"}>Cancel</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           )}
         </div>
