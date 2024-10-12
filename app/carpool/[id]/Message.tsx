@@ -32,18 +32,22 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface Props {
   message: MessageType;
+  messages: MessageType[];
   currentUser: User;
   chatroomUsers: User[];
   removeMessage: (message: MessageType) => void;
   editMessage: (message: MessageType) => void;
+  setMessage: (messages: MessageType[]) => void;
 }
 
 function Message({
   message,
+  messages,
   currentUser,
   chatroomUsers,
   removeMessage,
   editMessage,
+  setMessage,
 }: Props) {
   const isCurrentUser = message.userId === currentUser.id;
   const [isHovering, setIsHovering] = useState(false);
@@ -56,31 +60,50 @@ function Message({
 
   async function remove() {
     setDeleteLoading(true);
+    const prevMessages = messages;
+    removeMessage(message);
     try {
-      const { data } = await axios.delete("/api/chat", {
+      await axios.delete("/api/chat", {
         data: { message },
       });
-      removeMessage(data.deletedMessage);
       setDeleteLoading(false);
     } catch (e) {
       console.log(e);
       FailureToast("Could not delete message");
+      setMessage(prevMessages);
       setDeleteLoading(false);
     }
   }
 
   async function edit() {
-    setEditLoading(true);
-    try {
-      const { data } = await axios.patch("/api/chat", {
-        message: { ...message, content: editedMessage.current!.value, edited: true },
-      });
-      editMessage(data.editedMessage);
-      setEditLoading(false);
+    const editedMessageValue = editedMessage.current!.value;
+    if (editedMessageValue === message.content) {
       setOpen(false);
+      return;
+    }
+
+    if (editedMessageValue === "") {
+      await remove();
+      return;
+    }
+
+    if (editedMessageValue.length > 500) {
+      FailureToast("Message length must be shorter than 500 characters");
+      return;
+    }
+    setEditLoading(true);
+    const prevMessages = messages;
+    editMessage({ ...message, content: editedMessageValue, edited: true });
+    setOpen(false);
+    try {
+      await axios.patch("/api/chat", {
+        message: { ...message, content: editedMessageValue, edited: true },
+      });
+      setEditLoading(false);
     } catch (e) {
       console.log(e);
-      FailureToast("Could not delete message");
+      FailureToast("Could not edit message");
+      setMessage(prevMessages);
       setDeleteLoading(false);
       setEditLoading(false);
     }

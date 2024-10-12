@@ -3,12 +3,10 @@ import z from "zod";
 import prisma from "@/prisma/prismaClient";
 import { getUser } from "@/app/helpers/hooks/getUser";
 
-const newMessage = z.object({
-  content: z
-    .string()
-    .max(500, { message: "Message must be shorter than 500 characters" })
-    .min(0, { message: "Message is required" }),
-});
+const newMessageSchema = z
+  .string()
+  .max(500, { message: "Message must be shorter than 500 characters" })
+  .min(0, { message: "Message is required" });
 
 export async function POST(body: NextRequest) {
   const data = await body.json();
@@ -22,6 +20,10 @@ export async function POST(body: NextRequest) {
       attendees: true,
     },
   });
+
+  const { error } = newMessageSchema.safeParse(data.content);
+
+  if (error) return NextResponse.json({ error }, { status: 404 });
 
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
@@ -85,6 +87,9 @@ export async function PATCH(body: NextRequest) {
     where: { id: data.message.id },
   });
   if (!message) return NextResponse.json({ error: "Message not found" });
+
+  const { error } = newMessageSchema.safeParse(data.message.content);
+  if (error) return NextResponse.json({ error }, { status: 404 });
 
   const editedMessage = await prisma.message.update({
     where: { id: data.message.id },

@@ -4,6 +4,7 @@ import { Chatroom, Message as Messages, User } from "prisma/prisma-client";
 import { useEffect, useRef, useState } from "react";
 import { redirect } from "next/navigation";
 import FailureToast from "@/components/FailureToast";
+import failureToast from "@/components/FailureToast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
@@ -38,9 +39,26 @@ function ChatWindow({
   const scrollToBottom = () => bottomDiv.current!.scrollIntoView({ behavior: "smooth" });
 
   async function sendMessage() {
-    if (loading) return;
-    setLoading(true);
     const input = messageInput.current as unknown as HTMLInputElement;
+    if (loading || input.value === "") return;
+
+    if (input.value.length > 500) {
+      failureToast("Message cannot be longer than 500 characters");
+      return;
+    }
+    setLoading(true);
+    const prevMessages = messages;
+    setMessages([
+      ...messages,
+      {
+        id: -1,
+        content: input.value,
+        userId: currentUser.id,
+        chatroomId: chatRoom.carpoolId,
+        serverMessage: false,
+        edited: false,
+      },
+    ]);
 
     try {
       const { data } = await axios.post(`/api/chat`, {
@@ -48,11 +66,12 @@ function ChatWindow({
         content: input.value,
       });
       input.value = "";
-      setMessages([...messages, data.newMessage]);
+      setMessages([...messages.filter((message) => message.id !== -1), data.newMessage]);
       setLoading(false);
     } catch (e: any) {
       console.log(e);
-      FailureToast("Could not send message", e.response.data.error);
+      setMessages(prevMessages);
+      FailureToast("Could not send message");
       setLoading(false);
     }
   }
@@ -71,6 +90,7 @@ function ChatWindow({
           <Message
             key={message.id}
             message={message}
+            messages={messages}
             currentUser={currentUser}
             chatroomUsers={chatroomUsers}
             removeMessage={(removedMessage) =>
@@ -83,6 +103,7 @@ function ChatWindow({
                 ),
               )
             }
+            setMessage={(messages) => setMessages(messages)}
           />
         ))}
       </div>
