@@ -2,7 +2,7 @@
 
 import * as Ably from "ably";
 import { AblyProvider, ChannelProvider } from "ably/react";
-import albyChatName from "@/app/carpool/[id]/AlbyChatName";
+import albyChatName from "@/app/carpool/[id]/Chat/AlbyChatName";
 
 interface Props {
   children: React.ReactNode;

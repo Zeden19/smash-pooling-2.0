@@ -22,10 +22,10 @@ import {
 import { redirect } from "next/navigation";
 import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
 import { getUser } from "@/app/helpers/hooks/getUser";
-import ChatWindow from "@/app/carpool/[id]/ChatWindow";
+import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 
-const AlbyProvider = dynamic(() => import("./AlbyProvider"), {
+const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
   ssr: false,
 });
 
