@@ -27,7 +27,13 @@ export async function POST(body: NextRequest) {
 
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
-  if (!carpool.attendees.includes(user) && carpool.driver.id !== user.id)
+  console.log(carpool.attendees);
+  console.log(user);
+
+  if (
+    !carpool.attendees.map((attendee) => attendee.id).includes(user.id) &&
+    carpool.driver.id !== user.id
+  )
     return NextResponse.json(
       { error: "You aren't apart of this carpool!" },
       { status: 401 },

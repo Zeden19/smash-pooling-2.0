@@ -13,16 +13,21 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
-import { redirect } from "next/navigation";
-import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import ChatWindow from "@/app/carpool/[id]/ChatWindow";
+import { redirect } from "next/navigation";
+import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
 import { getUser } from "@/app/helpers/hooks/getUser";
+import ChatWindow from "@/app/carpool/[id]/ChatWindow";
+import dynamic from "next/dynamic";
+
+const AlbyProvider = dynamic(() => import("./AlbyProvider"), {
+  ssr: false,
+});
 
 interface Props {
   params: { id: string };
@@ -54,7 +59,6 @@ async function CarpoolPage({ params: { id } }: Props) {
     { title: "Distance:", value: carpool.distance },
     { title: "Status:", value: carpool.status },
   ];
-
   return (
     <div className={"m-5"}>
       <h1 className={"text-5xl font-bold mb-8"}>
@@ -126,13 +130,15 @@ async function CarpoolPage({ params: { id } }: Props) {
           <AccordionItem value={"item-2"}>
             <AccordionTrigger>Chat</AccordionTrigger>
             <AccordionContent>
-              <ChatWindow
-                chatRoom={carpool.chatroom!}
-                chatroomUsers={attendees}
-                currentUser={currentUser}
-                origin={carpool.originName}
-                destination={makeTitle(carpool.tournamentSlug)}
-              />
+              <AlbyProvider>
+                <ChatWindow
+                  chatRoom={carpool.chatroom!}
+                  chatroomUsers={attendees}
+                  currentUser={currentUser}
+                  origin={carpool.originName}
+                  destination={makeTitle(carpool.tournamentSlug)}
+                />
+              </AlbyProvider>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

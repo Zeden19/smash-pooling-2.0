@@ -10,6 +10,11 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Send } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useChannel } from "ably/react";
+import ALBY_CHAT_NAME from "@/app/carpool/[id]/AlbyChatName";
+
+//todo use reducer for messages cause its too much
+// todo organize message component
 
 interface ChatroomMessages extends Chatroom {
   messages: Messages[];
@@ -38,6 +43,11 @@ function ChatWindow({
   const bottomDiv = useRef<HTMLDivElement>(null); // to scroll to bottom of container
   const scrollToBottom = () => bottomDiv.current!.scrollIntoView({ behavior: "smooth" });
 
+  // runs when we receive a new message
+  const { channel, ably } = useChannel(ALBY_CHAT_NAME, (message) => {
+    setMessages([...messages, message.data]);
+  });
+
   async function sendMessage() {
     const input = messageInput.current as unknown as HTMLInputElement;
     if (loading || input.value === "") return;
@@ -48,6 +58,7 @@ function ChatWindow({
     }
     setLoading(true);
     const prevMessages = messages;
+    // Optimistic update
     setMessages([
       ...messages,
       {
@@ -65,7 +76,9 @@ function ChatWindow({
         chatRoom,
         content: input.value,
       });
+      await channel.publish({ name: ALBY_CHAT_NAME, data: data.newMessage });
       input.value = "";
+      // Replace the "fake" message with a real one
       setMessages([...messages.filter((message) => message.id !== -1), data.newMessage]);
       setLoading(false);
     } catch (e: any) {
