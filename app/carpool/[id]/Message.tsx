@@ -29,15 +29,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { RealtimeChannel } from "ably";
+import ALBY_CHAT_NAME from "@/app/carpool/[id]/AlbyChatName";
 
 interface Props {
   message: MessageType;
   messages: MessageType[];
   currentUser: User;
   chatroomUsers: User[];
+  channel: RealtimeChannel;
   removeMessage: (message: MessageType) => void;
   editMessage: (message: MessageType) => void;
-  setMessage: (messages: MessageType[]) => void;
+  revertMessages: (messages: MessageType[]) => void;
 }
 
 function Message({
@@ -45,9 +48,10 @@ function Message({
   messages,
   currentUser,
   chatroomUsers,
+  channel,
   removeMessage,
   editMessage,
-  setMessage,
+  revertMessages,
 }: Props) {
   const isCurrentUser = message.userId === currentUser.id;
   const [isHovering, setIsHovering] = useState(false);
@@ -56,7 +60,7 @@ function Message({
   const [open, setOpen] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
 
-  const editedMessage = useRef<HTMLInputElement>(null);
+  const editedMessageInput = useRef<HTMLInputElement>(null);
 
   async function remove() {
     setDeleteLoading(true);
@@ -66,44 +70,56 @@ function Message({
       await axios.delete("/api/chat", {
         data: { message },
       });
+      await channel.publish({
+        name: ALBY_CHAT_NAME,
+        data: { action: "remove", messageId: message.id },
+      });
       setDeleteLoading(false);
     } catch (e) {
       console.log(e);
       FailureToast("Could not delete message");
-      setMessage(prevMessages);
+      revertMessages(prevMessages);
       setDeleteLoading(false);
     }
   }
 
   async function edit() {
-    const editedMessageValue = editedMessage.current!.value;
-    if (editedMessageValue === message.content) {
+    const editedMessage = {
+      ...message,
+      content: editedMessageInput.current!.value,
+      edited: true,
+    };
+    if (editedMessage.content === message.content) {
       setOpen(false);
       return;
     }
 
-    if (editedMessageValue === "") {
+    if (editedMessage.content === "") {
       await remove();
       return;
     }
 
-    if (editedMessageValue.length > 500) {
+    if (editedMessage.content.length > 500) {
       FailureToast("Message length must be shorter than 500 characters");
       return;
     }
     setEditLoading(true);
     const prevMessages = messages;
-    editMessage({ ...message, content: editedMessageValue, edited: true });
+    editMessage({ ...message, content: editedMessage.content, edited: true });
     setOpen(false);
     try {
       await axios.patch("/api/chat", {
-        message: { ...message, content: editedMessageValue, edited: true },
+        message: { ...message, content: editedMessage.content, edited: true },
+      });
+      await channel.publish({
+        name: ALBY_CHAT_NAME,
+        data: { action: "edit", message: editedMessage },
       });
       setEditLoading(false);
     } catch (e) {
       console.log(e);
       FailureToast("Could not edit message");
-      setMessage(prevMessages);
+      revertMessages(prevMessages);
       setDeleteLoading(false);
       setEditLoading(false);
     }
@@ -192,7 +208,7 @@ function Message({
                   <div className={"flex flex-col gap-2"}>
                     <Label htmlFor={"newMessage"}>New Message</Label>
                     <Input
-                      ref={editedMessage}
+                      ref={editedMessageInput}
                       defaultValue={message.content}
                       id={"newMessage"}
                     />

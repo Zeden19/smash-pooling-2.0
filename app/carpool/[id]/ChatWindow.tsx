@@ -1,7 +1,7 @@
 "use client";
 import Message from "@/app/carpool/[id]/Message";
 import { Chatroom, Message as Messages, User } from "prisma/prisma-client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { redirect } from "next/navigation";
 import FailureToast from "@/components/FailureToast";
 import failureToast from "@/components/FailureToast";
@@ -12,8 +12,8 @@ import { Send } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useChannel } from "ably/react";
 import ALBY_CHAT_NAME from "@/app/carpool/[id]/AlbyChatName";
+import messageReducer from "@/app/carpool/[id]/MessageReducer";
 
-//todo use reducer for messages cause its too much
 // todo organize message component
 
 interface ChatroomMessages extends Chatroom {
@@ -37,15 +37,16 @@ function ChatWindow({
 }: Props) {
   if (!currentUser) redirect("/");
 
-  const [messages, setMessages] = useState<Messages[]>(chatRoom.messages);
+  const [messages, dispatch] = useReducer(messageReducer, chatRoom.messages);
   const [loading, setLoading] = useState(false);
   const messageInput = useRef(null); // to reset & get input
   const bottomDiv = useRef<HTMLDivElement>(null); // to scroll to bottom of container
   const scrollToBottom = () => bottomDiv.current!.scrollIntoView({ behavior: "smooth" });
 
   // runs when we receive a new message
-  const { channel, ably } = useChannel(ALBY_CHAT_NAME, (message) => {
-    setMessages([...messages, message.data]);
+  const { channel, ably } = useChannel(ALBY_CHAT_NAME, (action) => {
+    console.log(action);
+    dispatch(action.data);
   });
 
   async function sendMessage() {
@@ -57,33 +58,40 @@ function ChatWindow({
       return;
     }
     setLoading(true);
-    const prevMessages = messages;
+
+    const newMessage = {
+      id: -1,
+      content: input.value,
+      userId: currentUser.id,
+      chatroomId: chatRoom.carpoolId,
+      serverMessage: false,
+      edited: false,
+    };
+
     // Optimistic update
-    setMessages([
-      ...messages,
-      {
-        id: -1,
-        content: input.value,
-        userId: currentUser.id,
-        chatroomId: chatRoom.carpoolId,
-        serverMessage: false,
-        edited: false,
-      },
-    ]);
+    const prevMessages = messages;
+    dispatch({
+      action: "add",
+      newMessage,
+    });
 
     try {
       const { data } = await axios.post(`/api/chat`, {
         chatRoom,
         content: input.value,
       });
-      await channel.publish({ name: ALBY_CHAT_NAME, data: data.newMessage });
+      // Realtime updates
+      await channel.publish({
+        name: ALBY_CHAT_NAME,
+        data: { action: "add", newMessage: data.newMessage },
+      });
       input.value = "";
       // Replace the "fake" message with a real one
-      setMessages([...messages.filter((message) => message.id !== -1), data.newMessage]);
+      dispatch({ action: "remove", messageId: -1 });
       setLoading(false);
     } catch (e: any) {
       console.log(e);
-      setMessages(prevMessages);
+      dispatch({ action: "revert", messages: prevMessages });
       FailureToast("Could not send message");
       setLoading(false);
     }
@@ -106,17 +114,16 @@ function ChatWindow({
             messages={messages}
             currentUser={currentUser}
             chatroomUsers={chatroomUsers}
+            channel={channel}
             removeMessage={(removedMessage) =>
-              setMessages(messages.filter((message) => removedMessage.id !== message.id))
+              dispatch({ action: "remove", messageId: removedMessage.id })
             }
             editMessage={(editedMessage) =>
-              setMessages(
-                messages.map((message) =>
-                  editedMessage.id === message.id ? editedMessage : message,
-                ),
-              )
+              dispatch({ action: "edit", message: editedMessage })
             }
-            setMessage={(messages) => setMessages(messages)}
+            revertMessages={(messages) =>
+              dispatch({ action: "revert", messages: messages })
+            }
           />
         ))}
       </div>
