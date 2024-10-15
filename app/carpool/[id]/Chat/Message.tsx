@@ -5,32 +5,31 @@ import { useState } from "react";
 import { RealtimeChannel } from "ably";
 import DeleteMessage from "@/app/carpool/[id]/Chat/DeleteMessage";
 import EditMessage from "@/app/carpool/[id]/Chat/EditMessage";
+import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";
 
-interface Props {
+interface Props extends OptimisticUpdate {
   message: MessageType;
-  messages: MessageType[];
   currentUser: User;
   chatroomUsers: User[];
   channel: RealtimeChannel;
   removeMessage: (message: MessageType) => void;
   editMessage: (message: MessageType) => void;
-  revertMessages: (messages: MessageType[]) => void;
 }
 
 function Message({
   message,
-  messages,
   currentUser,
   chatroomUsers,
   channel,
   removeMessage,
   editMessage,
-  revertMessages,
+  optimisticUpdate,
 }: Props) {
   const isCurrentUser = message.userId === currentUser.id;
   const [isHovering, setIsHovering] = useState(false);
 
   const messageAuthor = chatroomUsers.find((user) => user.id === message.userId);
+
   return (
     <>
       {message.serverMessage ? (
@@ -80,18 +79,16 @@ function Message({
               }>
               <DeleteMessage
                 message={message}
-                messages={messages}
                 removeMessage={removeMessage}
                 channel={channel}
-                revertMessages={revertMessages}
+                optimisticUpdate={optimisticUpdate}
               />
 
               <EditMessage
                 message={message}
-                messages={messages}
                 editMessage={editMessage}
                 channel={channel}
-                revertMessages={revertMessages}
+                optimisticUpdate={optimisticUpdate}
               />
             </div>
           )}

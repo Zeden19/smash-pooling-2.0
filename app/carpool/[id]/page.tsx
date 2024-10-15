@@ -135,8 +135,7 @@ async function CarpoolPage({ params: { id } }: Props) {
                   chatRoom={carpool.chatroom!}
                   chatroomUsers={attendees}
                   currentUser={currentUser}
-                  origin={carpool.originName}
-                  destination={makeTitle(carpool.tournamentSlug)}
+                  chatroomName={`Carpool Chat: From ${carpool.originName} to ${makeTitle(carpool.tournamentSlug)}`}
                 />
               </AlbyProvider>
             </AccordionContent>

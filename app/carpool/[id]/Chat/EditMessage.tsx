@@ -19,59 +19,56 @@ import ALBY_CHAT_NAME from "@/app/carpool/[id]/Chat/AlbyChatName";
 import { useRef, useState } from "react";
 import { Pencil } from "lucide-react";
 import axios from "axios";
+import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";
 
-interface Props {
+interface Props extends OptimisticUpdate {
   message: Message;
-  messages: Message[];
   editMessage: (message: Message) => void;
   channel: RealtimeChannel;
-  revertMessages: (messages: Message[]) => void;
 }
 
-function EditMessage({ message, messages, editMessage, channel, revertMessages }: Props) {
+function EditMessage({ message, editMessage, channel, optimisticUpdate }: Props) {
   const [open, setOpen] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const editedMessageInput = useRef<HTMLInputElement>(null);
 
   async function edit() {
-    const editedMessage = {
-      ...message,
-      content: editedMessageInput.current!.value,
-      edited: true,
-    };
-    if (editedMessage.content === message.content) {
-      setOpen(false);
-      return;
-    }
+    optimisticUpdate(
+      async () => {
+        const editedMessage = {
+          ...message,
+          content: editedMessageInput.current!.value,
+          edited: true,
+        };
+        if (editedMessage.content === message.content) {
+          setOpen(false);
+          return;
+        }
 
-    if (editedMessage.content === "") {
-      // await remove();
-      return;
-    }
+        if (editedMessage.content === "") {
+          // await remove();
+          return;
+        }
 
-    if (editedMessage.content.length > 500) {
-      FailureToast("Message length must be shorter than 500 characters");
-      return;
-    }
-    setEditLoading(true);
-    const prevMessages = messages;
-    editMessage({ ...message, content: editedMessage.content, edited: true });
-    setOpen(false);
-    try {
-      await axios.patch("/api/chat", {
-        message: { ...message, content: editedMessage.content, edited: true },
-      });
-      await channel.publish({
-        name: ALBY_CHAT_NAME,
-        data: { action: "edit", message: editedMessage },
-      });
-      setEditLoading(false);
-    } catch (e) {
-      console.log(e);
-      FailureToast("Could not edit message");
-      revertMessages(prevMessages);
-      setEditLoading(false);
-    }
+        if (editedMessage.content.length > 500) {
+          FailureToast("Message length must be shorter than 500 characters");
+          return;
+        }
+        setEditLoading(true);
+        editMessage({ ...message, content: editedMessage.content, edited: true });
+        setOpen(false);
+        await axios.patch("/api/cat", {
+          message: { ...message, content: editedMessage.content, edited: true },
+        });
+        await channel.publish({
+          name: ALBY_CHAT_NAME,
+          data: { action: "edit", message: editedMessage },
+        });
+        setEditLoading(false);
+      },
+      () => setEditLoading(false),
+      "Could not edit message",
+    );
   }
 
   return (

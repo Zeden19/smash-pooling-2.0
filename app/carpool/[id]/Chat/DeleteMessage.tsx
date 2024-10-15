@@ -12,47 +12,38 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import ALBY_CHAT_NAME from "@/app/carpool/[id]/Chat/AlbyChatName";
-import FailureToast from "@/components/FailureToast";
 import { Message } from "prisma/prisma-client";
 import axios from "axios";
 import { RealtimeChannel } from "ably";
+import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";
 
-interface Props {
+interface Props extends OptimisticUpdate {
   message: Message;
-  messages: Message[];
   removeMessage: (message: Message) => void;
   channel: RealtimeChannel;
-  revertMessages: (messages: Message[]) => void;
 }
 
-function DeleteMessage({
-  message,
-  messages,
-  removeMessage,
-  channel,
-  revertMessages,
-}: Props) {
+function DeleteMessage({ message, removeMessage, channel, optimisticUpdate }: Props) {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   async function remove() {
-    setDeleteLoading(true);
-    const prevMessages = messages;
-    removeMessage(message);
-    try {
-      await axios.delete("/api/chat", {
-        data: { message },
-      });
-      await channel.publish({
-        name: ALBY_CHAT_NAME,
-        data: { action: "remove", messageId: message.id },
-      });
-      setDeleteLoading(false);
-    } catch (e) {
-      console.log(e);
-      FailureToast("Could not delete message");
-      revertMessages(prevMessages);
-      setDeleteLoading(false);
-    }
+    optimisticUpdate(
+      async () => {
+        setDeleteLoading(true);
+        removeMessage(message);
+
+        await axios.delete("/api/chat", {
+          data: { message },
+        });
+        await channel.publish({
+          name: ALBY_CHAT_NAME,
+          data: { action: "remove", messageId: message.id },
+        });
+        setDeleteLoading(false);
+      },
+      () => setDeleteLoading(false),
+      "Could not delete message",
+    );
   }
 
   return (
