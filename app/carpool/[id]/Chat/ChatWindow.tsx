@@ -43,7 +43,9 @@ function ChatWindow({ chatRoom, chatroomName, chatroomUsers, currentUser }: Prop
   const scrollToBottom = () => bottomDiv.current!.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
-    scrollToBottom();
+    setTimeout(() => {
+      scrollToBottom();
+    }, 50);
   }, [messages]);
 
   async function optimisticUpdate(
