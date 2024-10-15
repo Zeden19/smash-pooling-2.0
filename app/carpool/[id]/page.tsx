@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
 import {
   Accordion,
@@ -99,7 +99,10 @@ async function CarpoolPage({ params: { id } }: Props) {
                   <TableCell>
                     <div className={"flex gap-5 align-middle"}>
                       <Avatar>
-                        <AvatarImage src={attendee.profilePicture} />
+                        <AvatarImage src={attendee.profilePicture ?? undefined} />
+                        <AvatarFallback>
+                          {attendee.gamertag.charAt(0).toUpperCase()}
+                        </AvatarFallback>
                       </Avatar>
                       <div className={"text-2xl font-bold my-auto"}>
                         {attendee.gamertag}

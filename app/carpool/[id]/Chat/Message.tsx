@@ -46,7 +46,7 @@ function Message({
           onMouseOut={() => setIsHovering(false)}>
           {isCurrentUser ? (
             <Avatar className={"mt-2.5"}>
-              <AvatarImage src={messageAuthor!.profilePicture} />
+              <AvatarImage src={messageAuthor!.profilePicture ?? undefined} />
               <AvatarFallback>{messageAuthor!.gamertag.charAt(0)}</AvatarFallback>
             </Avatar>
           ) : null}
@@ -67,7 +67,7 @@ function Message({
 
           {!isCurrentUser ? (
             <Avatar className={"mt-2.5"}>
-              <AvatarImage src={messageAuthor!.profilePicture} />
+              <AvatarImage src={messageAuthor!.profilePicture ?? undefined} />
               <AvatarFallback>{messageAuthor!.gamertag.charAt(0)}</AvatarFallback>
             </Avatar>
           ) : null}

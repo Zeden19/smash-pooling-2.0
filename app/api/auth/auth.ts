@@ -42,7 +42,7 @@ interface DatabaseUserAttributes {
   slug: string;
   gamertag: string;
   email: string;
-  profilePicture: string;
+  profilePicture: string | null;
 
   isDriver: boolean;
   fullName: string;

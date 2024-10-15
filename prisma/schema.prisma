@@ -16,12 +16,12 @@ model Session {
 }
 
 model User {
-  id             String @id
-  startggId      Int    @unique
+  id             String  @id
+  startggId      Int     @unique
   gamertag       String
   slug           String
   email          String
-  profilePicture String @db.VarChar(1000)
+  profilePicture String? @db.VarChar(1000)
 
   sessions          Session[]
   carpoolsDriving   Carpool[] @relation(name: "CarpoolDriver") // Many To One
@@ -75,7 +75,7 @@ model Chatroom {
 model Message {
   id            Int      @id @default(autoincrement())
   user          User?    @relation(fields: [userId], references: [id]) // one to many
-  userId        String? // messagse can come from "server"
+  userId        String? // messages can come from "server"
   chatRoom      Chatroom @relation(fields: [chatroomId], references: [carpoolId], onDelete: Cascade) // one to many
   chatroomId    Int
   content       String   @db.VarChar(500)
