@@ -11,20 +11,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import ALBY_CHAT_NAME from "@/app/carpool/[id]/Chat/AlbyChatName";
+import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import { Message } from "prisma/prisma-client";
 import axios from "axios";
 import { RealtimeChannel } from "ably";
 import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";
+import { useMessageStore } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 
 interface Props extends OptimisticUpdate {
   message: Message;
-  removeMessage: (message: Message) => void;
   channel: RealtimeChannel;
 }
 
-function DeleteMessage({ message, removeMessage, channel, optimisticUpdate }: Props) {
+function DeleteMessage({ message, channel, optimisticUpdate }: Props) {
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const { removeMessage } = useMessageStore((state) => state);
 
   async function remove() {
     optimisticUpdate(
@@ -32,12 +33,12 @@ function DeleteMessage({ message, removeMessage, channel, optimisticUpdate }: Pr
         setDeleteLoading(true);
         removeMessage(message);
 
-        await axios.delete("/api/chat", {
+        const { data } = await axios.delete("/api/chat", {
           data: { message },
         });
         await channel.publish({
           name: ALBY_CHAT_NAME,
-          data: { action: "remove", messageId: message.id },
+          data: { functionName: "removeMessage", args: [data.deletedMessage] },
         });
         setDeleteLoading(false);
       },

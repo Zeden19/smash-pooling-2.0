@@ -3,29 +3,22 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Send } from "lucide-react";
 import failureToast from "@/components/FailureToast";
-import ALBY_CHAT_NAME from "@/app/carpool/[id]/Chat/AlbyChatName";
+import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import { useRef, useState } from "react";
-import { Chatroom, Message, User } from "prisma/prisma-client";
+import { Chatroom, User } from "prisma/prisma-client";
 import { RealtimeChannel } from "ably";
 import axios from "axios";
 import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";
+import { useMessageStore } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 
 interface Props extends OptimisticUpdate {
   currentUser: User;
   chatRoom: Chatroom;
   channel: RealtimeChannel;
-  addMessage: (message: Message) => void;
-  removeMessage: (messageId: number) => void;
 }
 
-function SendMessage({
-  chatRoom,
-  currentUser,
-  channel,
-  addMessage,
-  removeMessage,
-  optimisticUpdate,
-}: Props) {
+function SendMessage({ chatRoom, currentUser, channel, optimisticUpdate }: Props) {
+  const { removeMessage, addMessage } = useMessageStore((state) => state);
   const [loading, setLoading] = useState(false);
   const messageInput = useRef(null); // to reset & get input
 
@@ -59,11 +52,11 @@ function SendMessage({
         // Realtime updates
         await channel.publish({
           name: ALBY_CHAT_NAME,
-          data: { action: "add", newMessage: data.newMessage },
+          data: { functionName: "addMessage", args: [data.newMessage] },
         });
         input.value = "";
         // Replace the "fake" message with a real one
-        removeMessage(-1);
+        removeMessage(newMessage);
         setLoading(false);
       },
       () => setLoading(false),

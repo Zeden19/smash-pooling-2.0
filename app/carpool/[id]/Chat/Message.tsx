@@ -12,8 +12,6 @@ interface Props extends OptimisticUpdate {
   currentUser: User;
   chatroomUsers: User[];
   channel: RealtimeChannel;
-  removeMessage: (message: MessageType) => void;
-  editMessage: (message: MessageType) => void;
 }
 
 function Message({
@@ -21,8 +19,6 @@ function Message({
   currentUser,
   chatroomUsers,
   channel,
-  removeMessage,
-  editMessage,
   optimisticUpdate,
 }: Props) {
   const isCurrentUser = message.userId === currentUser.id;
@@ -79,14 +75,12 @@ function Message({
               }>
               <DeleteMessage
                 message={message}
-                removeMessage={removeMessage}
                 channel={channel}
                 optimisticUpdate={optimisticUpdate}
               />
 
               <EditMessage
                 message={message}
-                editMessage={editMessage}
                 channel={channel}
                 optimisticUpdate={optimisticUpdate}
               />

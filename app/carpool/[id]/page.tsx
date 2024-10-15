@@ -24,6 +24,7 @@ import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumbe
 import { getUser } from "@/app/helpers/hooks/getUser";
 import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
+import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 
 const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
   ssr: false,
@@ -130,19 +131,21 @@ async function CarpoolPage({ params: { id } }: Props) {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value={"item-2"}>
-            <AccordionTrigger>Chat</AccordionTrigger>
-            <AccordionContent>
-              <AlbyProvider>
-                <ChatWindow
-                  chatRoom={carpool.chatroom!}
-                  chatroomUsers={attendees}
-                  currentUser={currentUser}
-                  chatroomName={`Carpool Chat: From ${carpool.originName} to ${makeTitle(carpool.tournamentSlug)}`}
-                />
-              </AlbyProvider>
-            </AccordionContent>
-          </AccordionItem>
+          <MessageStoreProvider messages={carpool.chatroom!.messages}>
+            <AccordionItem value={"item-2"}>
+              <AccordionTrigger>Chat</AccordionTrigger>
+              <AccordionContent>
+                <AlbyProvider>
+                  <ChatWindow
+                    chatRoom={carpool.chatroom!}
+                    chatroomUsers={attendees}
+                    currentUser={currentUser}
+                    chatroomName={`Carpool Chat: From ${carpool.originName} to ${makeTitle(carpool.tournamentSlug)}`}
+                  />
+                </AlbyProvider>
+              </AccordionContent>
+            </AccordionItem>
+          </MessageStoreProvider>
         </Accordion>
 
         {/*Hacky solution to get around server component*/}

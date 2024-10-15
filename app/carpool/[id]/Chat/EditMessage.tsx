@@ -15,22 +15,23 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Message } from "prisma/prisma-client";
 import { RealtimeChannel } from "ably";
 import FailureToast from "@/components/FailureToast";
-import ALBY_CHAT_NAME from "@/app/carpool/[id]/Chat/AlbyChatName";
+import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import { useRef, useState } from "react";
 import { Pencil } from "lucide-react";
 import axios from "axios";
 import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";
+import { useMessageStore } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 
 interface Props extends OptimisticUpdate {
   message: Message;
-  editMessage: (message: Message) => void;
   channel: RealtimeChannel;
 }
 
-function EditMessage({ message, editMessage, channel, optimisticUpdate }: Props) {
+function EditMessage({ message, channel, optimisticUpdate }: Props) {
   const [open, setOpen] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const editedMessageInput = useRef<HTMLInputElement>(null);
+  const { editMessage } = useMessageStore((state) => state);
 
   async function edit() {
     optimisticUpdate(
@@ -57,12 +58,12 @@ function EditMessage({ message, editMessage, channel, optimisticUpdate }: Props)
         setEditLoading(true);
         editMessage({ ...message, content: editedMessage.content, edited: true });
         setOpen(false);
-        await axios.patch("/api/cat", {
+        const { data } = await axios.patch("/api/chat", {
           message: { ...message, content: editedMessage.content, edited: true },
         });
         await channel.publish({
           name: ALBY_CHAT_NAME,
-          data: { action: "edit", message: editedMessage },
+          data: { functionName: "editMessage", args: [data.editedMessage] },
         });
         setEditLoading(false);
       },
