@@ -62,6 +62,9 @@ export async function POST(request: NextRequest) {
           },
         },
       },
+      attendees: {
+        connect: [user],
+      },
     },
   });
 

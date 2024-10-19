@@ -3,17 +3,91 @@ import { User } from "prisma/prisma-client";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
-import RemoveAttendee from "@/app/carpool/[id]/RemoveAttendee";
-import { Crown } from "lucide-react";
+import { Crown, UserRoundMinus } from "lucide-react";
+import SuccessToast from "@/components/SuccessToast";
+import FailureToast from "@/components/FailureToast";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
 
-interface Props {
+interface RemoveAttendeeProps {
+  carpoolId: number;
+  attendeeId: string;
+  removeAttendee: (attendee: User) => void;
+}
+
+function RemoveAttendee({ carpoolId, attendeeId, removeAttendee }: RemoveAttendeeProps) {
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  async function remove() {
+    setDeleteLoading(true);
+    try {
+      const { data } = await axios.delete(`/api/carpool/attendee/${carpoolId}`, {
+        data: { attendeeId: attendeeId },
+      });
+      SuccessToast("Successfully removed attendee from carpool");
+      console.log(data);
+      removeAttendee(data.deletedAttendee);
+    } catch (e) {
+      console.log(e);
+      FailureToast("Could not delete user");
+    } finally {
+      setDeleteLoading(false);
+      setOpen(false);
+    }
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger className={"ml-auto"}>
+        <Button size={"smallIcon"} disabled={deleteLoading}>
+          <UserRoundMinus />
+        </Button>
+      </AlertDialogTrigger>
+
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Message</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to remove this user from Carpool? This cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <Button variant="destructive" onClick={remove}>
+            Delete
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+interface AttendeeRowProps {
   carpoolId: number;
   attendee: User;
   driverId: string;
   currentUser: User;
+  removeAttendee: (attendee: User) => void;
 }
 
-function AttendeeRow({ attendee, driverId, carpoolId, currentUser }: Props) {
+function AttendeeRow({
+  attendee,
+  driverId,
+  carpoolId,
+  currentUser,
+  removeAttendee,
+}: AttendeeRowProps) {
   const [isHovering, setIsHovering] = useState(false);
   return (
     <TableRow
@@ -33,7 +107,7 @@ function AttendeeRow({ attendee, driverId, carpoolId, currentUser }: Props) {
           {attendee.id === driverId && <Crown />}
           {isHovering && attendee.id !== driverId && driverId === currentUser.id && (
             <RemoveAttendee
-              currentUser={currentUser}
+              removeAttendee={removeAttendee}
               carpoolId={carpoolId}
               attendeeId={attendee.id}
             />

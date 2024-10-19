@@ -1,4 +1,4 @@
-import { Carpool, CarpoolStatus, Chatroom, Message, User } from "prisma/prisma-client";
+import { CarpoolStatus, Chatroom, Message, User } from "prisma/prisma-client";
 
 export interface CarpoolNumber {
   originLat: number;
@@ -21,7 +21,8 @@ export interface CarpoolNumber {
 interface ChatRoomMessages extends Chatroom {
   messages: Message[];
 }
-export interface CarpoolAttendeesAll extends Carpool {
+
+export interface CarpoolFull extends CarpoolNumber {
   driver: User;
   attendees: User[];
   chatroom: ChatRoomMessages | null;

@@ -6,16 +6,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CarpoolAttendeesAll } from "@/app/helpers/entities/CarpoolTypes";
+import { CarpoolFull } from "@/app/helpers/entities/CarpoolTypes";
 import AttendeeRow from "@/app/carpool/[id]/AttendeeRow";
 import { User } from "prisma/prisma-client";
+import { useState } from "react";
 
 interface Props {
-  carpool: CarpoolAttendeesAll;
+  carpool: CarpoolFull;
   currentUser: User;
 }
 
 function AttendeeTable({ carpool, currentUser }: Props) {
+  const [attendees, setAttendees] = useState<User[]>(carpool.attendees);
   return (
     <Table className={"bg-slate-900 rounded"}>
       <TableHeader>
@@ -24,10 +26,15 @@ function AttendeeTable({ carpool, currentUser }: Props) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {carpool.attendees.map((attendee) => (
+        {attendees.map((attendee) => (
           <AttendeeRow
             key={attendee.id}
             attendee={attendee}
+            removeAttendee={(attendeeDeleted) =>
+              setAttendees(
+                attendees.filter((attendee) => attendee.id !== attendeeDeleted.id),
+              )
+            }
             driverId={carpool.driverId}
             carpoolId={carpool.id}
             currentUser={currentUser}

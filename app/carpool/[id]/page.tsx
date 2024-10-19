@@ -17,6 +17,7 @@ import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
+import { CarpoolFull } from "@/app/helpers/entities/CarpoolTypes";
 
 const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
   ssr: false,
@@ -45,6 +46,12 @@ async function CarpoolPage({ params: { id } }: Props) {
 
   const driver = carpool.driver;
   const attendees = carpool.attendees;
+
+  if (!attendees.map((attendee) => attendee.id).includes(currentUser.id))
+    return redirect("/");
+
+  // @ts-ignore
+  const decimalCarpool: CarpoolFull = carpoolDecimalToNumber([carpool])[0];
 
   const carpoolInfo = [
     { title: "Tournament:", value: makeTitle(carpool.tournamentSlug) },
@@ -80,7 +87,7 @@ async function CarpoolPage({ params: { id } }: Props) {
             ))}
           </div>
 
-          <AttendeeTable currentUser={currentUser} carpool={carpool} />
+          <AttendeeTable currentUser={currentUser} carpool={decimalCarpool} />
         </div>
 
         <Accordion
@@ -116,7 +123,7 @@ async function CarpoolPage({ params: { id } }: Props) {
         </Accordion>
 
         {/*Hacky solution to get around server component*/}
-        <MapElements carpool={carpoolDecimalToNumber([carpool])[0]} />
+        <MapElements carpool={decimalCarpool} />
       </div>
     </div>
   );

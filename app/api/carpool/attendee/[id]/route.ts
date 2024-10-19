@@ -68,11 +68,11 @@ export async function DELETE(
   const body = await req.json();
   const userId = body.attendeeId;
 
-  const deletedUser = await prisma.user.findUnique({
+  const attendeeToDelete = await prisma.user.findUnique({
     where: { id: userId },
   });
 
-  if (!deletedUser)
+  if (!attendeeToDelete)
     return NextResponse.json({ error: "User does not exist" }, { status: 404 });
 
   const carpool = await prisma.carpool.findUnique({
@@ -81,15 +81,16 @@ export async function DELETE(
   });
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
-  const data = await prisma.carpool.update({
+  await prisma.carpool.update({
     where: { id: parseInt(id) },
     include: {
       attendees: true,
     },
     data: {
-      attendees: {
-        delete: [deletedUser],
-      },
+      id: 30,
+      // attendees: {
+      //   delete: [attendeeToDelete],
+      // },
       chatroom: {
         update: {
           where: {
@@ -99,7 +100,7 @@ export async function DELETE(
             messages: {
               create: {
                 serverMessage: true,
-                content: `${deletedUser.gamertag} has removed from Carpool.`,
+                content: `${attendeeToDelete.gamertag} has removed from Carpool.`,
               },
             },
           },
@@ -108,5 +109,5 @@ export async function DELETE(
     },
   });
 
-  return NextResponse.json(data, { status: 200 });
+  return NextResponse.json({ deletedAttendee: attendeeToDelete }, { status: 200 });
 }
