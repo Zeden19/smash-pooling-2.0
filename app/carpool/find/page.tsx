@@ -19,7 +19,7 @@ function FindCarpoolPage() {
 
   async function attendCarpool(id: number) {
     try {
-      const data = await axios.patch(`/api/carpool/addAttendee/${id}`);
+      const data = await axios.patch(`/api/carpool/attendee/${id}`);
       SuccessToast("Successfully attended Carpool!", "Stay safe!");
     } catch (e: any) {
       FailureToast(

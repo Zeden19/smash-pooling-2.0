@@ -3,15 +3,6 @@ import GoogleMap from "@/components/GoogleMap";
 import { makeTitle } from "@/app/helpers/services/makeTitle";
 import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
 import MapElements from "@/app/carpool/[id]/MapElements";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
 import {
   Accordion,
@@ -25,6 +16,7 @@ import { getUser } from "@/app/helpers/hooks/getUser";
 import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
+import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
 
 const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
   ssr: false,
@@ -88,32 +80,7 @@ async function CarpoolPage({ params: { id } }: Props) {
             ))}
           </div>
 
-          <Table className={"bg-slate-900 rounded"}>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Attendees</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {attendees.map((attendee) => (
-                <TableRow key={attendee.id}>
-                  <TableCell>
-                    <div className={"flex gap-5 align-middle"}>
-                      <Avatar>
-                        <AvatarImage src={attendee.profilePicture ?? undefined} />
-                        <AvatarFallback>
-                          {attendee.gamertag.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className={"text-2xl font-bold my-auto"}>
-                        {attendee.gamertag}
-                      </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <AttendeeTable currentUser={currentUser} carpool={carpool} />
         </div>
 
         <Accordion

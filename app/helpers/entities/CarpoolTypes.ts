@@ -24,5 +24,5 @@ interface ChatRoomMessages extends Chatroom {
 export interface CarpoolAttendeesAll extends Carpool {
   driver: User;
   attendees: User[];
-  chatroom: ChatRoomMessages;
+  chatroom: ChatRoomMessages | null;
 }
