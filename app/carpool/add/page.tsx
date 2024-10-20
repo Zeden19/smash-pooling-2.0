@@ -5,6 +5,8 @@ import TournamentForm from "@/app/carpool/add/TournamentForm";
 import OriginForm from "@/app/carpool/add/OriginForm";
 import GetRoute from "@/app/carpool/add/GetRoute";
 import AddCarpool from "@/app/carpool/add/AddCarpool";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 export interface Origin {
@@ -32,24 +34,40 @@ function AddCarpoolPage() {
 
   return (
     <>
-      <div className={"flex flex-row gap-5 space-x-6 justify-start ms-5 my-3"}>
-        <TournamentForm
-          destination={destination}
-          handleSubmit={(venueAddress, cords, slug) =>
-            setDestination({ name: venueAddress, cords: cords, slug: slug })
-          }
-        />
+      <div className={"grid grid-rows-5 grid-cols-2 justify-start mx-5 my-3"}>
+        <div className={"row-start-1 col-start-1"}>
+          <OriginForm origin={origin} setOrigin={(origin) => setOrigin(origin)} />
+        </div>
 
-        <OriginForm origin={origin} setOrigin={(origin) => setOrigin(origin)} />
+        <div className={"row-start-3 col-span-2 col-start-1"}>
+          <Textarea placeholder={"Carpool Description"} />
+        </div>
 
-        <GetRoute
-          route={route}
-          origin={origin}
-          destination={destination}
-          setRoute={(route) => setRoute(route)}
-        />
+        <div className={"row-start-1 row-span-2"}>
+          <Input placeholder={"Carpool Price"} />
+        </div>
 
-        <AddCarpool origin={origin} destination={destination} route={route} />
+        <div className={"row-start-2 col-start-1"}>
+          <TournamentForm
+            destination={destination}
+            handleSubmit={(venueAddress, cords, slug) =>
+              setDestination({ name: venueAddress, cords: cords, slug: slug })
+            }
+          />
+        </div>
+
+        <div className={"row-start-4 col-start-1"}>
+          <GetRoute
+            route={route}
+            origin={origin}
+            destination={destination}
+            setRoute={(route) => setRoute(route)}
+          />
+        </div>
+
+        <div className={"row-start-5 col-start-1"}>
+          <AddCarpool origin={origin} destination={destination} route={route} />
+        </div>
 
         {/*Used in the future when user has to select a route*/}
         {/*<Button onClick={() => setRoute()}>Set Route</Button>*/}

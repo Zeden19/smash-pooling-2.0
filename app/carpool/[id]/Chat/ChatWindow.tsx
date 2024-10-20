@@ -30,7 +30,6 @@ export interface OptimisticUpdate {
 
 function ChatWindow({ chatRoom, chatroomName, chatroomUsers, currentUser }: Props) {
   if (!currentUser) redirect("/");
-  //todo make all of this a context since this value keeps getting reset on a new render
   const messageStore = useMessageStore((state) => state);
 
   // runs when we receive a new message

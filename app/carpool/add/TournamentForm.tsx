@@ -68,7 +68,6 @@ function TournamentForm({ handleSubmit, destination }: Props) {
 
   return (
     <form
-      className={"w-96"}
       onSubmit={async (event) => {
         setLoadingDestination(true);
         await handleStartggLink(event);
