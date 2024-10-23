@@ -26,12 +26,23 @@ const schema = z.object({
   origin,
   destination,
   route,
+  description: z.optional(
+    z
+      .string()
+      .max(500, { message: "Description link must be smaller than 500 characters" }),
+  ),
+
+  price: z.optional(z.number().min(0, { message: "Price must be positive" })),
 });
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const { error } = schema.safeParse(body);
+  const price = parseInt(body.price);
+  const { error } = schema.safeParse({
+    ...body,
+    price: isNaN(price) ? undefined : price,
+  });
   if (error) return NextResponse.json({ error: error.format() }, { status: 400 });
 
   const { user } = await getUser();
@@ -52,6 +63,8 @@ export async function POST(request: NextRequest) {
       tournamentSlug: destination.slug,
       route: route.route,
       distance: route.distance,
+      description: body.description,
+      price: !price ? 0 : price,
       chatroom: {
         create: {
           messages: {

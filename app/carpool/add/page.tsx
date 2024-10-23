@@ -1,12 +1,17 @@
 "use client";
 import GoogleMap, { defaultMapSize } from "@/components/GoogleMap";
-import { useState } from "react";
-import TournamentForm from "@/app/carpool/add/TournamentForm";
-import OriginForm from "@/app/carpool/add/OriginForm";
-import GetRoute from "@/app/carpool/add/GetRoute";
-import AddCarpool from "@/app/carpool/add/AddCarpool";
+import { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import FailureToast from "@/components/FailureToast";
+import startggClient, { slug } from "@/app/helpers/services/startggClient";
+import { GET_TOURNAMENT_BY_URL } from "@/app/helpers/services/startggQueries";
+import SuccessToast from "@/components/SuccessToast";
+import useMapStore from "@/app/stores";
+import { orangeMarker } from "@/app/MarkerStyles";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 export interface Origin {
@@ -25,48 +30,184 @@ export interface Route {
   distance: string;
 }
 
+interface Tournament {
+  id: number;
+  lat: number;
+  lng: number;
+  mapsPlaceId: string;
+  name: string;
+  state: number;
+  url: string;
+  venueAddress: string;
+}
+
+interface TournamentResponse {
+  tournament: Tournament;
+}
+
 // consider using server search params: this might be overly complex due to the nature of things;
 // using placeids might help
 function AddCarpoolPage() {
-  const [origin, setOrigin] = useState<Origin>();
-  const [destination, setDestination] = useState<Destination>();
+  const [originObject, setOriginObject] = useState<Origin>();
+  const [destinationObject, setDestinationObject] = useState<Destination>();
   const [route, setRoute] = useState<Route>();
+
+  const originInput = useRef<HTMLInputElement>(null);
+  const destinationInput = useRef<HTMLInputElement>(null);
+  const description = useRef<HTMLTextAreaElement>(null);
+  const price = useRef<HTMLInputElement>(null);
+
+  const [loadingRoute, setLoadingRoute] = useState(false);
+  const [addingCarpool, setAddingCarpool] = useState(false);
+
+  const { mapsApi } = useMapStore();
+
+  //todo use modified sheet like in smash mapping
+  //todo make this a form, find route should also do origin and tournmaent forms
+  //todo use a list to make this more re-usable (set rows and cols by index)
+  // todo make this go in database
+
+  async function getRoutes() {
+    if (!originInput.current!.value || !destinationInput.current!.value) {
+      FailureToast("Origin and destination required");
+      return;
+    }
+
+    // Getting destination
+    const tournamentSlug = slug(destinationInput.current!.value);
+    if (!tournamentSlug) {
+      FailureToast("Could Not Find Tournament Slug", "Make sure the URL is correct");
+      return;
+    }
+
+    const { tournament }: TournamentResponse = await startggClient.request(
+      GET_TOURNAMENT_BY_URL,
+      { slug: tournamentSlug },
+    );
+
+    if (!tournament) {
+      FailureToast("Could Not Find tournament", "Make sure the URL is correct");
+      return;
+    }
+
+    const tournamentCords = { lat: tournament.lat, lng: tournament.lng };
+    const marker = mapsApi?.addMarker(tournamentCords);
+    setDestinationObject({
+      cords: tournamentCords,
+      name: tournament.venueAddress,
+      slug: tournamentSlug,
+    });
+
+    // Getting Origin
+    let data;
+    try {
+      data = await mapsApi?.geocode({ address: originInput.current!.value });
+    } catch (e) {
+      FailureToast("Could Not Find Address", "Make sure you entered a valid address");
+      return;
+    }
+
+    const originCords = {
+      lat: data!.geometry.location.lat(),
+      lng: data!.geometry.location.lng(),
+    };
+    mapsApi?.addMarker(originCords, orangeMarker);
+    setOriginObject({ cords: originCords, name: originInput.current!.value });
+
+    // Get route
+    try {
+      const route = await mapsApi?.getRoutes(originCords, tournamentCords)!;
+      const newRoute = mapsApi?.setRoute(route!.route);
+      setRoute(route!);
+      SuccessToast("Successfully Found Route");
+      // setShownRoute(newRoute);
+    } catch (e) {
+      FailureToast("Could Not Find Route", "Check your origin and tournament");
+    }
+  }
+
+  async function addCarpool() {
+    try {
+      const { data } = await axios.post("/api/carpool/add", {
+        origin: originObject,
+        destination: destinationObject,
+        route,
+        description: description.current!.value,
+        price: price.current!.value,
+      });
+      SuccessToast("Successfully Added Carpool", "Your good to go!");
+    } catch (e) {
+      console.log(e);
+      FailureToast(
+        "Could Not Add Carpool",
+        "Please try again or report this bug if it persists",
+      );
+    }
+  }
 
   return (
     <>
       <div className={"grid grid-rows-5 grid-cols-2 justify-start mx-5 my-3"}>
-        <div className={"row-start-1 col-start-1"}>
-          <OriginForm origin={origin} setOrigin={(origin) => setOrigin(origin)} />
-        </div>
+        {/*Origin*/}
+        <Input
+          ref={originInput}
+          className={`row-start-2 col-start-1 ${originObject?.name && "border-green-400"}`}
+          defaultValue={"Toronto"}
+          placeholder={"From"}
+        />
 
-        <div className={"row-start-3 col-span-2 col-start-1"}>
-          <Textarea placeholder={"Carpool Description"} />
-        </div>
+        {/*Destination*/}
+        <Input
+          ref={destinationInput}
+          defaultValue={"https://www.start.gg/tournament/bullet-hell-1/details"}
+          id={"link"}
+          type={"text"}
+          placeholder={"startgg Url"}
+          className={`${destinationObject?.name && "border-green-400 row-start-1 col-start-1"}`}
+        />
 
-        <div className={"row-start-1 row-span-2"}>
-          <Input placeholder={"Carpool Price"} />
-        </div>
+        {/*Description*/}
+        <Textarea
+          className={"row-start-3 col-span-2 col-start-1"}
+          placeholder={"Carpool Description"}
+          maxLength={500}
+          ref={description}
+        />
 
-        <div className={"row-start-2 col-start-1"}>
-          <TournamentForm
-            destination={destination}
-            handleSubmit={(venueAddress, cords, slug) =>
-              setDestination({ name: venueAddress, cords: cords, slug: slug })
-            }
-          />
-        </div>
+        {/*Price*/}
+        <Input
+          type={"number"}
+          className={"row-start-1 row-span-2"}
+          placeholder={"Carpool Price"}
+          min={0}
+          defaultValue={undefined}
+          ref={price}
+        />
 
         <div className={"row-start-4 col-start-1"}>
-          <GetRoute
-            route={route}
-            origin={origin}
-            destination={destination}
-            setRoute={(route) => setRoute(route)}
-          />
+          <Button
+            disabled={loadingRoute}
+            className={`${route && "border-green-400 border-2"}`}
+            onClick={async () => {
+              setLoadingRoute(true);
+              await getRoutes();
+              setLoadingRoute(false);
+            }}>
+            Find Route
+            {loadingRoute && <LoadingSpinner />}
+          </Button>
         </div>
 
         <div className={"row-start-5 col-start-1"}>
-          <AddCarpool origin={origin} destination={destination} route={route} />
+          <Button
+            disabled={addingCarpool || !route}
+            onClick={async () => {
+              setAddingCarpool(true);
+              await addCarpool();
+              setAddingCarpool(false);
+            }}>
+            Add Carpool {addingCarpool && <LoadingSpinner />}
+          </Button>
         </div>
 
         {/*Used in the future when user has to select a route*/}

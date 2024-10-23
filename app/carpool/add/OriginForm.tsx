@@ -51,7 +51,7 @@ function OriginForm({ setOrigin, origin }: Props) {
         className={origin && "border-green-400"}
         disabled={loadingOrigin}
         defaultValue={"Toronto"}
-        id={"origin"}
+        name={"origin"}
         placeholder={"From"}
       />
     </form>

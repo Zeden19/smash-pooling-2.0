@@ -43,7 +43,6 @@ function TournamentForm({ handleSubmit, destination }: Props) {
     const formData = event.target as HTMLFormElement;
     const tournamentSlug = slug(formData.link.value);
 
-    // add toast here
     if (!tournamentSlug) {
       FailureToast("Could Not Find Tournament Slug", "Make sure the URL is correct");
       return;
@@ -74,6 +73,7 @@ function TournamentForm({ handleSubmit, destination }: Props) {
         setLoadingDestination(false);
       }}>
       <Input
+        name={"destination"}
         disabled={loadingDestination}
         defaultValue={"https://www.start.gg/tournament/bullet-hell-1/details"}
         id={"link"}

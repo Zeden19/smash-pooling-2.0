@@ -57,7 +57,7 @@ model Carpool {
   startTime      DateTime?
   status         CarpoolStatus @default(OPEN)
   price          Int           @default(0)
-  description    String        @default("")
+  description    String        @default("") @db.VarChar(500)
 }
 
 enum CarpoolStatus {
