@@ -51,6 +51,11 @@ function AddCarpoolPage() {
   const [originObject, setOriginObject] = useState<Origin>();
   const [destinationObject, setDestinationObject] = useState<Destination>();
   const [route, setRoute] = useState<Route>();
+  const [shownRoute, setShownRoute] = useState<google.maps.Polyline>();
+  const [originMarker, setOriginMarker] =
+    useState<google.maps.marker.AdvancedMarkerElement>();
+  const [destinationMarker, setDestinationMarker] =
+    useState<google.maps.marker.AdvancedMarkerElement>();
 
   const originInput = useRef<HTMLInputElement>(null);
   const destinationInput = useRef<HTMLInputElement>(null);
@@ -62,16 +67,18 @@ function AddCarpoolPage() {
 
   const { mapsApi } = useMapStore();
 
-  //todo use modified sheet like in smash mapping
-  //todo make this a form, find route should also do origin and tournmaent forms
+  //todo use sidebar
   //todo use a list to make this more re-usable (set rows and cols by index)
-  // todo make this go in database
 
   async function getRoutes() {
     if (!originInput.current!.value || !destinationInput.current!.value) {
       FailureToast("Origin and destination required");
       return;
     }
+
+    if (shownRoute) shownRoute.setMap(null);
+    if (destinationMarker) mapsApi?.removeMarker(destinationMarker);
+    if (originMarker) mapsApi?.removeMarker(originMarker);
 
     // Getting destination
     const tournamentSlug = slug(destinationInput.current!.value);
@@ -111,7 +118,7 @@ function AddCarpoolPage() {
       lat: data!.geometry.location.lat(),
       lng: data!.geometry.location.lng(),
     };
-    mapsApi?.addMarker(originCords, orangeMarker);
+    const newOriginMarker = mapsApi?.addMarker(originCords, orangeMarker);
     setOriginObject({ cords: originCords, name: originInput.current!.value });
 
     // Get route
@@ -119,8 +126,12 @@ function AddCarpoolPage() {
       const route = await mapsApi?.getRoutes(originCords, tournamentCords)!;
       const newRoute = mapsApi?.setRoute(route!.route);
       setRoute(route!);
+
+      setOriginMarker(newOriginMarker);
+      setDestinationMarker(marker);
+      setShownRoute(newRoute);
+
       SuccessToast("Successfully Found Route");
-      // setShownRoute(newRoute);
     } catch (e) {
       FailureToast("Could Not Find Route", "Check your origin and tournament");
     }
