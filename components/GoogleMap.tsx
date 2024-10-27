@@ -19,9 +19,10 @@ interface Props {
   };
   disableDefaultUI?: boolean;
   className?: string;
+  children?: React.ReactNode;
 }
 
-function GoogleMap({ size, disableDefaultUI = false, className = "" }: Props) {
+function GoogleMap({ size, disableDefaultUI = false, className = "", children }: Props) {
   const { setMapsApi } = useMapStore();
 
   async function initMap(): Promise<void> {
@@ -46,8 +47,9 @@ function GoogleMap({ size, disableDefaultUI = false, className = "" }: Props) {
   }, []);
 
   return (
-    <div>
-      <div className={className} style={size} id={"map"} />
+    <div className={"relative"}>
+      <div className={className} style={size} id={"map"}></div>
+      {children}
     </div>
   );
 }
