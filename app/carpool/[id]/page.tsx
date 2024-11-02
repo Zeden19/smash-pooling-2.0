@@ -18,6 +18,7 @@ import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
 import { CarpoolFull } from "@/app/helpers/entities/CarpoolTypes";
+import { Button } from "@/components/ui/button";
 
 const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
   ssr: false,
@@ -58,6 +59,7 @@ async function CarpoolPage({ params: { id } }: Props) {
     { title: "Origin:", value: carpool.originName },
     { title: "Distance:", value: carpool.distance },
     { title: "Status:", value: carpool.status },
+    { title: "Price", value: "$" + carpool.price },
   ];
   return (
     <div className={"m-5"}>
@@ -69,7 +71,10 @@ async function CarpoolPage({ params: { id } }: Props) {
         <div className={"grid grid-cols-2"}>
           <div className={"mx-3"}>
             <DriverInfo driver={driver} />
-            <DeleteCarpoolDialog carpoolId={carpool.id} />
+            <div className={"flex gap-3 items-center my-3"}>
+              <DeleteCarpoolDialog carpoolId={carpool.id} />
+              <Button>Edit Carpool</Button>
+            </div>
           </div>
 
           <div className={"grid grid-cols-2 h-64"}>
@@ -86,8 +91,15 @@ async function CarpoolPage({ params: { id } }: Props) {
               </div>
             ))}
           </div>
-
-          <AttendeeTable currentUser={currentUser} carpool={decimalCarpool} />
+          <div>
+            <AttendeeTable currentUser={currentUser} carpool={decimalCarpool} />
+            {carpool.description && (
+              <>
+                <h2 className={"text-2xl mt-2 font-bold"}>Description</h2>
+                {carpool.description}
+              </>
+            )}
+          </div>
         </div>
 
         <Accordion

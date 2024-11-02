@@ -56,13 +56,15 @@ class MapsApi {
   }
 
   setRoute(route: string, infoWindowContent?: HTMLElement) {
+    const path = decodePolyline(route);
     const newRoute = new google.maps.Polyline({
-      path: decodePolyline(route),
+      path,
       strokeColor: "#FF0000",
       strokeOpacity: 1.0,
       strokeWeight: 2,
       map: this.map,
     });
+    this.setCentre(path[Math.floor(path.length / 2)]);
 
     if (infoWindowContent) {
       google.maps.event.addListener(newRoute, "click", (event: { latLng: LatLng }) => {
@@ -89,7 +91,7 @@ class MapsApi {
     this.polyLines.forEach((polyline) => polyline.setMap(null));
   }
 
-  setCentre(cords: LatLng, zoom = 7) {
+  setCentre(cords: LatLng | { lat: number; lng: number }, zoom = 7) {
     this.map.setCenter(cords);
     this.map.setZoom(zoom);
   }

@@ -57,7 +57,7 @@ function RemoveAttendee({ carpoolId, attendeeId, removeAttendee }: RemoveAttende
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Message</AlertDialogTitle>
+          <AlertDialogTitle>Remove User</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to remove this user from Carpool? This cannot be undone.
           </AlertDialogDescription>

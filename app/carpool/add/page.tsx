@@ -68,9 +68,6 @@ function AddCarpoolPage() {
 
   const { mapsApi } = useMapStore();
 
-  //todo use sidebar
-  //todo use a list to make this more re-usable (set rows and cols by index)
-
   async function getRoutes() {
     if (!originInput.current!.value || !destinationInput.current!.value) {
       FailureToast("Origin and destination required");
@@ -162,11 +159,11 @@ function AddCarpoolPage() {
       <GoogleMap size={defaultMapSize}>
         <div
           className={
-            "grid grid-rows-5 grid-cols-1 justify-start h-full w-1/4 absolute top-0 left-0 bg-black"
+            "flex flex-col gap-4 p-4 h-full w-1/4 absolute top-0 left-0 bg-black"
           }>
           {/*Origin*/}
-          <div className={"row-start-1 col-start-1"}>
-            <Label htmlFor={"origin"}>Staring Location</Label>
+          <div>
+            <Label htmlFor={"origin"}>Starting Location</Label>
             <Input
               id={"origin"}
               ref={originInput}
@@ -190,7 +187,7 @@ function AddCarpoolPage() {
           </div>
 
           {/*Price*/}
-          <div className={"row-start-3"}>
+          <div>
             <Label htmlFor={"price"}>Price</Label>
             <Input
               id={"price"}
@@ -203,7 +200,7 @@ function AddCarpoolPage() {
           </div>
 
           {/*Description*/}
-          <div className={"row-start-4"}>
+          <div>
             <Label htmlFor={"description"}>Description</Label>
             <Textarea
               id={"description"}
@@ -226,7 +223,7 @@ function AddCarpoolPage() {
             </Button>
           </div>
 
-          <div className={"row-start-6"}>
+          <div>
             <Button
               disabled={addingCarpool || !route}
               onClick={async () => {

@@ -19,7 +19,7 @@ interface Props {
 function AttendeeTable({ carpool, currentUser }: Props) {
   const [attendees, setAttendees] = useState<User[]>(carpool.attendees);
   return (
-    <Table className={"bg-slate-900 rounded"}>
+    <Table className={"bg-slate-900 rounded-lg"}>
       <TableHeader>
         <TableRow>
           <TableHead>Attendees</TableHead>
