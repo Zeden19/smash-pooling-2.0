@@ -18,7 +18,7 @@ import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
 import { CarpoolFull } from "@/app/helpers/entities/CarpoolTypes";
-import { Button } from "@/components/ui/button";
+import EditCarpoolButton from "@/app/carpool/[id]/EditCarpoolButton";
 
 const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
   ssr: false,
@@ -73,7 +73,7 @@ async function CarpoolPage({ params: { id } }: Props) {
             <DriverInfo driver={driver} />
             <div className={"flex gap-3 items-center my-3"}>
               <DeleteCarpoolDialog carpoolId={carpool.id} />
-              <Button>Edit Carpool</Button>
+              <EditCarpoolButton id={carpool.id} />
             </div>
           </div>
 
@@ -91,15 +91,7 @@ async function CarpoolPage({ params: { id } }: Props) {
               </div>
             ))}
           </div>
-          <div>
-            <AttendeeTable currentUser={currentUser} carpool={decimalCarpool} />
-            {carpool.description && (
-              <>
-                <h2 className={"text-2xl mt-2 font-bold"}>Description</h2>
-                {carpool.description}
-              </>
-            )}
-          </div>
+          <AttendeeTable currentUser={currentUser} carpool={decimalCarpool} />
         </div>
 
         <Accordion
@@ -132,6 +124,13 @@ async function CarpoolPage({ params: { id } }: Props) {
               </AccordionContent>
             </AccordionItem>
           </MessageStoreProvider>
+
+          <AccordionItem value={"item-3"}>
+            <AccordionTrigger>Description</AccordionTrigger>
+            <AccordionContent>
+              {carpool.description && <div>{carpool.description}</div>}
+            </AccordionContent>
+          </AccordionItem>
         </Accordion>
 
         {/*Hacky solution to get around server component*/}

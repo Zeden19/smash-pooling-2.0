@@ -46,7 +46,7 @@ function ChatWindow({ chatRoom, chatroomName, chatroomUsers, currentUser }: Prop
   useEffect(() => {
     setTimeout(() => {
       scrollToBottom();
-    }, 50);
+    }, 100);
   }, [messageStore.messages]);
 
   async function optimisticUpdate(

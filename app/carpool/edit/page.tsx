@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
 import CarpoolsDisplay from "@/components/CarpoolsDisplay";
 
+export const fetchCache = "force-no-store";
+
 async function EditCarpoolsPage() {
   const { user } = await getUser();
   if (!user) redirect("/");
