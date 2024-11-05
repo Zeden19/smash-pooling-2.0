@@ -13,6 +13,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Label } from "@/components/ui/label";
+import { DateTimePicker } from "@/components/DateTimePicker";
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 export interface Origin {
@@ -65,6 +66,8 @@ function AddCarpoolPage() {
 
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [addingCarpool, setAddingCarpool] = useState(false);
+
+  const [date, setDate] = useState<Date | undefined>(undefined);
 
   const { mapsApi } = useMapStore();
 
@@ -143,14 +146,27 @@ function AddCarpoolPage() {
         route,
         description: description.current!.value,
         price: price.current!.value,
+        date,
       });
       SuccessToast("Successfully Added Carpool", "Your good to go!");
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
-      FailureToast(
-        "Could Not Add Carpool",
-        "Please try again or report this bug if it persists",
-      );
+      console.log(e.response.data.error);
+      if (e.response.data.error.name === "ZodError") {
+        FailureToast(
+          "Could Not Add Carpool",
+          e.response.data.error.issues.map(
+            (error: { message: string }) => error.message + "\n",
+          ),
+        );
+      } else if (e.response.data.error) {
+        FailureToast("Could Not Add Carpool", e.response.data.error);
+      } else {
+        FailureToast(
+          "Could Not Add Carpool",
+          "Try again or report this error if it persists",
+        );
+      }
     }
   }
 
@@ -185,6 +201,12 @@ function AddCarpoolPage() {
               className={`${destinationObject?.name && "border-green-400 row-start-2"}`}
             />
           </div>
+
+          {/*Date-Time*/}
+          <DateTimePicker
+            date={date}
+            setDate={(newDate: Date | undefined) => setDate(newDate)}
+          />
 
           {/*Price*/}
           <div>
