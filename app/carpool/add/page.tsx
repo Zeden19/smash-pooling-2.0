@@ -1,6 +1,6 @@
 "use client";
 import GoogleMap, { defaultMapSize } from "@/components/GoogleMap";
-import { useRef, useState } from "react";
+import { RefObject, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import FailureToast from "@/components/FailureToast";
@@ -17,11 +17,13 @@ import { DateTimePicker } from "@/components/DateTimePicker";
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 export interface Origin {
+  error: boolean;
   cords: LatLngLiteral;
   name: string;
 }
 
 export interface Destination {
+  error: boolean;
   cords: LatLngLiteral;
   name: string;
   slug: string;
@@ -53,6 +55,21 @@ function AddCarpoolPage() {
   const [originObject, setOriginObject] = useState<Origin>();
   const [destinationObject, setDestinationObject] = useState<Destination>();
   const [route, setRoute] = useState<Route>();
+  const [date, setDate] = useState<{ dateTime: Date | undefined; error: boolean }>({
+    dateTime: undefined,
+    error: false,
+  });
+
+  const [price, setPrice] = useState<{
+    priceInput: RefObject<HTMLInputElement>;
+    error: boolean;
+  }>({ priceInput: useRef(null), error: false });
+
+  const [description, setDescription] = useState<{
+    descriptionInput: RefObject<HTMLTextAreaElement>;
+    error: boolean;
+  }>({ descriptionInput: useRef(null), error: false });
+
   const [shownRoute, setShownRoute] = useState<google.maps.Polyline>();
   const [originMarker, setOriginMarker] =
     useState<google.maps.marker.AdvancedMarkerElement>();
@@ -61,18 +78,18 @@ function AddCarpoolPage() {
 
   const originInput = useRef<HTMLInputElement>(null);
   const destinationInput = useRef<HTMLInputElement>(null);
-  const description = useRef<HTMLTextAreaElement>(null);
-  const price = useRef<HTMLInputElement>(null);
 
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [addingCarpool, setAddingCarpool] = useState(false);
-
-  const [date, setDate] = useState<Date | undefined>(undefined);
 
   const { mapsApi } = useMapStore();
 
   async function getRoutes() {
     if (!originInput.current!.value || !destinationInput.current!.value) {
+      !originInput.current!.value && setOriginObject({ ...originObject!, error: true });
+      !destinationInput.current!.value &&
+        setDestinationObject({ ...destinationObject!, error: true });
+
       FailureToast("Origin and destination required");
       return;
     }
@@ -84,6 +101,7 @@ function AddCarpoolPage() {
     // Getting destination
     const tournamentSlug = slug(destinationInput.current!.value);
     if (!tournamentSlug) {
+      setDestinationObject({ ...destinationObject!, error: true });
       FailureToast("Could Not Find Tournament Slug", "Make sure the URL is correct");
       return;
     }
@@ -101,6 +119,7 @@ function AddCarpoolPage() {
     const tournamentCords = { lat: tournament.lat, lng: tournament.lng };
     const marker = mapsApi?.addMarker(tournamentCords);
     setDestinationObject({
+      error: false,
       cords: tournamentCords,
       name: tournament.venueAddress,
       slug: tournamentSlug,
@@ -111,6 +130,7 @@ function AddCarpoolPage() {
     try {
       data = await mapsApi?.geocode({ address: originInput.current!.value });
     } catch (e) {
+      setOriginObject({ ...originObject!, error: true });
       FailureToast("Could Not Find Address", "Make sure you entered a valid address");
       return;
     }
@@ -120,7 +140,11 @@ function AddCarpoolPage() {
       lng: data!.geometry.location.lng(),
     };
     const newOriginMarker = mapsApi?.addMarker(originCords, orangeMarker);
-    setOriginObject({ cords: originCords, name: originInput.current!.value });
+    setOriginObject({
+      error: false,
+      cords: originCords,
+      name: originInput.current!.value,
+    });
 
     // Get route
     try {
@@ -139,14 +163,43 @@ function AddCarpoolPage() {
   }
 
   async function addCarpool() {
+    if (
+      price.priceInput.current?.value !== null &&
+      parseInt(price.priceInput.current!.value) < 0
+    ) {
+      FailureToast("Price must be greater than 0");
+      setPrice({ ...price, error: true });
+      return;
+    }
+
+    if (!date.dateTime) {
+      setDate({ ...date, error: true });
+      FailureToast("Date is required");
+      return;
+    }
+
+    if (date.dateTime < new Date()) {
+      setDate({ ...date, error: true });
+      FailureToast("Date cannot be in the past");
+      return;
+    }
+
+    if (
+      description.descriptionInput.current?.value !== null &&
+      description.descriptionInput.current!.value.length >= 500
+    ) {
+      setDescription({ ...description, error: true });
+      FailureToast("Description must be smaller than 500 characters");
+      return;
+    }
     try {
       const { data } = await axios.post("/api/carpool/add", {
         origin: originObject,
         destination: destinationObject,
         route,
-        description: description.current!.value,
-        price: price.current!.value,
-        date,
+        description: description.descriptionInput.current!.value,
+        price: price.priceInput.current!.value,
+        date: date.dateTime,
       });
       SuccessToast("Successfully Added Carpool", "Your good to go!");
     } catch (e: any) {
@@ -183,7 +236,8 @@ function AddCarpoolPage() {
             <Input
               id={"origin"}
               ref={originInput}
-              className={`${originObject?.name && "border-green-400"}`}
+              className={`${originObject?.name && !originObject?.error && "border-green-400"} 
+                          ${originObject?.error && "border-red-600"}`}
               defaultValue={"Toronto"}
               placeholder={"From"}
             />
@@ -198,14 +252,21 @@ function AddCarpoolPage() {
               id={"destination"}
               type={"text"}
               placeholder={"startgg Url"}
-              className={`${destinationObject?.name && "border-green-400 row-start-2"}`}
+              className={`${
+                destinationObject?.name &&
+                !destinationObject?.error &&
+                "border-green-400 row-start-2"
+              } ${destinationObject?.error && "border-red-600"}`}
             />
           </div>
 
           {/*Date-Time*/}
           <DateTimePicker
-            date={date}
-            setDate={(newDate: Date | undefined) => setDate(newDate)}
+            error={date.error}
+            date={date.dateTime}
+            setDate={(newDate: Date | undefined) =>
+              setDate({ error: false, dateTime: newDate })
+            }
           />
 
           {/*Price*/}
@@ -217,7 +278,8 @@ function AddCarpoolPage() {
               placeholder={"Carpool Price"}
               min={0}
               defaultValue={undefined}
-              ref={price}
+              ref={price.priceInput}
+              className={`${price.error && "border-red-600"}`}
             />
           </div>
 
@@ -228,7 +290,8 @@ function AddCarpoolPage() {
               id={"description"}
               placeholder={"Carpool Description"}
               maxLength={500}
-              ref={description}
+              ref={description.descriptionInput}
+              className={`${description.error && "border-red-600"}`}
             />
           </div>
           <div className={"row-start-5"}>

@@ -14,9 +14,10 @@ import { Label } from "@/components/ui/label";
 interface Props {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
+  error: boolean;
 }
 
-export function DateTimePicker({ date, setDate }: Props) {
+export function DateTimePicker({ date, setDate, error }: Props) {
   /**
    * carry over the current time when a user clicks a new day
    * instead of resetting to 00:00
@@ -41,7 +42,11 @@ export function DateTimePicker({ date, setDate }: Props) {
           <Button
             id={"dateTime"}
             variant={"outline"}
-            className={cn("w-full justify-start", !date && "text-muted-foreground")}>
+            className={cn(
+              "w-full justify-start",
+              !date && "text-muted-foreground",
+              error && "border-red-600",
+            )}>
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? format(date, "Pp") : <span>Pick a date</span>}
           </Button>
