@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/prisma/prismaClient";
-import { getUser } from "@/app/helpers/hooks/getUser";
+import { getUser } from "@/app/_helpers/hooks/getUser";
 import { Prisma } from "@prisma/client";
 
 const cords = z.object({

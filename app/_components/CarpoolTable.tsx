@@ -7,10 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import CarpoolStatusBadge from "@/components/CarpoolStatusBadge";
+import CarpoolStatusBadge from "@/app/_components/CarpoolStatusBadge";
 import Link from "next/link";
-import { makeTitle } from "@/app/helpers/services/makeTitle";
-import { CarpoolNumber } from "@/components/CarpoolsDisplay";
+import { makeTitle } from "@/app/_helpers/functions/makeTitle";
+import { CarpoolNumber } from "@/app/_helpers/entities/CarpoolTypes";
 
 interface Props {
   carpools: CarpoolNumber[];

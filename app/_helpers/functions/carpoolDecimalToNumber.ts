@@ -1,5 +1,5 @@
 import { Carpool } from "prisma/prisma-client";
-import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
+import { DecimalToNumber } from "@/app/_helpers/functions/DecimalConversions";
 
 function carpoolDecimalToNumber(carpools: Carpool[]) {
   return carpools.map((carpool) => ({

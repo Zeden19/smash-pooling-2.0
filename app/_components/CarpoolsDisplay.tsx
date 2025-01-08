@@ -1,5 +1,5 @@
-import CarpoolTable from "@/components/CarpoolTable";
-import { CarpoolNumber } from "@/app/helpers/entities/CarpoolTypes";
+import CarpoolTable from "@/app/_components/CarpoolTable";
+import { CarpoolNumber } from "@/app/_helpers/entities/CarpoolTypes";
 
 interface Props {
   carpoolsDriving: CarpoolNumber[];

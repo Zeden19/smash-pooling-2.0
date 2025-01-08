@@ -1,6 +1,6 @@
 import { ArmchairIcon, CarIcon, IdCardIcon } from "lucide-react";
 import { User } from "prisma/prisma-client";
-import GenericToolTip from "@/components/GenericToolTip";
+import GenericToolTip from "@/app/_components/GenericToolTip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function DriverInfo({ driver }: { driver: User }) {

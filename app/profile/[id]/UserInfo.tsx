@@ -5,7 +5,7 @@ import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
 import { User } from "prisma/prisma-client";
 import EditDriverForm from "@/app/profile/[id]/EditDriverForm";
 import { useState } from "react";
-import GenericToolTip from "@/components/GenericToolTip";
+import GenericToolTip from "@/app/_components/GenericToolTip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {

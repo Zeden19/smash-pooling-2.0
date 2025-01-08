@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { getUser } from "@/app/helpers/hooks/getUser";
+import { getUser } from "@/app/_helpers/hooks/getUser";
 import { carColours, carData } from "@/app/profile/[id]/CarData";
 import { z } from "zod";
 import { carMakes } from "@/app/api/user/[id]/carMakes";

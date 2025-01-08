@@ -1,4 +1,4 @@
-import styles from "./styles.module.css";
+import styles from "../styles.module.css";
 
 export interface OverlayViewSafe extends google.maps.OverlayView {}
 

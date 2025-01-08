@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CarpoolFull } from "@/app/helpers/entities/CarpoolTypes";
+import { CarpoolFull } from "@/app/_helpers/entities/CarpoolTypes";
 import AttendeeRow from "@/app/carpool/[id]/AttendeeRow";
 import { User } from "prisma/prisma-client";
 import { useState } from "react";

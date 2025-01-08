@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUser } from "@/app/helpers/hooks/getUser";
+import { getUser } from "@/app/_helpers/hooks/getUser";
 import prisma from "@/prisma/prismaClient";
 
 export async function DELETE(

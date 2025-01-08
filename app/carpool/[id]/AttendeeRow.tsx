@@ -4,8 +4,8 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { Crown, UserRoundMinus } from "lucide-react";
-import SuccessToast from "@/components/SuccessToast";
-import FailureToast from "@/components/FailureToast";
+import SuccessToast from "@/app/_components/SuccessToast";
+import FailureToast from "@/app/_components/FailureToast";
 import {
   AlertDialog,
   AlertDialogCancel,

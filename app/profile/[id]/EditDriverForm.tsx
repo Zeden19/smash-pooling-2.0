@@ -21,9 +21,9 @@ import {
 import { carColours, carData } from "@/app/profile/[id]/CarData";
 import { useOptimistic, useState } from "react";
 import axios from "axios";
-import FailureToast from "@/components/FailureToast";
-import SuccessToast from "@/components/SuccessToast";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import FailureToast from "@/app/_components/FailureToast";
+import SuccessToast from "@/app/_components/SuccessToast";
+import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 import { User } from "prisma/prisma-client";
 
 interface Props {

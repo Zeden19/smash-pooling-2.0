@@ -1,8 +1,8 @@
-import { getUser } from "@/app/helpers/hooks/getUser";
+import { getUser } from "@/app/_helpers/hooks/getUser";
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
-import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
-import CarpoolsDisplay from "@/components/CarpoolsDisplay";
+import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
+import CarpoolsDisplay from "@/app/_components/CarpoolsDisplay";
 
 export const fetchCache = "force-no-store";
 

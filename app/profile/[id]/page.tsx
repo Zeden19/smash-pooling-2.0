@@ -1,9 +1,9 @@
 import { UserInfo } from "@/app/profile/[id]/UserInfo";
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
-import { getUser } from "@/app/helpers/hooks/getUser";
-import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
-import CarpoolsDisplay from "@/components/CarpoolsDisplay";
+import { getUser } from "@/app/_helpers/hooks/getUser";
+import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
+import CarpoolsDisplay from "@/app/_components/CarpoolsDisplay";
 
 interface Props {
   params: { id: string };

@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { useChannel } from "ably/react";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import SendMessage from "@/app/carpool/[id]/Chat/SendMessage";
-import FailureToast from "@/components/FailureToast";
+import FailureToast from "@/app/_components/FailureToast";
 import { useMessageStore } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 
 interface ChatroomMessages extends Chatroom {

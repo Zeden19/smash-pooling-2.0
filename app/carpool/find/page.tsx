@@ -1,17 +1,17 @@
 "use client";
-import GoogleMap, { defaultMapSize } from "@/components/GoogleMap";
+import GoogleMap, { defaultMapSize } from "@/app/carpool/_maps/GoogleMap";
 import { Input } from "@/components/ui/input";
 import { FormEvent, useState } from "react";
 import axios, { AxiosError } from "axios";
 import styles from "./styles.module.css";
-import { slug as getSlug } from "@/app/helpers/services/startggClient";
-import FailureToast from "@/components/FailureToast";
-import SuccessToast from "@/components/SuccessToast";
-import useMapStore from "@/app/stores";
+import { slug as getSlug } from "@/app/_helpers/services/startggClient";
+import FailureToast from "@/app/_components/FailureToast";
+import SuccessToast from "@/app/_components/SuccessToast";
+import useMapStore from "@/app/carpool/_maps/mapStore";
 import type { Carpool } from "@prisma/client";
-import { orangeMarker } from "@/app/MarkerStyles";
-import { DecimalToNumber } from "@/app/carpool/DecimalConversions";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { orangeMarker } from "@/app/carpool/_maps/MarkerStyles";
+import { DecimalToNumber } from "@/app/_helpers/functions/DecimalConversions";
+import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 
 function FindCarpoolPage() {
   const [findingCarpools, setFindingCarpools] = useState(false);

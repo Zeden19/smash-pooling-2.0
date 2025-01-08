@@ -12,9 +12,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import SuccessToast from "@/components/SuccessToast";
+import SuccessToast from "@/app/_components/SuccessToast";
 import { useRouter } from "next/navigation";
-import FailureToast from "@/components/FailureToast";
+import FailureToast from "@/app/_components/FailureToast";
 
 interface Props {
   carpoolId: number;

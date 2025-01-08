@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { defaultMapSize } from "@/components/GoogleMap";
+import { defaultMapSize } from "@/app/carpool/_maps/GoogleMap";
 
 function loading() {
   return (

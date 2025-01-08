@@ -1,9 +1,9 @@
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
-import GoogleMap from "@/components/GoogleMap";
+import GoogleMap from "@/app/carpool/_maps/GoogleMap";
 import MapElements from "@/app/carpool/[id]/MapElements";
-import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
-import { makeTitle } from "@/app/helpers/services/makeTitle";
+import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
+import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 

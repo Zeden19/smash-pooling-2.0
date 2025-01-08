@@ -1,6 +1,6 @@
 import prisma from "@/prisma/prismaClient";
-import GoogleMap from "@/components/GoogleMap";
-import { makeTitle } from "@/app/helpers/services/makeTitle";
+import GoogleMap from "@/app/carpool/_maps/GoogleMap";
+import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
 import MapElements from "@/app/carpool/[id]/MapElements";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
@@ -11,13 +11,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { redirect } from "next/navigation";
-import carpoolDecimalToNumber from "@/app/helpers/services/carpoolDecimalToNumber";
-import { getUser } from "@/app/helpers/hooks/getUser";
+import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
+import { getUser } from "@/app/_helpers/hooks/getUser";
 import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
-import { CarpoolFull } from "@/app/helpers/entities/CarpoolTypes";
+import { CarpoolFull } from "@/app/_helpers/entities/CarpoolTypes";
 import EditCarpoolButton from "@/app/carpool/[id]/EditCarpoolButton";
 
 const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {

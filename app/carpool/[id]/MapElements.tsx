@@ -1,8 +1,8 @@
 "use client";
-import useMapStore from "@/app/stores";
-import { orangeMarker } from "@/app/MarkerStyles";
-import decodePolyline from "@/app/carpool/decodePath";
-import { CarpoolNumber } from "@/app/helpers/entities/CarpoolTypes";
+import useMapStore from "@/app/carpool/_maps/mapStore";
+import { orangeMarker } from "@/app/carpool/_maps/MarkerStyles";
+import decodePolyline from "@/app/_helpers/functions/decodePath";
+import { CarpoolNumber } from "@/app/_helpers/entities/CarpoolTypes";
 
 interface Props {
   carpool: CarpoolNumber;

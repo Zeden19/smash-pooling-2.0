@@ -11,10 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 import { Message } from "prisma/prisma-client";
 import { RealtimeChannel } from "ably";
-import FailureToast from "@/components/FailureToast";
+import FailureToast from "@/app/_components/FailureToast";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import { useRef, useState } from "react";
 import { Pencil } from "lucide-react";

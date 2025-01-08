@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import MapsApi from "@/app/carpool/MapsApi";
+import MapsApi from "@/app/carpool/_maps/MapsApi";
 
 interface MapStore {
   mapsApi: MapsApi | null;
