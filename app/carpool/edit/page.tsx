@@ -2,7 +2,7 @@ import { getUser } from "@/app/_helpers/hooks/getUser";
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
 import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
-import CarpoolsDisplay from "@/app/_components/CarpoolsDisplay";
+import CarpoolsDisplay from "@/app/_components/carpools/CarpoolsDisplay";
 
 export const fetchCache = "force-no-store";
 

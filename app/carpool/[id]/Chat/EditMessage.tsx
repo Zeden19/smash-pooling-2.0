@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 import { Message } from "prisma/prisma-client";
 import { RealtimeChannel } from "ably";
-import FailureToast from "@/app/_components/FailureToast";
+import FailureToast from "@/app/_components/toast/FailureToast";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import { useRef, useState } from "react";
 import { Pencil } from "lucide-react";

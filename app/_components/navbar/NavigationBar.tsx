@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { CarIcon } from "lucide-react";
-import { ModeToggle } from "@/app/_components/ModeToggle";
+import { ModeToggle } from "@/app/_components/navbar/ModeToggle";
 import React from "react";
-import UserControls from "@/app/_components/UserControls";
-import NavLinks from "@/app/_components/NavLinks";
+import UserControls from "@/app/_components/navbar/UserControls";
+import NavLinks from "@/app/_components/navbar/NavLinks";
 
 async function NavigationBar() {
   return (

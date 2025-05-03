@@ -1,4 +1,4 @@
-import CarpoolTable from "@/app/_components/CarpoolTable";
+import CarpoolTable from "@/app/_components/carpools/CarpoolTable";
 import { CarpoolNumber } from "@/app/_helpers/entities/CarpoolTypes";
 
 interface Props {

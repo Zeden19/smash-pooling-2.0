@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 import { Send } from "lucide-react";
-import failureToast from "@/app/_components/FailureToast";
+import failureToast from "@/app/_components/toast/FailureToast";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import { useRef, useState } from "react";
 import { Chatroom, User } from "prisma/prisma-client";

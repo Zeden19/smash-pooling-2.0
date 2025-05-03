@@ -1,11 +1,10 @@
 "use client";
 import { User } from "prisma/prisma-client";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { Crown, UserRoundMinus } from "lucide-react";
-import SuccessToast from "@/app/_components/SuccessToast";
-import FailureToast from "@/app/_components/FailureToast";
+import SuccessToast from "@/app/_components/toast/SuccessToast";
+import FailureToast from "@/app/_components/toast/FailureToast";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import AvatarComponent from "@/app/_components/AvatarComponent";
 
 interface RemoveAttendeeProps {
   carpoolId: number;
@@ -96,10 +96,10 @@ function AttendeeRow({
       key={attendee.id}>
       <TableCell>
         <div className={"flex gap-5 items-center"}>
-          <Avatar>
-            <AvatarImage src={attendee.profilePicture ?? undefined} />
-            <AvatarFallback>{attendee.gamertag.charAt(0).toUpperCase()}</AvatarFallback>
-          </Avatar>
+          <AvatarComponent
+            src={attendee.profilePicture}
+            fallback={attendee.gamertag.charAt(0).toUpperCase()}
+          />
           <div
             className={`text-2xl font-bold my-auto ${attendee.id === currentUser.id && "italic"}`}>
             {attendee.gamertag}

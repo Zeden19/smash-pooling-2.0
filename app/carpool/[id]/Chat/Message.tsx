@@ -1,11 +1,11 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Message as MessageType, User } from "prisma/prisma-client";
 import { useState } from "react";
 import { RealtimeChannel } from "ably";
 import DeleteMessage from "@/app/carpool/[id]/Chat/DeleteMessage";
 import EditMessage from "@/app/carpool/[id]/Chat/EditMessage";
 import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";
+import AvatarComponent from "@/app/_components/AvatarComponent";
 
 interface Props extends OptimisticUpdate {
   message: MessageType;
@@ -41,10 +41,11 @@ function Message({
           onMouseOver={() => setIsHovering(true)}
           onMouseOut={() => setIsHovering(false)}>
           {isCurrentUser ? (
-            <Avatar className={"mt-2.5"}>
-              <AvatarImage src={messageAuthor!.profilePicture ?? undefined} />
-              <AvatarFallback>{messageAuthor!.gamertag.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <AvatarComponent
+              className={"mt-2.5"}
+              src={messageAuthor!.profilePicture}
+              fallback={messageAuthor!.gamertag.charAt(0)}
+            />
           ) : null}
 
           {message.edited && !isCurrentUser && (
@@ -62,10 +63,11 @@ function Message({
           )}
 
           {!isCurrentUser ? (
-            <Avatar className={"mt-2.5"}>
-              <AvatarImage src={messageAuthor!.profilePicture ?? undefined} />
-              <AvatarFallback>{messageAuthor!.gamertag.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <AvatarComponent
+              className={"mt-2.5"}
+              src={messageAuthor!.profilePicture}
+              fallback={messageAuthor!.gamertag.charAt(0)}
+            />
           ) : null}
 
           {isHovering && message.userId === currentUser.id && (
