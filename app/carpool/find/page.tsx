@@ -87,7 +87,7 @@ function FindCarpoolPage() {
 
   return (
     <>
-      <div className={"flex gap-5 space-x-6 justify-start ms-5 my-3"}>
+      <div className={"flex gap-5 space-x-6 justify-start ms-5 my-3 "}>
         <form
           className={"flex gap-2 items-center"}
           onSubmit={(event) => getCarpools(event)}>

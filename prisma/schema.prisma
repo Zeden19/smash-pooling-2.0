@@ -8,9 +8,10 @@ datasource db {
 }
 
 model Session {
-  id        String   @id
-  userId    String
-  expiresAt DateTime
+  id         String   @id
+  userId     String
+  secretHash Bytes
+  createdAt  DateTime @default(now())
 
   user User @relation(references: [id], fields: [userId], onDelete: Cascade)
 }

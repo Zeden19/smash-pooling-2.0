@@ -1,31 +1,17 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
+import { Session, User } from "@prisma/client";
 
-import { Session, User } from "lucia";
-import { lucia } from "@/app/api/auth/auth";
+import { validateSessionToken } from "@/app/api/session";
 
 export const getUser = cache(
-  async (): Promise<{ user: User; session: Session } | { user: null; session: null }> => {
-    const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-    if (!sessionId) {
-      return {
-        user: null,
-        session: null,
-      };
+  async (): Promise<{ user: User | null; session: Session | null }> => {
+    const cookieStore = cookies();
+    const token = cookieStore.get("session_token")?.value ?? null;
+    if (token === null) {
+      return { session: null, user: null };
     }
 
-    const result = await lucia.validateSession(sessionId);
-    // next.js throws when you attempt to set cookie when rendering page
-    try {
-      if (result.session && result.session.fresh) {
-        const sessionCookie = lucia.createSessionCookie(result.session.id);
-        cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-      }
-      if (!result.session) {
-        const sessionCookie = lucia.createBlankSessionCookie();
-        cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-      }
-    } catch {}
-    return result;
+    return await validateSessionToken(token);
   },
 );
