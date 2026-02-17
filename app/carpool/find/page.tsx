@@ -10,7 +10,6 @@ import SuccessToast from "@/app/_components/toast/SuccessToast";
 import useMapStore from "@/app/carpool/_maps/mapStore";
 import type { Carpool } from "@prisma/client";
 import { orangeMarker } from "@/app/carpool/_maps/MarkerStyles";
-import { DecimalToNumber } from "@/app/_helpers/functions/DecimalConversions";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 
 function FindCarpoolPage() {
@@ -19,7 +18,7 @@ function FindCarpoolPage() {
 
   async function attendCarpool(id: number) {
     try {
-      const data = await axios.patch(`/api/carpool/attendee/${id}`);
+      await axios.patch(`/api/carpool/attendee/${id}`);
       SuccessToast("Successfully attended Carpool!", "Stay safe!");
     } catch (e: any) {
       FailureToast(
@@ -43,7 +42,7 @@ function FindCarpoolPage() {
     let carpools;
 
     try {
-      const { data } = await axios.get(`/api/carpool/find/${slug}`);
+      const { data } = await axios.get<Carpool[]>(`/api/carpool/find/${slug}`);
       carpools = data;
     } catch (e: any) {
       if (e instanceof AxiosError) {
@@ -55,7 +54,7 @@ function FindCarpoolPage() {
     }
 
     mapsApi?.removeAllElements();
-    carpools.forEach((carpool: Carpool) => {
+    carpools?.forEach((carpool) => {
       const container = document.createElement("div");
       const text = document.createElement("div");
       text.textContent = "Carpool to " + carpool.destinationName;
@@ -69,16 +68,16 @@ function FindCarpoolPage() {
 
       mapsApi?.addMarker(
         {
-          lat: DecimalToNumber(carpool.originLat),
-          lng: DecimalToNumber(carpool.originLng),
+          lat: carpool.originLat,
+          lng: carpool.originLng,
         },
         orangeMarker,
       );
       // @ts-ignore
       mapsApi?.setRoute(carpool.route!, container);
       mapsApi?.addMarker({
-        lat: DecimalToNumber(carpool.destinationLat),
-        lng: DecimalToNumber(carpool.destinationLng),
+        lat: carpool.destinationLat,
+        lng: carpool.destinationLng,
       });
     });
     SuccessToast("Successfully Found Carpools");

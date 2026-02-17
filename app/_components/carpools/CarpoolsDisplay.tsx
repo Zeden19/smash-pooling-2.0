@@ -1,9 +1,9 @@
 import CarpoolTable from "@/app/_components/carpools/CarpoolTable";
-import { CarpoolNumber } from "@/app/_helpers/entities/CarpoolTypes";
+import { Carpool } from "prisma/prisma-client";
 
 interface Props {
-  carpoolsDriving: CarpoolNumber[];
-  carpoolsAttending: CarpoolNumber[];
+  carpoolsDriving: Carpool[];
+  carpoolsAttending: Carpool[];
 }
 
 function CarpoolsDisplay({ carpoolsDriving, carpoolsAttending }: Props) {

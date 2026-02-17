@@ -2,10 +2,10 @@
 import useMapStore from "@/app/carpool/_maps/mapStore";
 import { orangeMarker } from "@/app/carpool/_maps/MarkerStyles";
 import decodePolyline from "@/app/_helpers/functions/decodePath";
-import { CarpoolNumber } from "@/app/_helpers/entities/CarpoolTypes";
+import { Carpool } from "prisma/prisma-client";
 
 interface Props {
-  carpool: CarpoolNumber;
+  carpool: Carpool;
 }
 
 function MapElements({ carpool }: Props) {

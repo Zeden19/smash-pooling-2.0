@@ -4,7 +4,7 @@ import startggClient from "@/app/_helpers/services/startggClient";
 import { CHECK_TOURNAMENT_EXISTS } from "@/app/_helpers/services/startggQueries";
 
 export async function GET(
-  req: NextRequest,
+  _: NextRequest,
   { params: { slug } }: { params: { slug: string } },
 ) {
   const { tournament } = await startggClient.request<{ tournament: { id: number } }>(

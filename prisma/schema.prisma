@@ -45,11 +45,11 @@ model Carpool {
   attendees User[]    @relation(name: "CarpoolAttendee") // Many To Many
   chatroom  Chatroom? // one to one
 
-  originLat       Decimal
-  originLng       Decimal
+  originLat       Float
+  originLng       Float
   originName      String
-  destinationLat  Decimal
-  destinationLng  Decimal
+  destinationLat  Float
+  destinationLng  Float
   destinationName String
 
   tournamentSlug String

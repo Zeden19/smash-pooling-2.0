@@ -11,13 +11,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { redirect } from "next/navigation";
-import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
 import { getUser } from "@/app/_helpers/hooks/getUser";
 import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
-import { CarpoolFull } from "@/app/_helpers/entities/CarpoolTypes";
 import EditCarpoolButton from "@/app/carpool/[id]/EditCarpoolButton";
 
 const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
@@ -41,6 +39,7 @@ async function CarpoolPage({ params: { id } }: Props) {
       },
     },
   });
+
   if (!carpool) return redirect("/carpool/edit");
   const { user: currentUser } = await getUser();
   if (!currentUser) return redirect("/");
@@ -50,9 +49,6 @@ async function CarpoolPage({ params: { id } }: Props) {
 
   if (!attendees.map((attendee) => attendee.id).includes(currentUser.id))
     return redirect("/");
-
-  // @ts-ignore
-  const decimalCarpool: CarpoolFull = carpoolDecimalToNumber([carpool])[0];
 
   const carpoolInfo = [
     { title: "Tournament:", value: makeTitle(carpool.tournamentSlug) },
@@ -91,7 +87,7 @@ async function CarpoolPage({ params: { id } }: Props) {
               </div>
             ))}
           </div>
-          <AttendeeTable currentUser={currentUser} carpool={decimalCarpool} />
+          <AttendeeTable currentUser={currentUser} carpool={carpool} />
         </div>
 
         <Accordion
@@ -134,7 +130,7 @@ async function CarpoolPage({ params: { id } }: Props) {
         </Accordion>
 
         {/*Hacky solution to get around server component*/}
-        <MapElements carpool={decimalCarpool} />
+        <MapElements carpool={carpool} />
       </div>
     </div>
   );

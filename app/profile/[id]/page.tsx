@@ -2,7 +2,6 @@ import { UserInfo } from "@/app/profile/[id]/UserInfo";
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
 import { getUser } from "@/app/_helpers/hooks/getUser";
-import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
 import CarpoolsDisplay from "@/app/_components/carpools/CarpoolsDisplay";
 
 interface Props {
@@ -22,14 +21,8 @@ async function ProfilePage({ params: { id } }: Props) {
 
   if (!user) redirect("/");
 
-  // we have to do this or else we will get an error saying that we are passing decimal objects to client component
-  const carpoolsDriving = carpoolDecimalToNumber(user.carpoolsDriving);
-  const carpoolsAttending = carpoolDecimalToNumber(user.carpoolsAttending);
-
-  // @ts-ignore
-  delete user.carpoolsAttending;
-  // @ts-ignore
-  delete user.carpoolsDriving;
+  const carpoolsDriving = user.carpoolsDriving;
+  const carpoolsAttending = user.carpoolsAttending;
 
   return (
     <div className={"flex gap-12 w-[1400px]"}>

@@ -1,7 +1,7 @@
 import { getUser } from "@/app/_helpers/hooks/getUser";
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
-import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
+
 import CarpoolsDisplay from "@/app/_components/carpools/CarpoolsDisplay";
 
 export const fetchCache = "force-no-store";
@@ -19,8 +19,8 @@ async function EditCarpoolsPage() {
 
   if (!data) redirect("/");
 
-  const carpoolsDriving = carpoolDecimalToNumber(data.carpoolsDriving);
-  const carpoolsAttending = carpoolDecimalToNumber(data.carpoolsAttending);
+  const carpoolsDriving = data.carpoolsDriving;
+  const carpoolsAttending = data.carpoolsAttending;
   return (
     <div className={"m-5 flex w-[90vw] flex-col gap-5"}>
       <h1 className={"text-5xl font-bold"}>Select Carpool To Edit</h1>

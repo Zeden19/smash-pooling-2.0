@@ -6,13 +6,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CarpoolFull } from "@/app/_helpers/entities/CarpoolTypes";
 import AttendeeRow from "@/app/carpool/[id]/AttendeeRow";
-import { User } from "prisma/prisma-client";
+import { Prisma, User } from "prisma/prisma-client";
 import { useState } from "react";
 
 interface Props {
-  carpool: CarpoolFull;
+  carpool: Prisma.CarpoolGetPayload<{ include: { attendees: true } }>;
   currentUser: User;
 }
 

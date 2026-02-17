@@ -10,10 +10,10 @@ import {
 import CarpoolStatusBadge from "@/app/_components/carpools/CarpoolStatusBadge";
 import Link from "next/link";
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
-import { CarpoolNumber } from "@/app/_helpers/entities/CarpoolTypes";
+import { Carpool } from "prisma/prisma-client";
 
 interface Props {
-  carpools: CarpoolNumber[];
+  carpools: Carpool[];
 }
 
 function CarpoolTable({ carpools }: Props) {

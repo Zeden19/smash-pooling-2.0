@@ -2,7 +2,6 @@ import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
 import GoogleMap from "@/app/carpool/_maps/GoogleMap";
 import MapElements from "@/app/carpool/[id]/MapElements";
-import carpoolDecimalToNumber from "@/app/_helpers/functions/carpoolDecimalToNumber";
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -15,7 +14,6 @@ async function EditCarpoolDetails({ params: { id } }: Props) {
   const carpool = await prisma.carpool.findUnique({ where: { id: parseInt(id) } });
 
   if (!carpool) return redirect("/carpool/edit");
-  const carpoolNumber = carpoolDecimalToNumber([carpool])[0];
 
   const data = [
     {
@@ -59,7 +57,7 @@ async function EditCarpoolDetails({ params: { id } }: Props) {
         </div>
       </div>
 
-      <MapElements carpool={carpoolNumber} />
+      <MapElements carpool={carpool} />
     </div>
   );
 }

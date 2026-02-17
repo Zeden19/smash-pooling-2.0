@@ -3,12 +3,11 @@ import { getUser } from "@/app/_helpers/hooks/getUser";
 import prisma from "@/prisma/prismaClient";
 
 export async function DELETE(
-  req: NextRequest,
+  _: NextRequest,
   { params: { id } }: { params: { id: string } },
 ) {
   const { user } = await getUser();
   const carpool = await prisma.carpool.findUnique({ where: { id: parseInt(id) } });
-  console.log(id, user, carpool);
 
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
