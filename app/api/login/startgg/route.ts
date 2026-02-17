@@ -1,5 +1,5 @@
 import { generateState } from "arctic";
-import { startgg } from "@/app/api/auth/auth";
+import { startgg } from "@/app/api/auth";
 import { cookies } from "next/headers";
 
 export async function GET(): Promise<Response> {

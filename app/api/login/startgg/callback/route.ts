@@ -1,10 +1,27 @@
 import { cookies } from "next/headers";
-import { startgg } from "@/app/api/auth/auth";
+import { startgg } from "@/app/api/auth";
 import prisma from "@/prisma/prismaClient";
 import { GET_CURRENT_USER } from "@/app/_helpers/services/startggQueries";
 import * as arctic from "arctic";
 import { createSession } from "@/app/api/session";
 import { encodeBase32LowerCaseNoPadding } from "@oslojs/encoding";
+
+async function createAndSetSession(id: string) {
+  const { token } = await createSession(id);
+  cookies().set("session_token", token, {
+    maxAge: 86400,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    sameSite: "lax",
+  });
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: "/",
+    },
+  });
+}
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -46,20 +63,7 @@ export async function GET(request: Request): Promise<Response> {
     });
 
     if (existingUser) {
-      const { token } = await createSession(existingUser.id);
-      cookies().set("session_token", token, {
-        maxAge: 86400,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        sameSite: "lax",
-      });
-      return new Response(null, {
-        status: 302,
-        headers: {
-          Location: "/",
-        },
-      });
+      return createAndSetSession(existingUser.id);
     }
 
     const userId = generateSessionId(); // 16 characters long
@@ -75,20 +79,7 @@ export async function GET(request: Request): Promise<Response> {
       },
     });
 
-    const { token } = await createSession(userId);
-    cookies().set("session_token", token, {
-      maxAge: 86400,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      sameSite: "lax",
-    });
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: "/",
-      },
-    });
+    return createAndSetSession(userId);
   } catch (e) {
     if (e instanceof arctic.OAuth2RequestError) {
       // Invalid authorization code, credentials, or redirect URI

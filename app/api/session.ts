@@ -1,6 +1,9 @@
 import prisma from "@/prisma/prismaClient";
 import { Session, User } from "@prisma/client";
 
+const inactivityTimeout = 1000 * 60 * 60 * 24 * 30; // 30 days
+const activityCheckInterval = 1000 * 60 * 60; // 1 hour
+
 interface SessionWithToken extends Session {
   token: string;
 }
@@ -36,6 +39,7 @@ export async function createSession(userId: string): Promise<SessionWithToken> {
     userId,
     secretHash: Buffer.from(secretHash),
     createdAt: now,
+    lastVerifiedAt: now,
     token,
   };
 
@@ -45,6 +49,7 @@ export async function createSession(userId: string): Promise<SessionWithToken> {
       userId,
       secretHash: session.secretHash,
       createdAt: now,
+      lastVerifiedAt: now,
     },
   });
 
@@ -57,11 +62,10 @@ async function hashSecret(secret: string): Promise<Uint8Array> {
   return new Uint8Array(secretHashBuffer);
 }
 
-const sessionExpiresInSeconds = 60 * 60 * 24 * 365; // 1 day
-
 export async function validateSessionToken(
   token: string,
 ): Promise<{ session: Session | null; user: User | null }> {
+  const now = new Date();
   const tokenParts = token.split(".");
   if (tokenParts.length !== 2) {
     return { session: null, user: null };
@@ -80,6 +84,14 @@ export async function validateSessionToken(
     return { session: null, user: null };
   }
 
+  if (now.getTime() - session.lastVerifiedAt.getTime() >= activityCheckInterval) {
+    session.lastVerifiedAt = now;
+    await prisma.session.update({
+      where: { id: sessionId },
+      data: { lastVerifiedAt: now },
+    });
+  }
+
   const user = await prisma.user.findUnique({ where: { id: session.userId } });
   if (!user) {
     return { session: null, user: null };
@@ -91,7 +103,7 @@ export async function validateSessionToken(
 async function getSession(sessionId: string): Promise<Session | null> {
   const now = new Date();
 
-  const result = await prisma.session.findMany({
+  const result = await prisma.session.findUnique({
     where: {
       id: sessionId,
     },
@@ -101,31 +113,20 @@ async function getSession(sessionId: string): Promise<Session | null> {
     return null;
   }
 
-  if (result.length !== 1) {
-    return null;
-  }
-
-  const userSession = result[0];
+  const userSession = result;
   const user = await prisma.user.findUnique({ where: { id: userSession.userId } });
 
   if (!user) {
     return null;
   }
 
-  const session: Session = {
-    id: userSession.id,
-    userId: user.id,
-    secretHash: userSession.secretHash,
-    createdAt: userSession.createdAt,
-  };
-
-  // Check expiration
-  if (now.getTime() - session.createdAt.getTime() >= sessionExpiresInSeconds * 1000) {
+  // Inactivity timeout
+  if (now.getTime() - userSession.lastVerifiedAt.getTime() >= inactivityTimeout) {
     await deleteSession(sessionId);
     return null;
   }
 
-  return session;
+  return userSession;
 }
 
 export async function deleteSession(sessionId: string): Promise<void> {
