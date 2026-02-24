@@ -1,5 +1,6 @@
 "use client";
-import GoogleMap, { defaultMapSize } from "@/app/carpool/_maps/GoogleMap";
+import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/mapConfig";
+import { AdvancedMarker, Map, Pin, useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { RefObject, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,13 +8,12 @@ import FailureToast from "@/app/_components/toast/FailureToast";
 import startggClient, { slug } from "@/app/_helpers/services/startggClient";
 import { GET_TOURNAMENT_BY_URL } from "@/app/_helpers/services/startggQueries";
 import SuccessToast from "@/app/_components/toast/SuccessToast";
-import useMapStore from "@/app/carpool/_maps/mapStore";
-import { orangeMarker } from "@/app/carpool/_maps/MarkerStyles";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Label } from "@/components/ui/label";
 import { DateTimePicker } from "@/components/DateTimePicker";
+import { Polyline } from "@/app/carpool/_maps/Polyline";
 import LatLngLiteral = google.maps.LatLngLiteral;
 
 export interface Origin {
@@ -30,8 +30,8 @@ export interface Destination {
 }
 
 export interface Route {
-  route: string;
-  distance: string;
+  polyline: string;
+  distance: string | undefined;
 }
 
 interface Tournament {
@@ -48,6 +48,7 @@ interface Tournament {
 interface TournamentResponse {
   tournament: Tournament;
 }
+
 
 // consider using server search params: this might be overly complex due to the nature of things;
 // using placeids might help
@@ -70,33 +71,33 @@ function AddCarpoolPage() {
     error: boolean;
   }>({ descriptionInput: useRef(null), error: false });
 
-  const [shownRoute, setShownRoute] = useState<google.maps.Polyline>();
-  const [originMarker, setOriginMarker] =
-    useState<google.maps.marker.AdvancedMarkerElement>();
-  const [destinationMarker, setDestinationMarker] =
-    useState<google.maps.marker.AdvancedMarkerElement>();
-
   const originInput = useRef<HTMLInputElement>(null);
   const destinationInput = useRef<HTMLInputElement>(null);
 
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [addingCarpool, setAddingCarpool] = useState(false);
 
-  const { mapsApi } = useMapStore();
+  const routesLib = useMapsLibrary("routes");
+  const geocodingLib = useMapsLibrary("geocoding");
+  const map = useMap();
 
   async function getRoutes() {
-    if (!originInput.current!.value || !destinationInput.current!.value) {
-      !originInput.current!.value && setOriginObject({ ...originObject!, error: true });
-      !destinationInput.current!.value &&
-        setDestinationObject({ ...destinationObject!, error: true });
-
-      FailureToast("Origin and destination required");
+    if (!routesLib || !geocodingLib || !map) {
+      FailureToast("Something went wrong", "Please try again or report this error");
       return;
     }
 
-    if (shownRoute) shownRoute.setMap(null);
-    if (destinationMarker) mapsApi?.removeMarker(destinationMarker);
-    if (originMarker) mapsApi?.removeMarker(originMarker);
+    if (!originInput.current?.value) {
+      setOriginObject({ ...originObject!, error: true });
+      FailureToast("Origin required");
+      return;
+    }
+
+    if (!destinationInput.current?.value) {
+      setDestinationObject({ ...destinationObject!, error: true });
+      FailureToast("Destination required");
+      return;
+    }
 
     // Getting destination
     const tournamentSlug = slug(destinationInput.current!.value);
@@ -117,7 +118,6 @@ function AddCarpoolPage() {
     }
 
     const tournamentCords = { lat: tournament.lat, lng: tournament.lng };
-    const marker = mapsApi?.addMarker(tournamentCords);
     setDestinationObject({
       error: false,
       cords: tournamentCords,
@@ -128,7 +128,19 @@ function AddCarpoolPage() {
     // Getting Origin
     let data;
     try {
-      data = await mapsApi?.geocode({ address: originInput.current!.value });
+      const geocoder = new geocodingLib.Geocoder();
+      const address = await geocoder.geocode({ address: originInput.current.value });
+
+      if (address.results.length === 0) {
+        setOriginObject({ ...originObject!, error: true });
+        FailureToast(
+          "Something went wrong with your origin location",
+          "Please make sure the address is valid",
+        );
+        return;
+      }
+
+      data = address.results[0];
     } catch (e) {
       setOriginObject({ ...originObject!, error: true });
       FailureToast("Could Not Find Address", "Make sure you entered a valid address");
@@ -136,10 +148,9 @@ function AddCarpoolPage() {
     }
 
     const originCords = {
-      lat: data!.geometry.location.lat(),
-      lng: data!.geometry.location.lng(),
+      lat: data.geometry.location.lat(),
+      lng: data.geometry.location.lng(),
     };
-    const newOriginMarker = mapsApi?.addMarker(originCords, orangeMarker);
     setOriginObject({
       error: false,
       cords: originCords,
@@ -148,14 +159,24 @@ function AddCarpoolPage() {
 
     // Get route
     try {
-      const route = await mapsApi?.getRoutes(originCords, tournamentCords)!;
-      const newRoute = mapsApi?.setRoute(route!.route);
-      setRoute(route!);
+      const directionsService = new routesLib.DirectionsService();
+      const { routes } = await directionsService.route({
+        origin: originCords,
+        destination: tournamentCords,
+        travelMode: google.maps.TravelMode.DRIVING,
+      });
 
-      setOriginMarker(newOriginMarker);
-      setDestinationMarker(marker);
-      setShownRoute(newRoute);
+      if (routes.length === 0) {
+        FailureToast("Could Not Find Route");
+        return;
+      }
 
+      const route = routes[0];
+      const polyline = route.overview_polyline;
+      const distance = route.legs[0].distance?.text;
+      
+      map.setCenter(route.bounds.getCenter());
+      setRoute({ polyline: polyline, distance });
       SuccessToast("Successfully Found Route");
     } catch (e) {
       FailureToast("Could Not Find Route", "Check your origin and tournament");
@@ -163,6 +184,7 @@ function AddCarpoolPage() {
   }
 
   async function addCarpool() {
+    // Zod????
     if (
       price.priceInput.current?.value !== null &&
       parseInt(price.priceInput.current!.value) < 0
@@ -192,8 +214,13 @@ function AddCarpoolPage() {
       FailureToast("Description must be smaller than 500 characters");
       return;
     }
+    
+    if (!route) {
+      FailureToast("Route not found");
+      return;
+    }
     try {
-      const { data } = await axios.post("/api/carpool/add", {
+      await axios.post("/api/carpool/add", {
         origin: originObject,
         destination: destinationObject,
         route,
@@ -224,107 +251,115 @@ function AddCarpoolPage() {
   }
 
   return (
-    <>
-      <GoogleMap size={defaultMapSize}>
-        <div
-          className={
-            "flex flex-col gap-4 p-4 h-full w-1/4 absolute top-0 left-0 bg-black"
-          }>
-          {/*Origin*/}
-          <div>
-            <Label htmlFor={"origin"}>Starting Location</Label>
-            <Input
-              id={"origin"}
-              ref={originInput}
-              className={`${originObject?.name && !originObject?.error && "border-green-400"} 
+    <div className="flex h-[94vh]">
+      <div className={"flex flex-col gap-4 p-4 w-1/4 bg-black"}>
+        {/*Origin*/}
+        <div>
+          <Label htmlFor={"origin"}>Starting Location</Label>
+          <Input
+            id={"origin"}
+            ref={originInput}
+            className={`${originObject?.name && !originObject?.error && "border-green-400"}
                           ${originObject?.error && "border-red-600"}`}
-              defaultValue={"Toronto"}
-              placeholder={"From"}
-            />
-          </div>
-
-          {/*Destination*/}
-          <div>
-            <Label htmlFor={"destination"}>Tournament</Label>
-            <Input
-              ref={destinationInput}
-              defaultValue={"https://www.start.gg/tournament/bullet-hell-1/details"}
-              id={"destination"}
-              type={"text"}
-              placeholder={"startgg Url"}
-              className={`${
-                destinationObject?.name &&
-                !destinationObject?.error &&
-                "border-green-400 row-start-2"
-              } ${destinationObject?.error && "border-red-600"}`}
-            />
-          </div>
-
-          {/*Date-Time*/}
-          <DateTimePicker
-            error={date.error}
-            date={date.dateTime}
-            setDate={(newDate: Date | undefined) =>
-              setDate({ error: false, dateTime: newDate })
-            }
+            defaultValue={"Toronto"}
+            placeholder={"From"}
           />
-
-          {/*Price*/}
-          <div>
-            <Label htmlFor={"price"}>Price</Label>
-            <Input
-              id={"price"}
-              type={"number"}
-              placeholder={"Carpool Price"}
-              min={0}
-              defaultValue={undefined}
-              ref={price.priceInput}
-              className={`${price.error && "border-red-600"}`}
-            />
-          </div>
-
-          {/*Description*/}
-          <div>
-            <Label htmlFor={"description"}>Description</Label>
-            <Textarea
-              id={"description"}
-              placeholder={"Carpool Description"}
-              maxLength={500}
-              ref={description.descriptionInput}
-              className={`${description.error && "border-red-600"}`}
-            />
-          </div>
-          <div className={"row-start-5"}>
-            <Button
-              disabled={loadingRoute}
-              className={`${route && "border-green-400 border-2"}`}
-              onClick={async () => {
-                setLoadingRoute(true);
-                await getRoutes();
-                setLoadingRoute(false);
-              }}>
-              Find Route
-              {loadingRoute && <LoadingSpinner />}
-            </Button>
-          </div>
-
-          <div>
-            <Button
-              disabled={addingCarpool || !route}
-              onClick={async () => {
-                setAddingCarpool(true);
-                await addCarpool();
-                setAddingCarpool(false);
-              }}>
-              Add Carpool {addingCarpool && <LoadingSpinner />}
-            </Button>
-          </div>
-
-          {/*Used in the future when user has to select a route*/}
-          {/*<Button onClick={() => setRoute()}>Set Route</Button>*/}
         </div>
-      </GoogleMap>
-    </>
+
+        {/*Destination*/}
+        <div>
+          <Label htmlFor={"destination"}>Tournament</Label>
+          <Input
+            ref={destinationInput}
+            defaultValue={"https://www.start.gg/tournament/bullet-hell-1/details"}
+            id={"destination"}
+            type={"text"}
+            placeholder={"startgg Url"}
+            className={`${
+              destinationObject?.name &&
+              !destinationObject?.error &&
+              "border-green-400 row-start-2"
+            } ${destinationObject?.error && "border-red-600"}`}
+          />
+        </div>
+
+        {/*Date-Time*/}
+        <DateTimePicker
+          error={date.error}
+          date={date.dateTime}
+          setDate={(newDate: Date | undefined) =>
+            setDate({ error: false, dateTime: newDate })
+          }
+        />
+
+        {/*Price*/}
+        <div>
+          <Label htmlFor={"price"}>Price</Label>
+          <Input
+            id={"price"}
+            type={"number"}
+            placeholder={"Carpool Price"}
+            min={0}
+            defaultValue={undefined}
+            ref={price.priceInput}
+            className={`${price.error && "border-red-600"}`}
+          />
+        </div>
+
+        {/*Description*/}
+        <div>
+          <Label htmlFor={"description"}>Description</Label>
+          <Textarea
+            id={"description"}
+            placeholder={"Carpool Description"}
+            maxLength={500}
+            ref={description.descriptionInput}
+            className={`${description.error && "border-red-600"}`}
+          />
+        </div>
+        <div className={"row-start-5"}>
+          <Button
+            disabled={loadingRoute}
+            className={`${route && "border-green-400 border-2"}`}
+            onClick={async () => {
+              setLoadingRoute(true);
+              await getRoutes();
+              setLoadingRoute(false);
+            }}>
+            Find Route
+            {loadingRoute && <LoadingSpinner />}
+          </Button>
+        </div>
+
+        <div>
+          <Button
+            disabled={addingCarpool || !route}
+            onClick={async () => {
+              setAddingCarpool(true);
+              await addCarpool();
+              setAddingCarpool(false);
+            }}>
+            Add Carpool {addingCarpool && <LoadingSpinner />}
+          </Button>
+        </div>
+
+        {/*Used in the future when user has to select a route*/}
+        {/*<Button onClick={() => setRoute()}>Set Route</Button>*/}
+      </div>
+      <Map {...mapProps}>
+        {destinationObject?.cords && (
+          <AdvancedMarker position={destinationObject.cords}></AdvancedMarker>
+        )}
+
+        {originObject?.cords && (
+          <AdvancedMarker position={originObject.cords}>
+            <Pin {...orangeMarker} />
+          </AdvancedMarker>
+        )}
+
+        {route?.polyline && <Polyline encodedPath={route?.polyline} {...polylineOptions} />}
+      </Map>
+    </div>
   );
 }
 

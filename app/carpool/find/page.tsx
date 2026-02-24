@@ -1,20 +1,22 @@
 "use client";
-import GoogleMap, { defaultMapSize } from "@/app/carpool/_maps/GoogleMap";
+import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/mapConfig";
 import { Input } from "@/components/ui/input";
-import { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import styles from "./styles.module.css";
 import { slug as getSlug } from "@/app/_helpers/services/startggClient";
 import FailureToast from "@/app/_components/toast/FailureToast";
 import SuccessToast from "@/app/_components/toast/SuccessToast";
-import useMapStore from "@/app/carpool/_maps/mapStore";
 import type { Carpool } from "@prisma/client";
-import { orangeMarker } from "@/app/carpool/_maps/MarkerStyles";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
+import { AdvancedMarker, InfoWindow, Map, Pin, useMap } from "@vis.gl/react-google-maps";
+import { Polyline } from "@/app/carpool/_maps/Polyline";
 
 function FindCarpoolPage() {
   const [findingCarpools, setFindingCarpools] = useState(false);
-  const { mapsApi } = useMapStore();
+  const [infoWindow, setInfoWindow] = useState<React.ReactNode>(null);
+  const [carpools, setCarpools] = useState<Carpool[]>();
+  const map = useMap();
 
   async function attendCarpool(id: number) {
     try {
@@ -29,6 +31,11 @@ function FindCarpoolPage() {
   }
 
   async function getCarpools(event: FormEvent<HTMLFormElement>) {
+    if (!map) {
+      FailureToast("Something went wrong", "Please try again");
+      return;
+    }
+
     event.preventDefault();
     setFindingCarpools(true);
     const form = event.target as HTMLFormElement;
@@ -53,36 +60,15 @@ function FindCarpoolPage() {
       setFindingCarpools(false);
     }
 
-    mapsApi?.removeAllElements();
-    carpools?.forEach((carpool) => {
-      const container = document.createElement("div");
-      const text = document.createElement("div");
-      text.textContent = "Carpool to " + carpool.destinationName;
-      container.appendChild(text);
-
-      const button = document.createElement("button");
-      button.textContent = "Attend Carpool";
-      button.onclick = () => attendCarpool(carpool.id);
-      button.classList.add(styles.attendButton);
-      container.appendChild(button);
-
-      mapsApi?.addMarker(
-        {
-          lat: carpool.originLat,
-          lng: carpool.originLng,
-        },
-        orangeMarker,
-      );
-      // @ts-ignore
-      mapsApi?.setRoute(carpool.route!, container);
-      mapsApi?.addMarker({
-        lat: carpool.destinationLat,
-        lng: carpool.destinationLng,
-      });
-    });
+    setCarpools(carpools);
     SuccessToast("Successfully Found Carpools");
     setFindingCarpools(false);
   }
+
+  useEffect(() => {
+    if (!map) return;
+    map.addListener("drag", () => setInfoWindow(null));
+  }, [map]);
 
   return (
     <>
@@ -100,7 +86,55 @@ function FindCarpoolPage() {
           {findingCarpools && <LoadingSpinner />}
         </form>
       </div>
-      <GoogleMap size={defaultMapSize} />
+      <Map {...mapProps} style={{ width: "100vw", height: "80vh" }}>
+        {carpools &&
+          carpools.map(
+            ({
+              originLat,
+              originLng,
+              destinationLng,
+              destinationLat,
+              destinationName,
+              route,
+              id,
+            }) => {
+              const infoWindowNode = (event: google.maps.MapMouseEvent) => (
+                <InfoWindow
+                  className={"text-black"}
+                  position={event.latLng}
+                  onClose={() => setInfoWindow(null)}>
+                  <div>
+                    <div>Carpool to {destinationName}</div>
+                    <button
+                      className={styles.attendButton}
+                      onClick={() => attendCarpool(id)}>
+                      Attend Carpool
+                    </button>
+                  </div>
+                </InfoWindow>
+              );
+
+              return (
+                <div key={id}>
+                  <AdvancedMarker position={{ lat: originLat, lng: originLng }}>
+                    <Pin {...orangeMarker} />
+                  </AdvancedMarker>
+
+                  <AdvancedMarker
+                    position={{ lat: destinationLat, lng: destinationLng }}
+                  />
+
+                  <Polyline
+                    onClick={(event) => setInfoWindow(infoWindowNode(event))}
+                    encodedPath={route}
+                    {...polylineOptions}
+                  />
+                </div>
+              );
+            },
+          )}
+        {infoWindow !== null && infoWindow}
+      </Map>
     </>
   );
 }

@@ -1,8 +1,7 @@
-import prisma from "@/prisma/prismaClient";
-import GoogleMap from "@/app/carpool/_maps/GoogleMap";
+"use client";
+import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/mapConfig";
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
-import MapElements from "@/app/carpool/[id]/MapElements";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
 import {
   Accordion,
@@ -10,129 +9,143 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { redirect } from "next/navigation";
-import { getUser } from "@/app/_helpers/hooks/getUser";
 import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
-import EditCarpoolButton from "@/app/carpool/[id]/EditCarpoolButton";
+import { AdvancedMarker, Map, Pin, useMap } from "@vis.gl/react-google-maps";
+import { useEffect, useState } from "react";
+import { User } from "prisma/prisma-client";
+import { Polyline } from "@/app/carpool/_maps/Polyline";
+import { useCarpool } from "@/app/carpool/[id]/CarpoolContext";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
   ssr: false,
 });
 
-interface Props {
-  params: { id: string };
-}
+function CarpoolPage({ params: { id } }: { params: { id: string } }) {
+  const router = useRouter();
+  const carpool = useCarpool();
+  let [carpoolInfo, setCarpoolInfo] = useState<{ title: string; value: string }[] | null>(
+    null,
+  );
+  const [user, setUser] = useState<User | null>(null);
 
-async function CarpoolPage({ params: { id } }: Props) {
-  let carpool = await prisma.carpool.findUnique({
-    where: { id: parseInt(id) },
-    include: {
-      attendees: true,
-      driver: true,
-      chatroom: {
-        include: {
-          messages: true,
-        },
-      },
-    },
-  });
+  const map = useMap();
 
-  if (!carpool) return redirect("/carpool/edit");
-  const { user: currentUser } = await getUser();
-  if (!currentUser) return redirect("/");
+  useEffect(() => {
+    if (!carpool) return;
+    setCarpoolInfo([
+      { title: "Tournament:", value: makeTitle(carpool.tournamentSlug) },
+      { title: "Origin:", value: carpool.originName },
+      { title: "Distance:", value: carpool.distance },
+      { title: "Status:", value: carpool.status },
+      { title: "Price", value: "$" + carpool.price },
+    ]);
+    setUser(carpool.driver);
+  }, [carpool]);
 
-  const driver = carpool.driver;
-  const attendees = carpool.attendees;
-
-  if (!attendees.map((attendee) => attendee.id).includes(currentUser.id))
-    return redirect("/");
-
-  const carpoolInfo = [
-    { title: "Tournament:", value: makeTitle(carpool.tournamentSlug) },
-    { title: "Origin:", value: carpool.originName },
-    { title: "Distance:", value: carpool.distance },
-    { title: "Status:", value: carpool.status },
-    { title: "Price", value: "$" + carpool.price },
-  ];
+  useEffect(() => {
+    if (!map || !carpool) return;
+    map.setZoom(8);
+  }, [map]);
   return (
-    <div className={"m-5"}>
-      <h1 className={"text-5xl font-bold mb-8"}>
-        Carpool to {makeTitle(carpool!.tournamentSlug)}
-      </h1>
+    carpool &&
+    carpoolInfo &&
+    user && (
+      <div className={"m-5"}>
+        <h1 className={"text-5xl font-bold mb-8"}>
+          Carpool to {makeTitle(carpool.tournamentSlug)}
+        </h1>
 
-      <div className={"flex gap-5 justify-center"}>
-        <div className={"grid grid-cols-2"}>
-          <div className={"mx-3"}>
-            <DriverInfo driver={driver} />
-            <div className={"flex gap-3 items-center my-3"}>
-              <DeleteCarpoolDialog carpoolId={carpool.id} />
-              <EditCarpoolButton id={carpool.id} />
-            </div>
-          </div>
-
-          <div className={"grid grid-cols-2 h-64"}>
-            {carpoolInfo.map((info) => (
-              <div
-                key={info.title}
-                className={
-                  "flex flex-col text-center bg-slate-800 m-5 p-2 shadow-inner rounded-lg break-words"
-                }>
-                <h5 className={"text-lg font-bold underline mb-1 vertical"}>
-                  {info.title}
-                </h5>
-                <h2 className={"font-bold text-3xl"}>{info.value}</h2>
+        <div className={"flex gap-5 justify-center"}>
+          <div className={"grid grid-cols-2"}>
+            <div className={"mx-3"}>
+              <DriverInfo driver={carpool.driver} />
+              <div className={"flex gap-3 items-center my-3"}>
+                <DeleteCarpoolDialog carpoolId={carpool.id} />
+                <Button onClick={() => router.push(`/carpool/${id}/edit`)}>
+                  Edit Carpool
+                </Button>
               </div>
-            ))}
+            </div>
+
+            <div className={"grid grid-cols-2 h-64"}>
+              {carpoolInfo.map((info) => (
+                <div
+                  key={info.title}
+                  className={
+                    "flex flex-col text-center bg-slate-800 m-5 p-2 shadow-inner rounded-lg break-words"
+                  }>
+                  <h5 className={"text-lg font-bold underline mb-1 vertical"}>
+                    {info.title}
+                  </h5>
+                  <h2 className={"font-bold text-3xl"}>{info.value}</h2>
+                </div>
+              ))}
+            </div>
+            <AttendeeTable currentUser={user} carpool={carpool} />
           </div>
-          <AttendeeTable currentUser={currentUser} carpool={carpool} />
-        </div>
 
-        <Accordion
-          type="multiple"
-          defaultValue={["item-1"]}
-          className={"w-[45vw] h-[50vh]"}>
-          <AccordionItem value={"item-1"}>
-            <AccordionTrigger>Map</AccordionTrigger>
-            <AccordionContent>
-              <GoogleMap
-                className={"border-4 border-slate-700 rounded"}
-                disableDefaultUI={true}
-                size={{ width: "40vw", height: "50vh" }}
-              />
-            </AccordionContent>
-          </AccordionItem>
-
-          <MessageStoreProvider messages={carpool.chatroom!.messages}>
-            <AccordionItem value={"item-2"}>
-              <AccordionTrigger>Chat</AccordionTrigger>
+          <Accordion
+            type="multiple"
+            defaultValue={["item-1"]}
+            className={"w-[45vw] h-[50vh]"}>
+            <AccordionItem value={"item-1"}>
+              <AccordionTrigger>Map</AccordionTrigger>
               <AccordionContent>
-                <AlbyProvider>
-                  <ChatWindow
-                    chatRoom={carpool.chatroom!}
-                    chatroomUsers={attendees}
-                    currentUser={currentUser}
-                    chatroomName={`Carpool Chat: From ${carpool.originName} to ${makeTitle(carpool.tournamentSlug)}`}
+                <Map {...mapProps} style={{ width: "40vw", height: "50vh" }}>
+                  <AdvancedMarker
+                    position={{ lat: carpool.originLat, lng: carpool.originLng }}>
+                    <Pin {...orangeMarker} />
+                  </AdvancedMarker>
+
+                  <AdvancedMarker
+                    position={{
+                      lat: carpool.destinationLat,
+                      lng: carpool.destinationLng,
+                    }}
                   />
-                </AlbyProvider>
+
+                  <Polyline
+                    onLoad={(path) =>
+                      map?.setCenter(path.getAt(Math.floor(path.getLength() / 2)))
+                    }
+                    {...polylineOptions}
+                    encodedPath={carpool.route}
+                  />
+                </Map>
               </AccordionContent>
             </AccordionItem>
-          </MessageStoreProvider>
 
-          <AccordionItem value={"item-3"}>
-            <AccordionTrigger>Description</AccordionTrigger>
-            <AccordionContent>
-              {carpool.description && <div>{carpool.description}</div>}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+            <MessageStoreProvider messages={carpool.chatroom!.messages}>
+              <AccordionItem value={"item-2"}>
+                <AccordionTrigger>Chat</AccordionTrigger>
+                <AccordionContent>
+                  <AlbyProvider>
+                    <ChatWindow
+                      chatRoom={carpool.chatroom!}
+                      chatroomUsers={carpool.attendees}
+                      currentUser={user}
+                      chatroomName={`Carpool Chat: From ${carpool.originName} to ${makeTitle(carpool.tournamentSlug)}`}
+                    />
+                  </AlbyProvider>
+                </AccordionContent>
+              </AccordionItem>
+            </MessageStoreProvider>
 
-        {/*Hacky solution to get around server component*/}
-        <MapElements carpool={carpool} />
+            <AccordionItem value={"item-3"}>
+              <AccordionTrigger>Description</AccordionTrigger>
+              <AccordionContent>
+                {carpool.description && <div>{carpool.description}</div>}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
       </div>
-    </div>
+    )
   );
 }
 

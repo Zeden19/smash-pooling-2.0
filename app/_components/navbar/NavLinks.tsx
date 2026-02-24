@@ -9,7 +9,6 @@ function NavLinks() {
     { href: "/", label: "Home" },
     { href: "/carpool/add", label: "Add Carpools" },
     { href: "/carpool/find", label: "Find Carpools" },
-    { href: "/carpool/edit", label: "Edit Carpools" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
   ];

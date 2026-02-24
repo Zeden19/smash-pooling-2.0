@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/prisma/prismaClient";
 import { getUser } from "@/app/_helpers/hooks/getUser";
-import { Prisma } from "@prisma/client";
 
 const cords = z.object({
   lat: z.number({ message: "Lat required" }),
@@ -19,7 +18,7 @@ const destination = z.object({
   slug: z.string({ message: "Destination Slug required" }),
 });
 const route = z.object({
-  route: z.string({ message: "Encoded path required" }),
+  polyline: z.string({ message: "polyline required" }),
   distance: z.string({ message: "Distance is required" }),
 });
 const schema = z.object({
@@ -58,14 +57,14 @@ export async function POST(request: NextRequest) {
   const newCarpool = await prisma.carpool.create({
     data: {
       driverId: user.id,
-      originLat: new Prisma.Decimal(origin.cords.lat),
-      originLng: new Prisma.Decimal(origin.cords.lng),
+      originLat: origin.cords.lat,
+      originLng: origin.cords.lng,
       originName: origin.name,
-      destinationLat: new Prisma.Decimal(destination.cords.lat),
-      destinationLng: new Prisma.Decimal(destination.cords.lng),
+      destinationLat: destination.cords.lat,
+      destinationLng: destination.cords.lng,
       destinationName: destination.name,
       tournamentSlug: destination.slug,
-      route: route.route,
+      route: route.polyline,
       distance: route.distance,
       description: body.description,
       price: !price ? 0 : price,

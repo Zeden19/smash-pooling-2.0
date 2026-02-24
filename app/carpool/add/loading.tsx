@@ -1,7 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { defaultMapSize } from "@/app/carpool/_maps/GoogleMap";
 
 function loading() {
   return (
@@ -27,7 +26,7 @@ function loading() {
           </Button>
         </Skeleton>
       </div>
-      <Skeleton style={defaultMapSize} className={"mx-8"} />
+      <Skeleton style={{ width: "100vw", height: "80vh" }} className={"mx-8"} />
     </>
   );
 }
