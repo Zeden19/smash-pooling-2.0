@@ -3,7 +3,7 @@ import { createContext, ReactNode, useContext } from "react";
 import { Prisma } from "@prisma/client";
 
 export type CarpoolProps = Prisma.CarpoolGetPayload<{
-  include: { attendees: true; driver: true; chatroom: { include: { messages: true } } };
+  include: { attendees: true; driver: true; messages: true };
 }>;
 
 const CarpoolContext = createContext<CarpoolProps | null>(null);

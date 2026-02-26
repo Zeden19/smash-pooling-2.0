@@ -69,14 +69,10 @@ export async function POST(request: NextRequest) {
       description: body.description,
       price: !price ? 0 : price,
       startTime: date,
-      chatroom: {
+      messages: {
         create: {
-          messages: {
-            create: {
-              serverMessage: true,
-              content: `Carpool has been created.`,
-            },
-          },
+          serverMessage: true,
+          content: `Carpool has been created.`,
         },
       },
       attendees: {

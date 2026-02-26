@@ -1,6 +1,6 @@
 "use client";
 import Message from "@/app/carpool/[id]/Chat/Message";
-import { Chatroom, Message as Messages, User } from "prisma/prisma-client";
+import { Message as Messages, User } from "prisma/prisma-client";
 import { useEffect, useRef } from "react";
 import { redirect } from "next/navigation";
 import { useChannel } from "ably/react";
@@ -9,13 +9,9 @@ import SendMessage from "@/app/carpool/[id]/Chat/SendMessage";
 import FailureToast from "@/app/_components/toast/FailureToast";
 import { useMessageStore } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 
-interface ChatroomMessages extends Chatroom {
-  messages: Messages[];
-}
-
 interface Props {
   chatroomName: string;
-  chatRoom: ChatroomMessages;
+  carpoolId: number;
   chatroomUsers: User[];
   currentUser: User;
 }
@@ -28,7 +24,7 @@ export interface OptimisticUpdate {
   ) => void;
 }
 
-function ChatWindow({ chatRoom, chatroomName, chatroomUsers, currentUser }: Props) {
+function ChatWindow({ carpoolId, chatroomName, chatroomUsers, currentUser }: Props) {
   if (!currentUser) redirect("/");
   const messageStore = useMessageStore((state) => state);
 
@@ -81,8 +77,8 @@ function ChatWindow({ chatRoom, chatroomName, chatroomUsers, currentUser }: Prop
         ))}
       </div>
       <SendMessage
+        carpoolId={carpoolId}
         currentUser={currentUser}
-        chatRoom={chatRoom}
         channel={channel}
         optimisticUpdate={optimisticUpdate}
       />

@@ -1,5 +1,12 @@
 "use client";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import CarpoolStatusBadge from "./CarpoolStatusBadge";
 import Link from "next/link";
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";

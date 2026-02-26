@@ -120,13 +120,13 @@ function CarpoolPage({ params: { id } }: { params: { id: string } }) {
               </AccordionContent>
             </AccordionItem>
 
-            <MessageStoreProvider messages={carpool.chatroom!.messages}>
+            <MessageStoreProvider messages={carpool.messages}>
               <AccordionItem value={"item-2"}>
                 <AccordionTrigger>Chat</AccordionTrigger>
                 <AccordionContent>
                   <AlbyProvider>
                     <ChatWindow
-                      chatRoom={carpool.chatroom!}
+                      carpoolId={carpool.id}
                       chatroomUsers={carpool.attendees}
                       currentUser={user}
                       chatroomName={`Carpool Chat: From ${carpool.originName} to ${makeTitle(carpool.tournamentSlug)}`}

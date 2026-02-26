@@ -14,7 +14,7 @@ async function CarpoolLayout({ children, params: { id } }: Props) {
 
   const carpool = await prisma.carpool.findUnique({
     where: { id: parseInt(id) },
-    include: { attendees: true, driver: true, chatroom: { include: { messages: true } } },
+    include: { attendees: true, driver: true, messages: true },
   });
   if (!carpool) return;
   if (carpool.driverId !== user.id && !carpool.attendees.includes(user)) return;

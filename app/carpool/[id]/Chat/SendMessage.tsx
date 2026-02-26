@@ -5,7 +5,7 @@ import { Send } from "lucide-react";
 import failureToast from "@/app/_components/toast/FailureToast";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import { useRef, useState } from "react";
-import { Chatroom, User } from "prisma/prisma-client";
+import { Message, User } from "prisma/prisma-client";
 import { RealtimeChannel } from "ably";
 import axios from "axios";
 import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";
@@ -13,11 +13,11 @@ import { useMessageStore } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 
 interface Props extends OptimisticUpdate {
   currentUser: User;
-  chatRoom: Chatroom;
   channel: RealtimeChannel;
+  carpoolId: number;
 }
 
-function SendMessage({ chatRoom, currentUser, channel, optimisticUpdate }: Props) {
+function SendMessage({ currentUser, channel, optimisticUpdate, carpoolId }: Props) {
   const { removeMessage, addMessage } = useMessageStore((state) => state);
   const [loading, setLoading] = useState(false);
   const messageInput = useRef(null); // to reset & get input
@@ -34,11 +34,11 @@ function SendMessage({ chatRoom, currentUser, channel, optimisticUpdate }: Props
         }
         setLoading(true);
 
-        const newMessage = {
+        const newMessage: Message = {
           id: -1,
           content: input.value,
           userId: currentUser.id,
-          chatroomId: chatRoom.carpoolId,
+          carpoolId,
           serverMessage: false,
           edited: false,
         };
@@ -46,7 +46,7 @@ function SendMessage({ chatRoom, currentUser, channel, optimisticUpdate }: Props
         addMessage(newMessage);
 
         const { data } = await axios.post(`/api/chat`, {
-          chatRoom,
+          carpoolId,
           content: input.value,
         });
         // Realtime updates

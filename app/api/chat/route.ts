@@ -14,7 +14,7 @@ export async function POST(body: NextRequest) {
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
   const carpool = await prisma.carpool.findUnique({
-    where: { id: data.chatRoom.carpoolId },
+    where: { id: data.carpoolId },
     include: {
       driver: true,
       attendees: true,
@@ -41,8 +41,8 @@ export async function POST(body: NextRequest) {
       user: {
         connect: { id: user.id },
       },
-      chatRoom: {
-        connect: { carpoolId: data.chatRoom.carpoolId },
+      carpool: {
+        connect: { id: carpool.id },
       },
       content: data.content,
     },
