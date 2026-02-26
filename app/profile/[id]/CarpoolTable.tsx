@@ -1,13 +1,6 @@
 "use client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import CarpoolStatusBadge from "@/app/_components/carpools/CarpoolStatusBadge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import CarpoolStatusBadge from "./CarpoolStatusBadge";
 import Link from "next/link";
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { Carpool } from "prisma/prisma-client";

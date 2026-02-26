@@ -1,4 +1,4 @@
-import CarpoolTable from "@/app/_components/carpools/CarpoolTable";
+import CarpoolTable from "./CarpoolTable";
 import { Carpool } from "prisma/prisma-client";
 
 interface Props {

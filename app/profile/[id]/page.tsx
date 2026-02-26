@@ -2,7 +2,7 @@ import { UserInfo } from "@/app/profile/[id]/UserInfo";
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
 import { getUser } from "@/app/_helpers/hooks/getUser";
-import CarpoolsDisplay from "@/app/_components/carpools/CarpoolsDisplay";
+import CarpoolsDisplay from "./CarpoolsDisplay";
 
 interface Props {
   params: { id: string };
