@@ -17,8 +17,8 @@ async function CarpoolLayout({ children, params: { id } }: Props) {
     include: { attendees: true, driver: true, messages: true },
   });
   if (!carpool) return;
-  if (carpool.driverId !== user.id && !carpool.attendees.includes(user)) return;
-  return <CarpoolProvider value={carpool}>{children}</CarpoolProvider>;
+  if (!carpool.attendees.map((attendee) => attendee.id).includes(user.id)) return;
+  return <CarpoolProvider value={{ carpool, user }}>{children}</CarpoolProvider>;
 }
 
 export default CarpoolLayout;

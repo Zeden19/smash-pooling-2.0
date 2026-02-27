@@ -3,12 +3,7 @@ import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/map
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
@@ -27,11 +22,12 @@ const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
 
 function CarpoolPage({ params: { id } }: { params: { id: string } }) {
   const router = useRouter();
-  const carpool = useCarpool();
+  const { carpool, user } = useCarpool();
   let [carpoolInfo, setCarpoolInfo] = useState<{ title: string; value: string }[] | null>(
     null,
   );
-  const [user, setUser] = useState<User | null>(null);
+  const [driver, setDriver] = useState<User | null>(null);
+  const isDriver = user.id == driver?.id
 
   const map = useMap();
 
@@ -44,7 +40,7 @@ function CarpoolPage({ params: { id } }: { params: { id: string } }) {
       { title: "Status:", value: carpool.status },
       { title: "Price", value: "$" + carpool.price },
     ]);
-    setUser(carpool.driver);
+    setDriver(carpool.driver);
   }, [carpool]);
 
   useEffect(() => {
@@ -54,7 +50,7 @@ function CarpoolPage({ params: { id } }: { params: { id: string } }) {
   return (
     carpool &&
     carpoolInfo &&
-    user && (
+    driver && (
       <div className={"m-5"}>
         <h1 className={"text-5xl font-bold mb-8"}>
           Carpool to {makeTitle(carpool.tournamentSlug)}
@@ -65,10 +61,14 @@ function CarpoolPage({ params: { id } }: { params: { id: string } }) {
             <div className={"mx-3"}>
               <DriverInfo driver={carpool.driver} />
               <div className={"flex gap-3 items-center my-3"}>
-                <DeleteCarpoolDialog carpoolId={carpool.id} />
-                <Button onClick={() => router.push(`/carpool/${id}/edit`)}>
-                  Edit Carpool
-                </Button>
+                {(isDriver &&
+                  <>
+                    <DeleteCarpoolDialog carpoolId={carpool.id} />
+                    <Button onClick={() => router.push(`/carpool/${id}/edit`)}>
+                      Edit Carpool
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 

@@ -12,11 +12,9 @@ export async function PATCH(
 
   const carpool = await prisma.carpool.findUnique({
     where: { id: parseInt(id) },
-    include: { attendees: true, chatroom: true },
+    include: { attendees: true },
   });
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
-
-  //
 
   if (carpool.attendees.map((attendee) => attendee.id).includes(user.id))
     return NextResponse.json(
@@ -33,19 +31,10 @@ export async function PATCH(
       attendees: {
         set: [...carpool.attendees, user],
       },
-      chatroom: {
-        update: {
-          where: {
-            carpoolId: carpool.id,
-          },
-          data: {
-            messages: {
-              create: {
-                serverMessage: true,
-                content: `${user.gamertag} has been added to Carpool.`,
-              },
-            },
-          },
+      messages: {
+        create: {
+          serverMessage: true,
+          content: `${user.gamertag} has been added to Carpool.`,
         },
       },
     },
@@ -77,7 +66,7 @@ export async function DELETE(
 
   const carpool = await prisma.carpool.findUnique({
     where: { id: parseInt(id) },
-    include: { attendees: true, chatroom: true },
+    include: { attendees: true },
   });
   if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
 
@@ -86,24 +75,16 @@ export async function DELETE(
     include: {
       attendees: true,
     },
+    // technically shouldn't be deleting, just marking as not part of but used to be so they have their data still there
     data: {
       id: 30,
-      // attendees: {
-      //   delete: [attendeeToDelete],
-      // },
-      chatroom: {
-        update: {
-          where: {
-            carpoolId: carpool.id,
-          },
-          data: {
-            messages: {
-              create: {
-                serverMessage: true,
-                content: `${attendeeToDelete.gamertag} has removed from Carpool.`,
-              },
-            },
-          },
+      attendees: {
+        delete: [attendeeToDelete],
+      },
+      messages: {
+        create: {
+          serverMessage: true,
+          content: `${attendeeToDelete.gamertag} has removed from Carpool.`,
         },
       },
     },

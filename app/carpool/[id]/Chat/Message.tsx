@@ -37,40 +37,27 @@ function Message({
         </span>
       ) : (
         <div
-          className={`flex gap-2 w-full px-2 rounded-lg ${!isCurrentUser && "justify-end"} ${isHovering && "bg-slate-800"} relative`}
+          className={`flex gap-2 w-full px-2 rounded-lg ${!isCurrentUser && "flex-row-reverse"} ${isHovering && "bg-slate-800"} relative`}
           onMouseOver={() => setIsHovering(true)}
           onMouseOut={() => setIsHovering(false)}>
-          {isCurrentUser ? (
-            <AvatarComponent
-              className={"mt-2.5"}
-              src={messageAuthor!.profilePicture}
-              fallback={messageAuthor!.gamertag.charAt(0)}
-            />
-          ) : null}
+          <AvatarComponent
+            className={"mt-2.5"}
+            src={messageAuthor?.profilePicture}
+            fallback={messageAuthor?.gamertag.charAt(0)}
+          />
 
-          {message.edited && !isCurrentUser && (
-            <span className={"text-xs text-gray-500 italic bold self-end"}>Edited</span>
-          )}
           <div className={"flex flex-col gap-1"}>
-            <span className={"text-gray-400 text-xs"}>{messageAuthor!.gamertag}</span>
+            <span className={"text-gray-400 text-xs"}>{messageAuthor?.gamertag}</span>
             <span
               className={`self-end mb-1 bg-slate-500 border border-slate-800 p-2 rounded-xl ${isCurrentUser ? "mr-auto" : "ml-auto"}`}>
               {message.content}
             </span>
           </div>
-          {message.edited && isCurrentUser && (
+          {message.edited && (
             <span className={"text-xs text-gray-500 italic bold self-end"}>Edited</span>
           )}
 
-          {!isCurrentUser ? (
-            <AvatarComponent
-              className={"mt-2.5"}
-              src={messageAuthor!.profilePicture}
-              fallback={messageAuthor!.gamertag.charAt(0)}
-            />
-          ) : null}
-
-          {isHovering && message.userId === currentUser.id && (
+          {isHovering && isCurrentUser && (
             <div
               className={
                 "absolute top-[-17px] right-3 flex ml-auto gap-1 mb-1 overflow-visible"
