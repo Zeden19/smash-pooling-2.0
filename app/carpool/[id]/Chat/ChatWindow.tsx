@@ -29,7 +29,7 @@ function ChatWindow({ carpoolId, chatroomName, chatroomUsers, currentUser }: Pro
   const messageStore = useMessageStore((state) => state);
 
   // runs when we receive a new message
-  const { channel, ably } = useChannel(ALBY_CHAT_NAME, (action) => {
+  const { channel } = useChannel(ALBY_CHAT_NAME, (action) => {
     const functionName: "addMessage" | "editMessage" | "removeMessage" =
       action.data.functionName;
     const args: Messages = action.data.args[0];

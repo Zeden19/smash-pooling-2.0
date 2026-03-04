@@ -8,7 +8,7 @@ import { encodeBase32LowerCaseNoPadding } from "@oslojs/encoding";
 
 async function createAndSetSession(id: string) {
   const { token } = await createSession(id);
-  cookies().set("session_token", token, {
+  (await cookies()).set("session_token", token, {
     maxAge: 86400,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -27,7 +27,7 @@ export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
-  const storedState = cookies().get("startgg_oauth_state")?.value ?? null;
+  const storedState = (await cookies()).get("startgg_oauth_state")?.value ?? null;
 
   if (!code || !state || !storedState || state !== storedState) {
     return new Response(null, {

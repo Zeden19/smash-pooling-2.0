@@ -6,12 +6,14 @@ import { z } from "zod";
 import { carMakes } from "@/app/api/user/[id]/carMakes";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export async function GET(req: NextRequest, { params: { id } }: Props) {
+export async function GET(_: NextRequest, { params }: Props) {
+  const { id } = await params;
+
   const data = await prisma.user.findUnique({
-    where: { id: id },
+    where: { id },
     include: { carpoolsAttending: true, carpoolsDriving: true },
   });
 
@@ -42,7 +44,9 @@ const driverSchema = z.object({
     .max(12, { message: "Car seats must be smaller than 13" }),
 });
 
-export async function PATCH(req: NextRequest, { params: { id } }: Props) {
+export async function PATCH(req: NextRequest, { params }: Props) {
+  const { id } = await params;
+
   const body = await req.json();
   const { user } = await getUser();
   const data = await prisma.user.findUnique({

@@ -8,9 +8,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import CarpoolStatusBadge from "./CarpoolStatusBadge";
-import Link from "next/link";
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { Carpool } from "prisma/prisma-client";
+import { redirect } from "next/navigation";
 
 interface Props {
   carpools: Carpool[];
@@ -32,25 +32,17 @@ function CarpoolTable({ carpools }: Props) {
       </TableHeader>
       <TableBody>
         {carpools.map((carpool) => (
-          <Link legacyBehavior key={carpool.id} href={`/carpool/${carpool.id}`}>
-            <TableRow key={carpool.id}>
-              <TableCell className={"pl-5"}>
-                <a
-                  target={"_blank"}
-                  href={`https://www.start.gg/tournament/${carpool.tournamentSlug}/details`}>
-                  {makeTitle(carpool.tournamentSlug)}
-                </a>
-              </TableCell>
-              <TableCell>{carpool.originName}</TableCell>
-              <TableCell>{carpool.destinationName}</TableCell>
-              <TableCell>{carpool.startTime?.toDateString() || "N/A"}</TableCell>
-              <TableCell>{carpool.seatsAvailable || "N/A"}</TableCell>
-              <TableCell>{carpool.distance}</TableCell>
-              <TableCell className={"w-32 text-right pr-5"}>
-                <CarpoolStatusBadge carpoolStatus={carpool.status} />
-              </TableCell>
-            </TableRow>
-          </Link>
+          <TableRow key={carpool.id} onClick={() => redirect(`/carpool/${carpool.id}`)}>
+            <TableCell className={"pl-5"}>{makeTitle(carpool.tournamentSlug)}</TableCell>
+            <TableCell>{carpool.originName}</TableCell>
+            <TableCell>{carpool.destinationName}</TableCell>
+            <TableCell>{carpool.startTime?.toDateString() || "N/A"}</TableCell>
+            <TableCell>{carpool.seatsAvailable || "N/A"}</TableCell>
+            <TableCell>{carpool.distance}</TableCell>
+            <TableCell className={"w-32 text-right pr-5"}>
+              <CarpoolStatusBadge carpoolStatus={carpool.status} />
+            </TableCell>
+          </TableRow>
         ))}
       </TableBody>
     </Table>

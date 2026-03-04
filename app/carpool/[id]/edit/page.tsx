@@ -8,10 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Map } from "@vis.gl/react-google-maps";
 
 function EditPage() {
-  const carpool = useCarpool();
+  const { carpool } = useCarpool();
   const [data, setData] = useState<{ label: string; value: React.ReactNode }[] | null>(
     null,
   );
+
+  if (!carpool) return null;
 
   useEffect(() => {
     setData([

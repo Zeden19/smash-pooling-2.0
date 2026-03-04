@@ -1,7 +1,7 @@
 "use client";
 import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/mapConfig";
 import { Input } from "@/components/ui/input";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import styles from "./styles.module.css";
 import { slug as getSlug } from "@/app/_helpers/services/startggClient";
@@ -30,7 +30,7 @@ function FindCarpoolPage() {
     }
   }
 
-  async function getCarpools(event: FormEvent<HTMLFormElement>) {
+  async function getCarpools(event: React.SubmitEvent) {
     if (!map) {
       FailureToast("Something went wrong", "Please try again");
       return;

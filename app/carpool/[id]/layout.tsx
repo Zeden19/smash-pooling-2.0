@@ -5,10 +5,11 @@ import { getUser } from "@/app/_helpers/hooks/getUser";
 
 interface Props {
   children: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-async function CarpoolLayout({ children, params: { id } }: Props) {
+async function CarpoolLayout({ children, params }: Props) {
+  const { id } = await params;
   const { user } = await getUser();
   if (!user) return;
 
@@ -18,7 +19,7 @@ async function CarpoolLayout({ children, params: { id } }: Props) {
   });
   if (!carpool) return;
   if (!carpool.attendees.map((attendee) => attendee.id).includes(user.id)) return;
-  return <CarpoolProvider value={{ carpool, user }}>{children}</CarpoolProvider>;
+  return <CarpoolProvider value={{ carpool, user, id }}>{children}</CarpoolProvider>;
 }
 
 export default CarpoolLayout;

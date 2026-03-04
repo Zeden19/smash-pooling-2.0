@@ -7,15 +7,19 @@ export type CarpoolProps = Prisma.CarpoolGetPayload<{
   include: { attendees: true; driver: true; messages: true };
 }>;
 
-const CarpoolContext = createContext<{ carpool: CarpoolProps | null; user: User } | null>(
-  null,
-);
+interface Context {
+  carpool: CarpoolProps | null;
+  user: User;
+  id: string;
+}
+
+const CarpoolContext = createContext<Context | null>(null);
 
 export function CarpoolProvider({
   value,
   children,
 }: {
-  value: { carpool: CarpoolProps | null; user: User };
+  value: Context;
   children: ReactNode;
 }) {
   return <CarpoolContext.Provider value={value}>{children}</CarpoolContext.Provider>;

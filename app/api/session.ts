@@ -43,14 +43,10 @@ export async function createSession(userId: string): Promise<SessionWithToken> {
     token,
   };
 
+  const { token: _, ...data } = session;
+
   await prisma.session.create({
-    data: {
-      id,
-      userId,
-      secretHash: session.secretHash,
-      createdAt: now,
-      lastVerifiedAt: now,
-    },
+    data,
   });
 
   return session;
@@ -103,19 +99,18 @@ export async function validateSessionToken(
 async function getSession(sessionId: string): Promise<Session | null> {
   const now = new Date();
 
-  const result = await prisma.session.findUnique({
+  const userSession = await prisma.session.findUnique({
     where: {
       id: sessionId,
     },
+    include: { user: true },
   });
 
-  if (!result) {
+  if (!userSession) {
     return null;
   }
 
-  const userSession = result;
-  const user = await prisma.user.findUnique({ where: { id: userSession.userId } });
-
+  const user = userSession.user;
   if (!user) {
     return null;
   }

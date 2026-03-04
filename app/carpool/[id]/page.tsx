@@ -3,12 +3,17 @@ import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/map
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
-import { AdvancedMarker, Map, Pin, useMap } from "@vis.gl/react-google-maps";
+import { AdvancedMarker, Map, Pin } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
 import { User } from "prisma/prisma-client";
 import { Polyline } from "@/app/carpool/_maps/Polyline";
@@ -20,16 +25,14 @@ const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
   ssr: false,
 });
 
-function CarpoolPage({ params: { id } }: { params: { id: string } }) {
+function CarpoolPage() {
   const router = useRouter();
-  const { carpool, user } = useCarpool();
+  const { carpool, user, id } = useCarpool();
   let [carpoolInfo, setCarpoolInfo] = useState<{ title: string; value: string }[] | null>(
     null,
   );
   const [driver, setDriver] = useState<User | null>(null);
-  const isDriver = user.id == driver?.id
-
-  const map = useMap();
+  const isDriver = user.id == driver?.id;
 
   useEffect(() => {
     if (!carpool) return;
@@ -42,11 +45,6 @@ function CarpoolPage({ params: { id } }: { params: { id: string } }) {
     ]);
     setDriver(carpool.driver);
   }, [carpool]);
-
-  useEffect(() => {
-    if (!map || !carpool) return;
-    map.setZoom(8);
-  }, [map]);
   return (
     carpool &&
     carpoolInfo &&
@@ -61,7 +59,7 @@ function CarpoolPage({ params: { id } }: { params: { id: string } }) {
             <div className={"mx-3"}>
               <DriverInfo driver={carpool.driver} />
               <div className={"flex gap-3 items-center my-3"}>
-                {(isDriver &&
+                {isDriver && (
                   <>
                     <DeleteCarpoolDialog carpoolId={carpool.id} />
                     <Button onClick={() => router.push(`/carpool/${id}/edit`)}>
@@ -109,13 +107,7 @@ function CarpoolPage({ params: { id } }: { params: { id: string } }) {
                     }}
                   />
 
-                  <Polyline
-                    onLoad={(path) =>
-                      map?.setCenter(path.getAt(Math.floor(path.getLength() / 2)))
-                    }
-                    {...polylineOptions}
-                    encodedPath={carpool.route}
-                  />
+                  <Polyline {...polylineOptions} encodedPath={carpool.route} />
                 </Map>
               </AccordionContent>
             </AccordionItem>

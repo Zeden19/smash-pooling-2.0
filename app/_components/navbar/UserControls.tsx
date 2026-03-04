@@ -2,14 +2,36 @@ import { getUser } from "@/app/_helpers/hooks/getUser";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import Link from "next/link";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { logout } from "@/app/_helpers/hooks/logout";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import AvatarComponent from "@/app/_components/AvatarComponent";
+import { deleteSession } from "@/app/api/session";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+async function logout(): Promise<ActionResult> {
+  "use server";
+  const session = await getUser();
+  if (!session?.session) {
+    return {
+      error: "Unauthorized",
+    };
+  }
+
+  await deleteSession(session.session.id);
+
+  (await cookies()).set("session_token", "", {
+    maxAge: 86400,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    sameSite: "lax",
+  });
+  return redirect("/");
+}
+
+interface ActionResult {
+  error: string | null;
+}
 
 async function UserControls() {
   const { user } = await getUser();
@@ -52,9 +74,7 @@ async function UserControls() {
               <DropdownMenuItem>Your Carpools</DropdownMenuItem>
             </Link>
             <DropdownMenuItem>
-              <form action={logout}>
-                <Button>Log Out</Button>
-              </form>
+              <Button onClick={logout}>Log Out</Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

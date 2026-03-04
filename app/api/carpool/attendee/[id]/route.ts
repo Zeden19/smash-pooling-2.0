@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/prismaClient";
 import { getUser } from "@/app/_helpers/hooks/getUser";
 
-export async function PATCH(
-  req: NextRequest,
-  { params: { id } }: { params: { id: string } },
-) {
+interface Props {
+  params: Promise<{ id: string }>;
+}
+
+export async function PATCH(_: NextRequest, { params }: Props) {
+  const { id } = await params;
   const { user } = await getUser();
   if (!user)
     return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
@@ -43,10 +45,8 @@ export async function PATCH(
   return NextResponse.json(data, { status: 200 });
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params: { id } }: { params: { id: string } },
-) {
+export async function DELETE(req: NextRequest, { params }: Props) {
+  const { id } = await params;
   const { user } = await getUser();
   if (!user)
     return NextResponse.json(

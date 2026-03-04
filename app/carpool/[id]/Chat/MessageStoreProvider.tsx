@@ -39,7 +39,7 @@ interface Props {
   children: ReactNode;
 }
 export function MessageStoreProvider({ messages, children }: Props) {
-  const storeRef = useRef<MessageStoreApi>();
+  const storeRef = useRef<MessageStoreApi>(null);
   if (!storeRef.current) storeRef.current = createMessageStore(messages);
   return (
     <MessageStoreContext.Provider value={storeRef.current}>

@@ -62,12 +62,12 @@ function AddCarpoolPage() {
   });
 
   const [price, setPrice] = useState<{
-    priceInput: RefObject<HTMLInputElement>;
+    priceInput: RefObject<HTMLInputElement | null>;
     error: boolean;
   }>({ priceInput: useRef(null), error: false });
 
   const [description, setDescription] = useState<{
-    descriptionInput: RefObject<HTMLTextAreaElement>;
+    descriptionInput: RefObject<HTMLTextAreaElement | null>;
     error: boolean;
   }>({ descriptionInput: useRef(null), error: false });
 

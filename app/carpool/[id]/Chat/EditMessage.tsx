@@ -75,9 +75,7 @@ function EditMessage({ message, channel, optimisticUpdate }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Button size={"smallIcon"}>
-          <Pencil />
-        </Button>
+        <Pencil />
       </DialogTrigger>
 
       <DialogContent>

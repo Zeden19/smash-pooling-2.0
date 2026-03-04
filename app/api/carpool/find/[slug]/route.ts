@@ -3,10 +3,12 @@ import prisma from "@/prisma/prismaClient";
 import startggClient from "@/app/_helpers/services/startggClient";
 import { CHECK_TOURNAMENT_EXISTS } from "@/app/_helpers/services/startggQueries";
 
-export async function GET(
-  _: NextRequest,
-  { params: { slug } }: { params: { slug: string } },
-) {
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+export async function GET(_: NextRequest, { params }: Props) {
+  const { slug } = await params;
   const { tournament } = await startggClient.request<{ tournament: { id: number } }>(
     CHECK_TOURNAMENT_EXISTS,
     {

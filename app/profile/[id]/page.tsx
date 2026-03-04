@@ -5,10 +5,11 @@ import { getUser } from "@/app/_helpers/hooks/getUser";
 import CarpoolsDisplay from "./CarpoolsDisplay";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-async function ProfilePage({ params: { id } }: Props) {
+async function ProfilePage({ params }: Props) {
+  const { id } = await params;
   const user = await prisma.user.findUnique({
     where: { id },
     include: {

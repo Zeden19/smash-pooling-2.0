@@ -6,11 +6,11 @@ export async function GET(): Promise<Response> {
   const state = generateState();
   const url = startgg.createAuthorizationURL(state, ["user.identity", "user.email"]);
 
-  cookies().set("startgg_oauth_state", state, {
+  (await cookies()).set("startgg_oauth_state", state, {
     path: "/",
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
-    maxAge: 60 * 10,
+    maxAge: 86400,
     sameSite: "lax",
   });
 

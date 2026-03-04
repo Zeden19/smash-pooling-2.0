@@ -50,9 +50,7 @@ function DeleteMessage({ message, channel, optimisticUpdate }: Props) {
   return (
     <AlertDialog>
       <AlertDialogTrigger>
-        <Button size={"smallIcon"} disabled={deleteLoading}>
-          <Trash2 />
-        </Button>
+        <Trash2 />
       </AlertDialogTrigger>
 
       <AlertDialogContent>

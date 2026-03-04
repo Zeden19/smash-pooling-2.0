@@ -2,6 +2,7 @@
 
 import * as Ably from "ably";
 import { AblyProvider, ChannelProvider } from "ably/react";
+import React from "react";
 
 interface Props {
   children: React.ReactNode;
