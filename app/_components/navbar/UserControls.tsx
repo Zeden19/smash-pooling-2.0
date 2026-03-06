@@ -2,7 +2,12 @@ import { getUser } from "@/app/_helpers/hooks/getUser";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import Link from "next/link";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import AvatarComponent from "@/app/_components/AvatarComponent";
 import { deleteSession } from "@/app/api/session";
 import { cookies } from "next/headers";

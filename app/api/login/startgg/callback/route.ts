@@ -83,6 +83,7 @@ export async function GET(request: Request): Promise<Response> {
   } catch (e) {
     if (e instanceof arctic.OAuth2RequestError) {
       // Invalid authorization code, credentials, or redirect URI
+      console.log(e);
       const code = e.code;
       return new Response(code, {
         status: 500,
@@ -94,6 +95,7 @@ export async function GET(request: Request): Promise<Response> {
     if (e instanceof arctic.ArcticFetchError) {
       // Failed to call `fetch()`
       const cause = e.cause;
+      console.log(cause);
       return new Response(null, {
         status: 404,
         headers: {

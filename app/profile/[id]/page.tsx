@@ -2,7 +2,7 @@ import { UserInfo } from "@/app/profile/[id]/UserInfo";
 import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
 import { getUser } from "@/app/_helpers/hooks/getUser";
-import CarpoolsDisplay from "./CarpoolsDisplay";
+import CarpoolTable from "./CarpoolsTable";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -34,10 +34,15 @@ async function ProfilePage({ params }: Props) {
       <div className={"mt-7 flex flex-col gap-5"}>
         <h1 className={"text-5xl font-bold"}>Carpool Info</h1>
 
-        <CarpoolsDisplay
-          carpoolsDriving={carpoolsDriving}
-          carpoolsAttending={carpoolsAttending}
-        />
+        <div>
+          <h3 className={"text-2xl font-bold"}>Carpools Driving/Driven</h3>
+          <CarpoolTable carpools={carpoolsDriving} />
+        </div>
+
+        <div>
+          <h3 className={"text-2xl font-bold"}>Carpools Attending/Attended</h3>
+          <CarpoolTable carpools={carpoolsAttending} />
+        </div>
       </div>
     </div>
   );

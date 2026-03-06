@@ -1,4 +1,5 @@
 "use client";
+import { Carpool } from "@/prisma/generated/prisma/client";
 import {
   Table,
   TableBody,
@@ -7,10 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import CarpoolStatusBadge from "./CarpoolStatusBadge";
-import { makeTitle } from "@/app/_helpers/functions/makeTitle";
-import { Carpool } from "prisma/prisma-client";
 import { redirect } from "next/navigation";
+import { makeTitle } from "@/app/_helpers/functions/makeTitle";
+import CarpoolStatusBadge from "@/app/profile/[id]/CarpoolStatusBadge";
 
 interface Props {
   carpools: Carpool[];
@@ -48,5 +48,4 @@ function CarpoolTable({ carpools }: Props) {
     </Table>
   );
 }
-
 export default CarpoolTable;

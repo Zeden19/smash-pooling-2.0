@@ -1,8 +1,8 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
 import { MailIcon, PhoneIcon, TagIcon } from "lucide-react";
-import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
-import { User } from "prisma/prisma-client";
+import { DriverInfo } from "@/app/_components/DriverInfo";
+import { User } from "@/prisma/generated/prisma/client";
 import EditDriverForm from "@/app/profile/[id]/EditDriverForm";
 import { useState } from "react";
 import GenericToolTip from "@/app/_components/GenericToolTip";
@@ -28,21 +28,18 @@ export function UserInfo({ profileUser, validatedUser }: Props) {
         />
       </GenericToolTip>
       <h1 className={"text-4xl font-bold"}>{user.fullName || user.gamertag}</h1>
-
       <div className={"flex gap-2"}>
         <MailIcon />
         <GenericToolTip toolTipText={"Email"}>
           <p>{user.email}</p>
         </GenericToolTip>
       </div>
-
       <div className={"flex gap-2"}>
         <TagIcon />
         <GenericToolTip toolTipText={"Gamer Tag"}>
           <p>{user.gamertag}</p>
         </GenericToolTip>
       </div>
-
       <div className={"flex gap-2"}>
         {user.phoneNumber && (
           <>
@@ -54,14 +51,8 @@ export function UserInfo({ profileUser, validatedUser }: Props) {
         )}
       </div>
       <Separator className={"w-56"} />
-      {user.isDriver ? (
-        <>
-          <DriverInfo driver={user} />
-          {canEdit && <EditDriverForm setUser={(user) => setUser(user)} user={user} />}
-        </>
-      ) : (
-        canEdit && <EditDriverForm setUser={(user) => setUser(user)} user={user} />
-      )}
+      {user.isDriver && <DriverInfo driver={user} />}
+      {canEdit && <EditDriverForm setUser={(user) => setUser(user)} user={user} />}
     </div>
   );
 }

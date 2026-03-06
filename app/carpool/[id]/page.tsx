@@ -1,7 +1,7 @@
 "use client";
 import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/mapConfig";
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
-import { DriverInfo } from "@/app/profile/[id]/DriverInfo";
+import { DriverInfo } from "@/app/_components/DriverInfo";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
 import {
   Accordion,
@@ -15,7 +15,7 @@ import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvid
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
 import { AdvancedMarker, Map, Pin } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
-import { User } from "prisma/prisma-client";
+import { User } from "@/prisma/generated/prisma/client";
 import { Polyline } from "@/app/carpool/_maps/Polyline";
 import { useCarpool } from "@/app/carpool/[id]/CarpoolContext";
 import { useRouter } from "next/navigation";

@@ -1,4 +1,4 @@
-import { CarpoolStatus } from "prisma/prisma-client";
+import { CarpoolStatus } from "@/prisma/generated/prisma/client";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {

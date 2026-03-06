@@ -9596,4 +9596,4 @@ export const carColours = [
   "Purple",
 ] as const;
 
-
+export type CarMakes = keyof typeof carData;

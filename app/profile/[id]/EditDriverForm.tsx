@@ -18,13 +18,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { carColours, carData } from "@/app/profile/[id]/CarData";
+import { carColours, carData, CarMakes } from "@/app/profile/[id]/CarData";
 import { useOptimistic, useState } from "react";
 import axios from "axios";
 import FailureToast from "@/app/_components/toast/FailureToast";
 import SuccessToast from "@/app/_components/toast/SuccessToast";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
-import { User } from "prisma/prisma-client";
+import { User } from "@/prisma/generated/prisma/client";
+import { z } from "zod";
+
+const driverSchema = z.object({
+  fullName: z
+    .string({ message: "Name is required" })
+    .min(3, { message: "Name must be longer than 3 characters" })
+    .max(40, { message: "Name must be smaller than 40 characters" }),
+  phoneNumber: z
+    .string({ message: "Phone number is required" })
+    .min(4, { message: "Phone number must be larger than 4 characters" })
+    .max(22, { message: "Phone number must be smaller than 23 characters" }),
+  carMake: z.enum(Object.keys(carData) as [CarMakes], { message: "Invalid car make" }),
+  carModel: z.string({ message: "Car model is required" }),
+  carColour: z.enum(carColours, { message: "Invalid car colour" }),
+  licencePlate: z
+    .string({ message: "Licence Plate is required" })
+    .min(6, { message: "Licence Plate must be longer than 6 characters" })
+    .max(12, { message: "Licence Plate must be shorter than 13 characters" }),
+  carSeats: z
+    .number({ message: "Car Seats is required" })
+    .min(1, { message: "Car seats must be greater than 1" })
+    .max(12, { message: "Car seats must be smaller than 13" }),
+});
 
 interface Props {
   user: User;
@@ -33,42 +56,43 @@ interface Props {
 
 function NewDriverForm({ user, setUser }: Props) {
   const carInfo = user.carInfo ? user.carInfo.split(" ") : undefined;
-  const carMake = carInfo ? carInfo[0] : undefined;
+  const carMake = carInfo ? (carInfo[0] as CarMakes) : undefined;
   const carModel = carInfo ? carInfo.slice(1, -1) : undefined;
   const carColour = carInfo ? carInfo[carInfo.length - 1] : undefined;
 
-  const [selectedMake, setSelectedMake] = useState<string | undefined>(carMake);
+  const [selectedMake, setSelectedMake] = useState<CarMakes | undefined>(carMake);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useOptimistic(false, () => true);
 
-  // @ts-ignore
   const carModels = selectedMake ? carData[selectedMake] : null;
 
   async function onSubmit(formData: FormData) {
     setLoading(true);
-    const fullName = formData.get("fullName");
-    const phoneNumber = formData.get("phoneNumber");
-    const carModel = formData.get("carModel");
-    const carMake = formData.get("carMake");
-    const carColour = formData.get("carColour");
-    const carSeats = formData.get("carSeats") as string;
-    const licencePlate = formData.get("licencePlate");
+
+    const body = {
+      fullName: formData.get("fullName"),
+      phoneNumber: formData.get("phoneNumber"),
+      carModel: formData.get("carModel"),
+      carMake: formData.get("carMake"),
+      carColour: formData.get("carColour"),
+      carSeats: parseInt(formData.get("carSeats") as string),
+      licencePlate: formData.get("licencePlate"),
+    };
+
+    const validation = driverSchema.safeParse(body);
+    if (validation.error) {
+      FailureToast("Fields Error", JSON.parse(validation.error.message)[0].message);
+      return;
+    }
 
     try {
-      const { data } = await axios.patch(`/api/user/${user.id}`, {
-        fullName,
-        phoneNumber,
-        carModel,
-        carMake,
-        carColour,
-        carSeats: parseInt(carSeats),
-        licencePlate,
-      });
+      const { data } = await axios.patch(`/api/user/${user.id}`, validation.data);
       SuccessToast("Successfully updated data", "Get driving!");
       setUser(data);
       setOpen(false);
-    } catch (e: any) {
-      FailureToast("Could not update data", e.response.data.error);
+    } catch (e) {
+      console.error(e);
+      FailureToast("Could not update data", "Please try again");
     } finally {
       setLoading(false);
     }
@@ -125,7 +149,7 @@ function NewDriverForm({ user, setUser }: Props) {
                   required
                   name={"carMake"}
                   defaultValue={carMake}
-                  onValueChange={(value) => {
+                  onValueChange={(value: CarMakes) => {
                     setSelectedMake(value);
                   }}>
                   <SelectTrigger id={"carMake"}>
@@ -154,7 +178,6 @@ function NewDriverForm({ user, setUser }: Props) {
                     <SelectValue className={"w-100"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {/*//@ts-ignore*/}
                     {carModels?.map((car) => (
                       <SelectItem key={car} value={car}>
                         {car}

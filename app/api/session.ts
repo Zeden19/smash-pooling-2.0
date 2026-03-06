@@ -25,6 +25,12 @@ function generateSecureRandomString(): string {
   return id;
 }
 
+async function hashSecret(secret: string): Promise<Uint8Array> {
+  const secretBytes = new TextEncoder().encode(secret);
+  const secretHashBuffer = await crypto.subtle.digest("SHA-256", secretBytes);
+  return new Uint8Array(secretHashBuffer);
+}
+
 export async function createSession(userId: string): Promise<SessionWithToken> {
   const now = new Date();
 
@@ -37,7 +43,7 @@ export async function createSession(userId: string): Promise<SessionWithToken> {
   const session: SessionWithToken = {
     id,
     userId,
-    secretHash: Buffer.from(secretHash),
+    secretHash,
     createdAt: now,
     lastVerifiedAt: now,
     token,
@@ -50,12 +56,6 @@ export async function createSession(userId: string): Promise<SessionWithToken> {
   });
 
   return session;
-}
-
-async function hashSecret(secret: string): Promise<Uint8Array> {
-  const secretBytes = new TextEncoder().encode(secret);
-  const secretHashBuffer = await crypto.subtle.digest("SHA-256", secretBytes);
-  return new Uint8Array(secretHashBuffer);
 }
 
 export async function validateSessionToken(
