@@ -1,6 +1,6 @@
 "use client";
 import Message from "@/app/carpool/[id]/Chat/Message";
-import { Message as Messages, User } from "prisma/prisma-client";
+import { Message as Messages, User } from "@/prisma/generated/prisma/client";
 import { useEffect, useRef } from "react";
 import { redirect } from "next/navigation";
 import { useChannel } from "ably/react";

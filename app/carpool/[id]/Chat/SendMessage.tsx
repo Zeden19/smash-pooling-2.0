@@ -5,7 +5,7 @@ import { Send } from "lucide-react";
 import failureToast from "@/app/_components/toast/FailureToast";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import { useRef, useState } from "react";
-import { Message, User } from "prisma/prisma-client";
+import { Message, User } from "@/prisma/generated/prisma/client";
 import { RealtimeChannel } from "ably";
 import axios from "axios";
 import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";

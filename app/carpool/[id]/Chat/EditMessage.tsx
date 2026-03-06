@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
-import { Message } from "prisma/prisma-client";
+import { Message } from "@/prisma/generated/prisma/client";
 import { RealtimeChannel } from "ably";
 import FailureToast from "@/app/_components/toast/FailureToast";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";

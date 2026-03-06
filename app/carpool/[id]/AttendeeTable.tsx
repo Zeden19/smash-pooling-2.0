@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Prisma, User } from "prisma/prisma-client";
+import { Prisma, User } from "@/prisma/generated/prisma/client";
 import { Crown, UserRoundMinus } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";

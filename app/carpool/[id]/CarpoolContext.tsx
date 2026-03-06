@@ -1,7 +1,7 @@
 "use client";
 import { createContext, ReactNode, useContext } from "react";
 import { Prisma } from "@prisma/client";
-import { User } from "prisma/prisma-client";
+import { User } from "@/prisma/generated/prisma/client";
 
 export type CarpoolProps = Prisma.CarpoolGetPayload<{
   include: { attendees: true; driver: true; messages: true };

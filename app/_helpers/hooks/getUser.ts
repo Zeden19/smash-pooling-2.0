@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
-import { Session, User } from "@prisma/client";
+import { Session, User } from "@/prisma/generated/prisma/client";
 
 import { validateSessionToken } from "@/app/api/session";
 

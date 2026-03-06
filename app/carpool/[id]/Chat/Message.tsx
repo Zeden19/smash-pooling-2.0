@@ -1,5 +1,5 @@
 "use client";
-import { Message as MessageType, User } from "prisma/prisma-client";
+import { Message as MessageType, User } from "@/prisma/generated/prisma/client";
 import { useState } from "react";
 import { RealtimeChannel } from "ably";
 import DeleteMessage from "@/app/carpool/[id]/Chat/DeleteMessage";

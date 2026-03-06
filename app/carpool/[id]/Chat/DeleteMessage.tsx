@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
-import { Message } from "prisma/prisma-client";
+import { Message } from "@/prisma/generated/prisma/client";
 import axios from "axios";
 import { RealtimeChannel } from "ably";
 import { OptimisticUpdate } from "@/app/carpool/[id]/Chat/ChatWindow";

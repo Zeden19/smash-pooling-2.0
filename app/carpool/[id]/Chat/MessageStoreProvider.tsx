@@ -1,5 +1,5 @@
 "use client";
-import { Message } from "prisma/prisma-client";
+import { Message } from "@/prisma/generated/prisma/client";
 import { createContext, type ReactNode, useContext, useRef } from "react";
 import { create, useStore } from "zustand";
 
