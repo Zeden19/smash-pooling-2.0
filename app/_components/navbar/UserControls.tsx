@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AvatarComponent from "@/app/_components/AvatarComponent";
-import { deleteSession } from "@/app/api/session";
+import { deleteSession } from "@/app/api/_services/sessionService";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 

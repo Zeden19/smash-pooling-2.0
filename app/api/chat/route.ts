@@ -1,103 +1,97 @@
-import { NextRequest, NextResponse } from "next/server";
-import z from "zod";
+import { NextRequest } from "next/server";
+import { z } from "zod";
 import prisma from "@/prisma/prismaClient";
-import { getUser } from "@/app/_helpers/hooks/getUser";
+import { handleRoute } from "@/app/api/_core/handler";
+import {
+  assertMembershipThrow,
+  requireMessageOwnership,
+  requireUser,
+} from "@/app/api/_core/auth";
+import { parseBody } from "@/app/api/_core/validation";
+import { getCarpoolByIdOrThrow } from "@/app/api/_services/carpoolService";
+import { getMessageByIdOrThrow } from "@/app/api/_services/chatService";
 
 const newMessageSchema = z
   .string()
   .max(500, { message: "Message must be shorter than 500 characters" })
-  .min(0, { message: "Message is required" });
+  .min(1, { message: "Message is required" });
+
+const createMessageSchema = z.object({
+  carpoolId: z.preprocess(
+    (value) => (value == null || value === "" ? undefined : Number(value)),
+    z.number({ message: "carpoolId is required" }),
+  ),
+  content: newMessageSchema,
+});
+
+const deleteMessageSchema = z.object({
+  message: z.object({
+    id: z.number({ message: "message.id is required" }),
+  }),
+});
+
+const editMessageSchema = z.object({
+  message: z.object({
+    id: z.number({ message: "message.id is required" }),
+    content: newMessageSchema,
+  }),
+});
 
 export async function POST(body: NextRequest) {
-  const data = await body.json();
-  const { user } = await getUser();
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  return handleRoute(async () => {
+    const user = await requireUser();
+    const data = await parseBody(body, createMessageSchema);
 
-  const carpool = await prisma.carpool.findUnique({
-    where: { id: data.carpoolId },
-    include: {
-      driver: true,
-      attendees: true,
-    },
-  });
+    const carpool = await getCarpoolByIdOrThrow(data.carpoolId);
+    assertMembershipThrow(user.id, carpool);
 
-  const { error } = newMessageSchema.safeParse(data.content);
-
-  if (error) return NextResponse.json({ error }, { status: 404 });
-
-  if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
-
-  if (
-    !carpool.attendees.map((attendee) => attendee.id).includes(user.id) &&
-    carpool.driver.id !== user.id
-  )
-    return NextResponse.json(
-      { error: "You aren't apart of this carpool!" },
-      { status: 401 },
-    );
-
-  const newMessage = await prisma.message.create({
-    data: {
-      user: {
-        connect: { id: user.id },
+    const newMessage = await prisma.message.create({
+      data: {
+        user: {
+          connect: { id: user.id },
+        },
+        carpool: {
+          connect: { id: carpool.id },
+        },
+        content: data.content,
       },
-      carpool: {
-        connect: { id: carpool.id },
-      },
-      content: data.content,
-    },
-  });
+    });
 
-  return NextResponse.json({ newMessage }, { status: 200 });
+    return { newMessage };
+  });
 }
 
 export async function DELETE(body: NextRequest) {
-  const data = await body.json();
-  const { user } = await getUser();
-  if (!user) return NextResponse.json({ error: "User not found" });
+  return handleRoute(async () => {
+    const user = await requireUser();
+    const data = await parseBody(body, deleteMessageSchema);
+    const message = await getMessageByIdOrThrow(data.message.id);
 
-  if (user.id !== data.message.userId)
-    return NextResponse.json(
-      { error: "You are not the owner of this message" },
-      { status: 401 },
-    );
+    assertMembershipThrow(user.id, message.carpool);
+    requireMessageOwnership(user.id, message);
 
-  const message = await prisma.message.findUnique({
-    where: { id: data.message.id },
+    const deletedMessage = await prisma.message.delete({
+      where: { id: message.id },
+    });
+
+    return { deletedMessage };
   });
-
-  if (!message) return NextResponse.json({ error: "Message not found" }, { status: 404 });
-
-  const deletedMessage = await prisma.message.delete({
-    where: { id: message.id },
-  });
-
-  return NextResponse.json({ deletedMessage }, { status: 200 });
 }
 
 export async function PATCH(body: NextRequest) {
-  const data = await body.json();
-  const { user } = await getUser();
+  return handleRoute(async () => {
+    const user = await requireUser();
+    const data = await parseBody(body, editMessageSchema);
+    const message = await getMessageByIdOrThrow(data.message.id);
 
-  if (!user) return NextResponse.json({ error: "User not found" });
-  if (user.id !== data.message.userId)
-    return NextResponse.json(
-      { error: "You are not the owner of this message" },
-      { status: 401 },
-    );
+    assertMembershipThrow(user.id, message.carpool);
+    requireMessageOwnership(user.id, message);
 
-  const message = await prisma.message.findUnique({
-    where: { id: data.message.id },
+    const editedMessage = await prisma.message.update({
+      where: { id: message.id },
+      data: { content: data.message.content, edited: true },
+    });
+
+    return { editedMessage };
   });
-  if (!message) return NextResponse.json({ error: "Message not found" });
-
-  const { error } = newMessageSchema.safeParse(data.message.content);
-  if (error) return NextResponse.json({ error }, { status: 404 });
-
-  const editedMessage = await prisma.message.update({
-    where: { id: data.message.id },
-    data: data.message,
-  });
-
-  return NextResponse.json({ editedMessage }, { status: 200 });
 }

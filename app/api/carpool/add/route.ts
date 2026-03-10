@@ -1,7 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
 import prisma from "@/prisma/prismaClient";
-import { getUser } from "@/app/_helpers/hooks/getUser";
+import { handleRoute } from "@/app/api/_core/handler";
+import { parseBody } from "@/app/api/_core/validation";
+import { requireUser } from "@/app/api/_core/auth";
+import { badRequest } from "@/app/api/_core/responses";
 
 const cords = z.object({
   lat: z.number({ message: "Lat required" }),
@@ -31,55 +34,54 @@ const schema = z.object({
       .max(500, { message: "Description link must be smaller than 500 characters" }),
   ),
   date: z.string().datetime({ offset: true, message: "Date is required" }),
-  price: z.optional(z.number().min(0, { message: "Price must be positive" })),
+  price: z
+    .preprocess(
+      (value) => (value === "" || value == null ? undefined : Number(value)),
+      z.number().min(0, { message: "Price must be positive" }).optional(),
+    )
+    .optional(),
 });
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  return handleRoute(async () => {
+    const user = await requireUser();
+    const body = await parseBody(request, schema);
 
-  const price = parseInt(body.price);
-  const { error } = schema.safeParse({
-    ...body,
-    price: isNaN(price) ? undefined : price,
-  });
-  if (error) return NextResponse.json({ error: error }, { status: 400 });
+    if (new Date(body.date) < new Date()) {
+      return badRequest("Date is in the past");
+    }
 
-  const { user } = await getUser();
-  if (!user) return NextResponse.json({ error: "User not logged in" }, { status: 400 });
-
-  if (new Date(body.date) < new Date())
-    return NextResponse.json({ error: "Date is in the past" }, { status: 400 });
-
-  const destination = body.destination;
-  const origin = body.origin;
-  const route = body.route;
-  const date = body.date;
-  const newCarpool = await prisma.carpool.create({
-    data: {
-      driverId: user.id,
-      originLat: origin.cords.lat,
-      originLng: origin.cords.lng,
-      originName: origin.name,
-      destinationLat: destination.cords.lat,
-      destinationLng: destination.cords.lng,
-      destinationName: destination.name,
-      tournamentSlug: destination.slug,
-      route: route.polyline,
-      distance: route.distance,
-      description: body.description,
-      price: !price ? 0 : price,
-      startTime: date,
-      messages: {
-        create: {
-          serverMessage: true,
-          content: `Carpool has been created.`,
+    const destination = body.destination;
+    const origin = body.origin;
+    const route = body.route;
+    const date = body.date;
+    const newCarpool = await prisma.carpool.create({
+      data: {
+        driverId: user.id,
+        originLat: origin.cords.lat,
+        originLng: origin.cords.lng,
+        originName: origin.name,
+        destinationLat: destination.cords.lat,
+        destinationLng: destination.cords.lng,
+        destinationName: destination.name,
+        tournamentSlug: destination.slug,
+        route: route.polyline,
+        distance: route.distance,
+        description: body.description,
+        price: body.price ?? 0,
+        startTime: date,
+        messages: {
+          create: {
+            serverMessage: true,
+            content: "Carpool has been created.",
+          },
+        },
+        attendees: {
+          connect: { id: user.id },
         },
       },
-      attendees: {
-        connect: [user],
-      },
-    },
-  });
+    });
 
-  return NextResponse.json({ route: newCarpool.route }, { status: 200 });
+    return { route: newCarpool.route };
+  });
 }

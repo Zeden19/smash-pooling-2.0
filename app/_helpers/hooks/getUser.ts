@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 import { Session, User } from "@/prisma/generated/prisma/client";
 
-import { validateSessionToken } from "@/app/api/session";
+import { validateSessionToken } from "@/app/api/_services/sessionService";
 
 export const getUser = cache(
   async (): Promise<{ user: User | null; session: Session | null }> => {

@@ -1,10 +1,12 @@
 import { cookies } from "next/headers";
-import { startgg } from "@/app/api/auth";
+import { startgg } from "@/app/api/_services/startggAuthService";
 import prisma from "@/prisma/prismaClient";
-import { GET_CURRENT_USER } from "@/app/_helpers/services/startggQueries";
 import * as arctic from "arctic";
-import { createSession } from "@/app/api/session";
+import { createSession } from "@/app/api/_services/sessionService";
 import { encodeBase32LowerCaseNoPadding } from "@oslojs/encoding";
+import { getCurrentUser } from "@/app/api/_services/startggService";
+import { handleRoute } from "@/app/api/_core/handler";
+import { AppError, ValidationError } from "@/app/api/_core/errors";
 
 async function createAndSetSession(id: string) {
   const { token } = await createSession(id);
@@ -24,37 +26,34 @@ async function createAndSetSession(id: string) {
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-  const code = url.searchParams.get("code");
-  const state = url.searchParams.get("state");
-  const storedState = (await cookies()).get("startgg_oauth_state")?.value ?? null;
+  return handleRoute(async () => {
+    const url = new URL(request.url);
+    const code = url.searchParams.get("code");
+    const state = url.searchParams.get("state");
+    const storedState = (await cookies()).get("startgg_oauth_state")?.value ?? null;
 
-  if (!code || !state || !storedState || state !== storedState) {
-    return new Response(null, {
-      status: 400,
-    });
-  }
+    if (!code || !state || !storedState || state !== storedState) {
+      throw new ValidationError("Invalid OAuth state");
+    }
 
-  let tokens: arctic.OAuth2Tokens;
-  try {
-    tokens = await startgg.validateAuthorizationCode(code, [
-      "user.identity",
-      "user.email",
-    ]);
+    let tokens: arctic.OAuth2Tokens;
+    try {
+      tokens = await startgg.validateAuthorizationCode(code, [
+        "user.identity",
+        "user.email",
+      ]);
+    } catch (e) {
+      if (e instanceof arctic.OAuth2RequestError) {
+        throw new ValidationError(e.code);
+      }
+      if (e instanceof arctic.ArcticFetchError) {
+        throw new AppError("StartGG is unavailable", 502, "STARTGG_UNAVAILABLE");
+      }
+      throw e;
+    }
+
     const accessToken = tokens.accessToken();
-    const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
-    const refreshToken = tokens.refreshToken();
-
-    const response = await fetch("https://api.start.gg/gql/alpha", {
-      method: "POST",
-      body: JSON.stringify({ query: GET_CURRENT_USER }),
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    const { data }: { data: StartGGResponse } = await response.json();
-    const startGGUser = data.currentUser;
+    const startGGUser = (await getCurrentUser(accessToken)) as StartGGUser;
 
     const existingUser = await prisma.user.findFirst({
       where: {
@@ -80,38 +79,7 @@ export async function GET(request: Request): Promise<Response> {
     });
 
     return createAndSetSession(userId);
-  } catch (e) {
-    if (e instanceof arctic.OAuth2RequestError) {
-      // Invalid authorization code, credentials, or redirect URI
-      console.log(e);
-      const code = e.code;
-      return new Response(code, {
-        status: 500,
-        headers: {
-          Location: "/",
-        },
-      });
-    }
-    if (e instanceof arctic.ArcticFetchError) {
-      // Failed to call `fetch()`
-      const cause = e.cause;
-      console.log(cause);
-      return new Response(null, {
-        status: 404,
-        headers: {
-          Location: "/",
-        },
-      });
-    }
-
-    console.log(e);
-    return new Response(null, {
-      status: 500,
-      headers: {
-        Location: "/",
-      },
-    });
-  }
+  });
 }
 
 function generateSessionId(): string {
@@ -119,10 +87,6 @@ function generateSessionId(): string {
   crypto.getRandomValues(bytes);
 
   return encodeBase32LowerCaseNoPadding(bytes);
-}
-
-interface StartGGResponse {
-  currentUser: StartGGUser;
 }
 
 interface StartGGUser {

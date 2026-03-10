@@ -1,94 +1,87 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { getUser } from "@/app/_helpers/hooks/getUser";
+import { handleRoute } from "@/app/api/_core/handler";
+import {
+  assertDriverThrow,
+  assertMembership,
+  assertMembershipThrow,
+  requireUser,
+} from "@/app/api/_core/auth";
+import { parseId } from "@/app/api/_core/params";
+import { badRequest } from "@/app/api/_core/responses";
+import { getCarpoolByIdOrThrow } from "@/app/api/_services/carpoolService";
+import { parseBody } from "@/app/api/_core/validation";
+import { z } from "zod";
+import { getUserByIdOrThrow } from "@/app/api/_services/userService";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 export async function PATCH(_: NextRequest, { params }: Props) {
-  const { id } = await params;
-  const { user } = await getUser();
-  if (!user)
-    return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+  return handleRoute(async () => {
+    const user = await requireUser();
+    const { id } = await params;
+    const carpoolId = parseId(id);
+    const carpool = await getCarpoolByIdOrThrow(carpoolId);
 
-  const carpool = await prisma.carpool.findUnique({
-    where: { id: parseInt(id) },
-    include: { attendees: true },
-  });
-  if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
+    if (assertMembership(user.id, carpool)) {
+      return badRequest("You are already apart of this carpool");
+    }
 
-  if (carpool.attendees.map((attendee) => attendee.id).includes(user.id))
-    return NextResponse.json(
-      { error: "You are already in this carpool." },
-      { status: 400 },
-    );
-
-  const data = await prisma.carpool.update({
-    where: { id: parseInt(id) },
-    include: {
-      attendees: true,
-    },
-    data: {
-      attendees: {
-        set: [...carpool.attendees, user],
+    return prisma.carpool.update({
+      where: { id: carpoolId },
+      include: {
+        attendees: true,
       },
-      messages: {
-        create: {
-          serverMessage: true,
-          content: `${user.gamertag} has been added to Carpool.`,
+      data: {
+        attendees: {
+          set: [...carpool.attendees, user],
+        },
+        messages: {
+          create: {
+            serverMessage: true,
+            content: `${user.gamertag} has been added to Carpool.`,
+          },
         },
       },
-    },
+    });
   });
-
-  return NextResponse.json(data, { status: 200 });
 }
 
 export async function DELETE(req: NextRequest, { params }: Props) {
-  const { id } = await params;
-  const { user } = await getUser();
-  if (!user)
-    return NextResponse.json(
-      { error: "You cannot remove attendees in this carpool" },
-      { status: 401 },
+  return handleRoute(async () => {
+    const user = await requireUser();
+    const { id } = await params;
+    const carpoolId = parseId(id);
+    const body = await parseBody(
+      req,
+      z.object({ attendeeId: z.string({ message: "attendeeId required" }) }),
     );
 
-  const body = await req.json();
-  const userId = body.attendeeId;
+    const attendeeToDelete = await getUserByIdOrThrow(body.attendeeId);
+    const carpool = await getCarpoolByIdOrThrow(carpoolId);
+    assertMembershipThrow(attendeeToDelete.id, carpool);
+    assertDriverThrow(user.id, carpool);
 
-  const attendeeToDelete = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-
-  if (!attendeeToDelete)
-    return NextResponse.json({ error: "User does not exist" }, { status: 404 });
-
-  const carpool = await prisma.carpool.findUnique({
-    where: { id: parseInt(id) },
-    include: { attendees: true },
-  });
-  if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
-
-  await prisma.carpool.update({
-    where: { id: parseInt(id) },
-    include: {
-      attendees: true,
-    },
-    // technically shouldn't be deleting, just marking as not part of but used to be so they have their data still there
-    data: {
-      id: 30,
-      attendees: {
-        delete: [attendeeToDelete],
+    await prisma.carpool.update({
+      where: { id: carpoolId },
+      include: {
+        attendees: true,
       },
-      messages: {
-        create: {
-          serverMessage: true,
-          content: `${attendeeToDelete.gamertag} has removed from Carpool.`,
+      data: {
+        attendees: {
+          disconnect: { id: attendeeToDelete.id },
+        },
+        messages: {
+          create: {
+            serverMessage: true,
+            content: `${attendeeToDelete.gamertag} has removed from Carpool.`,
+          },
         },
       },
-    },
-  });
+    });
 
-  return NextResponse.json({ deletedAttendee: attendeeToDelete }, { status: 200 });
+    return { deletedAttendee: attendeeToDelete };
+  });
 }

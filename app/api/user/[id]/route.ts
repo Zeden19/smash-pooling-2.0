@@ -1,25 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import { getUser } from "@/app/_helpers/hooks/getUser";
 import { carColours, carData } from "@/app/profile/[id]/CarData";
 import { z } from "zod";
 import { carMakes } from "@/app/api/user/[id]/carMakes";
+import { handleRoute } from "@/app/api/_core/handler";
+import { parseBody } from "@/app/api/_core/validation";
+import { requireUser, requireUserOwnership } from "@/app/api/_core/auth";
+import { badRequest } from "@/app/api/_core/responses";
+import { getUserByIdOrThrow } from "@/app/api/_services/userService";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 export async function GET(_: NextRequest, { params }: Props) {
-  const { id } = await params;
-
-  const data = await prisma.user.findUnique({
-    where: { id },
-    include: { carpoolsAttending: true, carpoolsDriving: true },
+  return handleRoute(async () => {
+    const { id } = await params;
+    const data = await getUserByIdOrThrow(id);
+    return { data };
   });
-
-  if (!data) return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-  return NextResponse.json({ data }, { status: 201 });
 }
 
 const driverSchema = z.object({
@@ -44,48 +43,34 @@ const driverSchema = z.object({
     .max(12, { message: "Car seats must be smaller than 13" }),
 });
 
+// todo make microservice to host this instead of having enermouse json file
 export async function PATCH(req: NextRequest, { params }: Props) {
-  const { id } = await params;
+  return handleRoute(async () => {
+    const { id } = await params;
+    const user = await requireUser();
+    requireUserOwnership(id, user);
 
-  const body = await req.json();
-  const { user } = await getUser();
-  const data = await prisma.user.findUnique({
-    where: { id: id },
-    include: { carpoolsAttending: true, carpoolsDriving: true },
+    const body = await parseBody(req, driverSchema);
+    const carModels = body.carMake ? carData[body.carMake] : null;
+
+    if (!carModels) {
+      throw new badRequest("Invalid car make");
+    }
+
+    if (!carModels.includes(body.carModel)) {
+      return badRequest("Car model does not exist with selected car Make");
+    }
+
+    return prisma.user.update({
+      where: { id },
+      data: {
+        isDriver: true,
+        phoneNumber: body.phoneNumber,
+        fullName: body.fullName,
+        carInfo: body.carMake + " " + body.carModel + " " + body.carColour,
+        carSeats: body.carSeats,
+        licencePlate: body.licencePlate,
+      },
+    });
   });
-
-  if (!data) return NextResponse.json({ error: "User not found" }, { status: 401 });
-
-  if (user?.id !== id)
-    return NextResponse.json({ error: "Access Denied" }, { status: 403 });
-
-  const validation = driverSchema.safeParse(body);
-
-  const carModels = body.carMake
-    ? //@ts-ignore
-      carData[body.carMake]
-    : null;
-
-  if (!carModels?.includes(body.carModel))
-    return NextResponse.json(
-      { error: "Car model does not exist with selected car Make" },
-      { status: 400 },
-    );
-
-  if (validation.error)
-    return NextResponse.json({ error: validation.error.format() }, { status: 400 });
-
-  const driverInfo = await prisma.user.update({
-    where: { id: id },
-    data: {
-      isDriver: true,
-      phoneNumber: body.phoneNumber,
-      fullName: body.fullName,
-      carInfo: body.carMake + " " + body.carModel + " " + body.carColour,
-      carSeats: body.carSeats,
-      licencePlate: body.licencePlate,
-    },
-  });
-
-  return NextResponse.json(driverInfo, { status: 200 });
 }

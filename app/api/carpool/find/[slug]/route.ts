@@ -1,30 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import prisma from "@/prisma/prismaClient";
-import startggClient from "@/app/_helpers/services/startggClient";
-import { CHECK_TOURNAMENT_EXISTS } from "@/app/_helpers/services/startggQueries";
+import { handleRoute } from "@/app/api/_core/handler";
+import { notFound } from "@/app/api/_core/responses";
+import { checkTournamentExists } from "@/app/api/_services/startggService";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 export async function GET(_: NextRequest, { params }: Props) {
-  const { slug } = await params;
-  const { tournament } = await startggClient.request<{ tournament: { id: number } }>(
-    CHECK_TOURNAMENT_EXISTS,
-    {
-      slug,
-    },
-  );
+  return handleRoute(async () => {
+    const { slug } = await params;
+    const { tournament } = await checkTournamentExists(slug);
 
-  if (!tournament)
-    return NextResponse.json({ error: "Tournament does not exist" }, { status: 404 });
+    if (!tournament) {
+      return notFound("Tournament does not exist");
+    }
 
-  const carpools = await prisma.carpool.findMany({
-    where: { tournamentSlug: slug },
+    const carpools = await prisma.carpool.findMany({
+      where: { tournamentSlug: slug },
+    });
+
+    if (carpools.length === 0) {
+      return notFound("No carpools found");
+    }
+
+    return carpools;
   });
-
-  if (carpools.length === 0)
-    return NextResponse.json({ error: "No carpools not found" }, { status: 404 });
-
-  return NextResponse.json(carpools, { status: 200 });
 }

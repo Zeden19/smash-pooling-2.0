@@ -1,5 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getUser } from "@/app/_helpers/hooks/getUser";
+import { NextRequest } from "next/server";
+import { handleRoute } from "@/app/api/_core/handler";
+import {
+  assertDriverThrow,
+  assertMembershipThrow,
+  requireUser,
+} from "@/app/api/_core/auth";
+import { parseId } from "@/app/api/_core/params";
+import { getCarpoolByIdOrThrow } from "@/app/api/_services/carpoolService";
 import prisma from "@/prisma/prismaClient";
 
 interface Props {
@@ -7,34 +14,27 @@ interface Props {
 }
 
 export async function GET(_: NextRequest, { params }: Props) {
-  const { id } = await params;
-  const { user } = await getUser();
-  if (!user)
-    return NextResponse.json({ error: "User not driver of carpool" }, { status: 401 });
+  return handleRoute(async () => {
+    const user = await requireUser();
+    const { id } = await params;
+    const carpoolId = parseId(id);
+    const carpool = await getCarpoolByIdOrThrow(carpoolId);
 
-  const carpool = await prisma.carpool.findUnique({
-    where: { id: parseInt(id) },
-    include: { attendees: true, driver: true, messages: true },
+    assertMembershipThrow(user.id, carpool);
+
+    return carpool;
   });
-  if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
-  if (carpool.driverId !== user.id && !carpool.attendees.includes(user))
-    return NextResponse.json({ error: "User not apart of carpool" });
-
-  return NextResponse.json(carpool, { status: 200 });
 }
 
 export async function DELETE(_: NextRequest, { params }: Props) {
-  const { id } = await params;
-  const { user } = await getUser();
-  const carpool = await prisma.carpool.findUnique({ where: { id: parseInt(id) } });
+  return handleRoute(async () => {
+    const user = await requireUser();
+    const { id } = await params;
+    const carpoolId = parseId(id);
+    const carpool = await getCarpoolByIdOrThrow(carpoolId);
 
-  if (!carpool) return NextResponse.json({ error: "Carpool not found" }, { status: 404 });
+    assertDriverThrow(user.id, carpool);
 
-  if (!user) return NextResponse.json({ error: "User not logged in" }, { status: 404 });
-
-  if (carpool.driverId !== user.id)
-    return NextResponse.json({ error: "User not driver of carpool" }, { status: 401 });
-
-  const data = await prisma.carpool.delete({ where: { id: parseInt(id) } });
-  return NextResponse.json(data, { status: 200 });
+    return prisma.carpool.delete({ where: { id: carpoolId } });
+  });
 }
