@@ -12,8 +12,9 @@ interface Props {
 async function CarpoolLayout({ children, params }: Props) {
   const { id } = await params;
   const { user } = await getUser();
-  console.log(id);
-  if (!user || !id) redirect("/");
+  if (!user) redirect("/login");
+
+  if (!id || id == "edit") redirect(`/profile/${user.id}`);
 
   const carpool = await prisma.carpool.findUnique({
     where: { id: parseInt(id) },

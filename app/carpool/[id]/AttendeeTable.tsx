@@ -39,7 +39,7 @@ function RemoveAttendee({ carpoolId, attendeeId, removeAttendee }: RemoveAttende
   async function remove() {
     setDeleteLoading(true);
     try {
-      const { data } = await axios.delete(`/api/carpool/attendee/${carpoolId}`, {
+      const { data } = await axios.delete(`/api/carpool/${carpoolId}/attendee`, {
         data: { attendeeId: attendeeId },
       });
       SuccessToast("Successfully removed attendee from carpool");

@@ -220,7 +220,7 @@ function AddCarpoolPage() {
       return;
     }
     try {
-      await axios.post("/api/carpool/add", {
+      await axios.post("/api/carpool", {
         origin: originObject,
         destination: destinationObject,
         route,
