@@ -2,7 +2,7 @@
 import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/mapConfig";
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useState } from "react";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import styles from "./styles.module.css";
 import { slug as getSlug } from "@/app/_helpers/services/startggClient";
 import FailureToast from "@/app/_components/toast/FailureToast";
@@ -11,6 +11,7 @@ import type { Carpool } from "@prisma/client";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 import { AdvancedMarker, InfoWindow, Map, Pin, useMap } from "@vis.gl/react-google-maps";
 import { Polyline } from "@/app/carpool/_maps/Polyline";
+import { handleApiError } from "@/app/_helpers/api/handleApiError";
 
 function FindCarpoolPage() {
   const [findingCarpools, setFindingCarpools] = useState(false);
@@ -22,11 +23,8 @@ function FindCarpoolPage() {
     try {
       await axios.patch(`/api/carpool/${id}/attendee`);
       SuccessToast("Successfully attended Carpool!", "Stay safe!");
-    } catch (e: any) {
-      FailureToast(
-        "Could not attend carpool: " + e.response.data.error,
-        "Please try again",
-      );
+    } catch (e) {
+      handleApiError(e, "Could not attend carpool");
     }
   }
 
@@ -52,12 +50,9 @@ function FindCarpoolPage() {
       const { data } = await axios.get<Carpool[]>(`/api/carpool/find/${slug}`);
       carpools = data;
     } catch (e: any) {
-      if (e instanceof AxiosError) {
-        setFindingCarpools(false);
-        return FailureToast(e.response?.data.error);
-      }
-      FailureToast("Could not Find Carpool");
+      handleApiError(e, "Could not Find Carpool");
       setFindingCarpools(false);
+      return;
     }
 
     setCarpools(carpools);

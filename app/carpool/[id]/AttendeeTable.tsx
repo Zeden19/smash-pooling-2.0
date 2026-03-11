@@ -12,7 +12,7 @@ import { Crown, UserRoundMinus } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import SuccessToast from "@/app/_components/toast/SuccessToast";
-import FailureToast from "@/app/_components/toast/FailureToast";
+import { handleApiError } from "@/app/_helpers/api/handleApiError";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -45,7 +45,7 @@ function RemoveAttendee({ carpoolId, attendeeId, removeAttendee }: RemoveAttende
       SuccessToast("Successfully removed attendee from carpool");
       removeAttendee(data.deletedAttendee);
     } catch (e) {
-      FailureToast("Could not delete user");
+      handleApiError(e, "Could not delete user");
     } finally {
       setDeleteLoading(false);
       setOpen(false);

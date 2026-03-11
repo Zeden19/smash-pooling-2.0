@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import SuccessToast from "@/app/_components/toast/SuccessToast";
 import { useRouter } from "next/navigation";
-import FailureToast from "@/app/_components/toast/FailureToast";
+import { handleApiError } from "@/app/_helpers/api/handleApiError";
 
 interface Props {
   carpoolId: number;
@@ -28,8 +28,7 @@ export function DeleteCarpoolDialog({ carpoolId }: Props) {
       SuccessToast("Carpool deleted successfully.");
       router.push("/carpool/edit");
     } catch (e: any) {
-      console.log(e);
-      FailureToast("Could not delete carpool", e.response);
+      handleApiError(e, "Could not delete carpool");
     }
   }
 

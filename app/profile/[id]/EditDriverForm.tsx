@@ -26,6 +26,7 @@ import SuccessToast from "@/app/_components/toast/SuccessToast";
 import { LoadingSpinner } from "@/app/_components/LoadingSpinner";
 import { User } from "@/prisma/generated/prisma/client";
 import { z } from "zod";
+import { handleApiError } from "@/app/_helpers/api/handleApiError";
 
 const driverSchema = z.object({
   fullName: z
@@ -91,8 +92,7 @@ function NewDriverForm({ user, setUser }: Props) {
       setUser(data);
       setOpen(false);
     } catch (e) {
-      console.error(e);
-      FailureToast("Could not update data", "Please try again");
+      handleApiError(e, "Could not update data");
     } finally {
       setLoading(false);
     }

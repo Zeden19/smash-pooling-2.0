@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { useChannel } from "ably/react";
 import { ALBY_CHAT_NAME } from "@/app/carpool/[id]/Chat/AlbyProvider";
 import SendMessage from "@/app/carpool/[id]/Chat/SendMessage";
-import FailureToast from "@/app/_components/toast/FailureToast";
+import { handleApiError } from "@/app/_helpers/api/handleApiError";
 import { useMessageStore } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 
 interface Props {
@@ -54,8 +54,7 @@ function ChatWindow({ carpoolId, chatroomName, chatroomUsers, currentUser }: Pro
     try {
       await updateFnc(); // await is needed here so catch can actually catch the errors
     } catch (e) {
-      console.log(e);
-      FailureToast(errorMessage);
+      handleApiError(e, errorMessage);
       messageStore.revertMessages(prevMessages);
       errorFnc();
     }

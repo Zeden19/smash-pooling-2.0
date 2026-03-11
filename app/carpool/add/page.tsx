@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Label } from "@/components/ui/label";
 import { DateTimePicker } from "@/components/DateTimePicker";
+import { handleApiError } from "@/app/_helpers/api/handleApiError";
 import { Polyline } from "@/app/carpool/_maps/Polyline";
 import LatLngLiteral = google.maps.LatLngLiteral;
 
@@ -229,24 +230,8 @@ function AddCarpoolPage() {
         date: date.dateTime,
       });
       SuccessToast("Successfully Added Carpool", "Your good to go!");
-    } catch (e: any) {
-      console.log(e);
-      console.log(e.response.data.error);
-      if (e.response.data.error.name === "ZodError") {
-        FailureToast(
-          "Could Not Add Carpool",
-          e.response.data.error.issues.map(
-            (error: { message: string }) => error.message + "\n",
-          ),
-        );
-      } else if (e.response.data.error) {
-        FailureToast("Could Not Add Carpool", e.response.data.error);
-      } else {
-        FailureToast(
-          "Could Not Add Carpool",
-          "Try again or report this error if it persists",
-        );
-      }
+    } catch (e) {
+      handleApiError(e, "Could Not Add Carpool");
     }
   }
 
