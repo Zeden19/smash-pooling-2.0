@@ -1,6 +1,5 @@
 "use client";
 import { useCarpool } from "@/app/carpool/[id]/CarpoolContext";
-import React, { useEffect, useState } from "react";
 import { mapProps } from "@/app/carpool/_maps/mapConfig";
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,38 +8,29 @@ import { Map } from "@vis.gl/react-google-maps";
 
 function EditPage() {
   const { carpool } = useCarpool();
-  const [data, setData] = useState<{ label: string; value: React.ReactNode }[] | null>(
-    null,
-  );
-
-  if (!carpool) return null;
-
-  useEffect(() => {
-    setData([
-      {
-        label: "Tournament",
-        value: (
-          <Input
-            defaultValue={makeTitle(carpool.tournamentSlug)}
-            placeholder={"Tournament"}
-          />
-        ),
-      },
-      {
-        label: "Origin",
-        value: <Input defaultValue={carpool.originName} placeholder={"Origin"} />,
-      },
-      {
-        label: "Description",
-        value: <Textarea placeholder={"Description"}>{carpool.description}</Textarea>,
-      },
-      {
-        label: "Price",
-        value: <Input defaultValue={carpool.price} placeholder={"Price"}></Input>,
-      },
-    ]);
-  }, [carpool]);
-
+  const data = [
+    {
+      label: "Tournament",
+      value: (
+        <Input
+          defaultValue={makeTitle(carpool.tournamentSlug)}
+          placeholder={"Tournament"}
+        />
+      ),
+    },
+    {
+      label: "Origin",
+      value: <Input defaultValue={carpool.originName} placeholder={"Origin"} />,
+    },
+    {
+      label: "Description",
+      value: <Textarea placeholder={"Description"}>{carpool.description}</Textarea>,
+    },
+    {
+      label: "Price",
+      value: <Input defaultValue={carpool.price} placeholder={"Price"}></Input>,
+    },
+  ];
   return (
     <div className="m-4">
       <h2 className="text-4xl font-bold mb-3">Edit Carpool Info</h2>

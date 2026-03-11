@@ -3,19 +3,12 @@ import { mapProps, orangeMarker, polylineOptions } from "@/app/carpool/_maps/map
 import { makeTitle } from "@/app/_helpers/functions/makeTitle";
 import { DriverInfo } from "@/app/_components/DriverInfo";
 import { DeleteCarpoolDialog } from "@/app/carpool/[id]/DeleteCarpoolDialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import ChatWindow from "@/app/carpool/[id]/Chat/ChatWindow";
 import dynamic from "next/dynamic";
 import { MessageStoreProvider } from "@/app/carpool/[id]/Chat/MessageStoreProvider";
 import AttendeeTable from "@/app/carpool/[id]/AttendeeTable";
 import { AdvancedMarker, Map, Pin } from "@vis.gl/react-google-maps";
-import { useEffect, useState } from "react";
-import { User } from "@/prisma/generated/prisma/client";
 import { Polyline } from "@/app/carpool/_maps/Polyline";
 import { useCarpool } from "@/app/carpool/[id]/CarpoolContext";
 import { useRouter } from "next/navigation";
@@ -28,23 +21,15 @@ const AlbyProvider = dynamic(() => import("./Chat/AlbyProvider"), {
 function CarpoolPage() {
   const router = useRouter();
   const { carpool, user, id } = useCarpool();
-  let [carpoolInfo, setCarpoolInfo] = useState<{ title: string; value: string }[] | null>(
-    null,
-  );
-  const [driver, setDriver] = useState<User | null>(null);
+  const carpoolInfo = [
+    { title: "Tournament:", value: makeTitle(carpool.tournamentSlug) },
+    { title: "Origin:", value: carpool.originName },
+    { title: "Distance:", value: carpool.distance },
+    { title: "Status:", value: carpool.status },
+    { title: "Price", value: "$" + carpool.price },
+  ];
+  const driver = carpool.driver;
   const isDriver = user.id == driver?.id;
-
-  useEffect(() => {
-    if (!carpool) return;
-    setCarpoolInfo([
-      { title: "Tournament:", value: makeTitle(carpool.tournamentSlug) },
-      { title: "Origin:", value: carpool.originName },
-      { title: "Distance:", value: carpool.distance },
-      { title: "Status:", value: carpool.status },
-      { title: "Price", value: "$" + carpool.price },
-    ]);
-    setDriver(carpool.driver);
-  }, [carpool]);
   return (
     carpool &&
     carpoolInfo &&

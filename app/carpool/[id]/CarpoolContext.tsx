@@ -8,7 +8,7 @@ export type CarpoolProps = Prisma.CarpoolGetPayload<{
 }>;
 
 interface Context {
-  carpool: CarpoolProps | null;
+  carpool: CarpoolProps;
   user: User;
   id: string;
 }

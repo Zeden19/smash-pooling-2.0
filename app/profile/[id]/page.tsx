@@ -1,8 +1,8 @@
 import { UserInfo } from "@/app/profile/[id]/UserInfo";
-import prisma from "@/prisma/prismaClient";
 import { redirect } from "next/navigation";
 import { getUser } from "@/app/_helpers/hooks/getUser";
 import CarpoolTable from "./CarpoolsTable";
+import { getUserById } from "@/app/api/_services/userService";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -10,13 +10,7 @@ interface Props {
 
 async function ProfilePage({ params }: Props) {
   const { id } = await params;
-  const user = await prisma.user.findUnique({
-    where: { id },
-    include: {
-      carpoolsAttending: true,
-      carpoolsDriving: true,
-    },
-  });
+  const user = await getUserById(id);
 
   const { user: validatedUser } = await getUser();
 

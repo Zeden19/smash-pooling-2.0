@@ -1,8 +1,8 @@
 import React from "react";
 import { CarpoolProvider } from "./CarpoolContext";
-import prisma from "@/prisma/prismaClient";
 import { getUser } from "@/app/_helpers/hooks/getUser";
 import { redirect } from "next/navigation";
+import { getCarpoolById } from "@/app/api/_services/carpoolService";
 
 interface Props {
   children: React.ReactNode;
@@ -16,12 +16,9 @@ async function CarpoolLayout({ children, params }: Props) {
 
   if (!id || id == "edit") redirect(`/profile/${user.id}`);
 
-  const carpool = await prisma.carpool.findUnique({
-    where: { id: parseInt(id) },
-    include: { attendees: true, driver: true, messages: true },
-  });
-  if (!carpool) return;
-  if (!carpool.attendees.map((attendee) => attendee.id).includes(user.id)) return;
+  const carpool = await getCarpoolById(parseInt(id));
+  if (!carpool) redirect("/");
+  if (!carpool.attendees.map((attendee) => attendee.id).includes(user.id)) redirect("/");
   return <CarpoolProvider value={{ carpool, user, id }}>{children}</CarpoolProvider>;
 }
 
