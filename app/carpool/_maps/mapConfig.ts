@@ -31,3 +31,12 @@ export const orangeMarker: PinElementOptions = {
   borderColor: "#d17700",
   glyphColor: "#d17700",
 };
+
+export const blueMarker: PinElementOptions = {
+  background: "#2563eb",
+  borderColor: "#1d4ed8",
+  glyphColor: "#1d4ed8",
+};
+
+export const routeColors = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6"];
+export const selectedRouteColor = "#22c55e";

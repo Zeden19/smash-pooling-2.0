@@ -13,7 +13,9 @@ function CarpoolLayout({ children }: Props) {
     return null;
   }
   return (
-    <APIProvider libraries={["geocoding", "routes", "marker", "core"]} apiKey={key}>
+    <APIProvider
+      libraries={["geocoding", "routes", "marker", "core", "geometry"]}
+      apiKey={key}>
       {children}
     </APIProvider>
   );

@@ -82,6 +82,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return { route: newCarpool.route };
+    return { id: newCarpool.id, route: newCarpool.route };
   });
 }

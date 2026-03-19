@@ -4,6 +4,7 @@ export const GET_TOURNAMENT_BY_URL =
   "    name\n" +
   "    lat\n" +
   "    lng\n" +
+  "    startAt\n" +
   "    id\n" +
   "    mapsPlaceId\n" +
   "    state\n" +

@@ -15,9 +15,10 @@ interface Props {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
   error: boolean;
+  maxDate?: Date;
 }
 
-export function DateTimePicker({ date, setDate, error }: Props) {
+export function DateTimePicker({ date, setDate, error, maxDate }: Props) {
   /**
    * carry over the current time when a user clicks a new day
    * instead of resetting to 00:00
@@ -55,6 +56,7 @@ export function DateTimePicker({ date, setDate, error }: Props) {
           <Calendar
             required
             fromDate={new Date()}
+            toDate={maxDate}
             mode="single"
             selected={date}
             onSelect={(d) => handleSelect(d)}
